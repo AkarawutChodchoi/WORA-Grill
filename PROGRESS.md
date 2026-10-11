@@ -7,7 +7,7 @@ Status legend: ✅ implemented & verified (tests/typecheck/build run) · 🟡 pa
 | 01 | Project audit & plan | ✅ | `docs/01-implementation-plan.md` |
 | 02 | Architecture & data model | ✅ | `docs/02-data-model.md`, core schema + migration 0000 |
 | 03 | Design system & app shell | ✅ | Tokens in `web/src/styles.css`, UI kit `web/src/components/ui`, role-filtered shell `web/src/layouts/AppLayout.tsx` |
-| 04 | Auth, roles, audit log | ⬜ | |
+| 04 | Auth, roles, audit log | ✅ | Email+password, PIN on paired devices, RBAC w/ branch scope, manager-PIN approval, lockout, CSRF header, audit log UI |
 | 05 | Menu, modifiers, pricing | ⬜ | |
 | 06 | Tables & floor plan | ⬜ | |
 | 07 | POS orders | ⬜ | |

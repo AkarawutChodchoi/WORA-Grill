@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { LayoutDashboard } from 'lucide-react';
+import { History, LayoutDashboard, MonitorSmartphone, ShieldCheck, Users } from 'lucide-react';
 import type { Permission } from '@shared/permissions';
 
 export interface NavItem {
@@ -25,6 +25,15 @@ export const NAV: NavGroup[] = [
   {
     label: 'ภาพรวม',
     items: [{ to: '/', label: 'หน้าหลัก', icon: LayoutDashboard, anyOf: [] }],
+  },
+  {
+    label: 'ระบบ',
+    items: [
+      { to: '/admin/users', label: 'ผู้ใช้', icon: Users, anyOf: ['user.manage'] },
+      { to: '/admin/roles', label: 'บทบาท', icon: ShieldCheck, anyOf: ['user.manage'] },
+      { to: '/admin/devices', label: 'อุปกรณ์', icon: MonitorSmartphone, anyOf: ['device.manage'] },
+      { to: '/admin/audit', label: 'Audit Log', icon: History, anyOf: ['audit.view'] },
+    ],
   },
 ];
 
