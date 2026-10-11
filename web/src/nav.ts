@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { BookOpen, Grid3x3, History, LayoutDashboard, MonitorSmartphone, ShieldCheck, Users } from 'lucide-react';
+import { BookOpen, Calculator, Grid3x3, History, LayoutDashboard, MonitorSmartphone, ShieldCheck, Users } from 'lucide-react';
 import type { Permission } from '@shared/permissions';
 
 export interface NavItem {
@@ -28,7 +28,10 @@ export const NAV: NavGroup[] = [
   },
   {
     label: 'หน้าร้าน',
-    items: [{ to: '/tables', label: 'ผังโต๊ะ', icon: Grid3x3, anyOf: ['table.view'] }],
+    items: [
+      { to: '/pos', label: 'POS / บิล', icon: Calculator, anyOf: ['order.view'] },
+      { to: '/tables', label: 'ผังโต๊ะ', icon: Grid3x3, anyOf: ['table.view'] },
+    ],
   },
   {
     label: 'หลังร้าน',

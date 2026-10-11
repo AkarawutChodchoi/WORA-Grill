@@ -10,7 +10,7 @@ Status legend: ✅ implemented & verified (tests/typecheck/build run) · 🟡 pa
 | 04 | Auth, roles, audit log | ✅ | Email+password, PIN on paired devices, RBAC w/ branch scope, manager-PIN approval, lockout, CSRF header, audit log UI |
 | 05 | Menu, modifiers, pricing | ✅ | Categories/items/modifier groups/combos, th/en/zh names, branch+channel prices, time windows, 86 propagation event, image upload w/ magic-byte check, stations |
 | 06 | Tables & floor plan | ✅ | Zones, tables, drag/keyboard floor-plan editor, derived statuses, open/move/join/unjoin with row locks + partial unique index, WebSocket gateway + polling fallback |
-| 07 | POS orders | ⬜ | |
+| 07 | POS orders | ✅ | Tested totals engine (shared/pricing.ts), idempotent client-id lines, draft vs send, hold/fire courses, cancel/void w/ reason+approval, split/merge, barcode entry, POS screen |
 | 08 | Payments, shifts, receipts | ⬜ | |
 | 09 | KDS | ⬜ | |
 | 10 | Recipes & inventory | ⬜ | |

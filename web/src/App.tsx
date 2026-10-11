@@ -11,6 +11,8 @@ import { SetupPage } from './features/auth/SetupPage';
 import { HomePage } from './features/home/HomePage';
 import { MenuPage } from './features/menu/MenuPage';
 import { TablesPage } from './features/tables/TablesPage';
+import { OrderScreen } from './features/pos/OrderScreen';
+import { PosHome } from './features/pos/PosHome';
 import { AppLayout, RequireAuth, RequirePermission } from './layouts/AppLayout';
 import type { Permission } from '@shared/permissions';
 import { ApiError } from './lib/api';
@@ -38,6 +40,14 @@ export function AppRoutes() {
       <Route path="/setup" element={<SetupPage />} />
       <Route path="/pin" element={<PinPage />} />
       <Route
+        path="/pos/orders/:id"
+        element={
+          <RequireAuth>
+            {guard(['order.view', 'order.create'], <OrderScreen />)}
+          </RequireAuth>
+        }
+      />
+      <Route
         element={
           <RequireAuth>
             <AppLayout />
@@ -45,6 +55,7 @@ export function AppRoutes() {
         }
       >
         <Route index element={<HomePage />} />
+        <Route path="pos" element={guard(['order.view'], <PosHome />)} />
         <Route path="tables" element={guard(['table.view'], <TablesPage />)} />
         <Route path="menu" element={guard(['menu.view'], <MenuPage />)} />
         <Route path="admin/users" element={guard(['user.manage'], <UsersPage />)} />

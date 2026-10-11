@@ -10,6 +10,9 @@ import { userRoles, users } from '../src/db/schema';
 import { hashSecret } from '../src/lib/crypto';
 import { EventBus } from '../src/lib/events';
 import { bootstrapOrganization } from '../src/modules/auth/bootstrap';
+import { seedDemoData } from '../src/db/seed-demo';
+import { eq } from 'drizzle-orm';
+import { diningTables, menuItems } from '../src/db/schema';
 
 export const TEST_PASSWORD = 'test-password-123';
 export const TEST_PIN = '2468';
@@ -85,7 +88,7 @@ export interface TestEnv {
 }
 
 /** Fresh in-memory Postgres + app + one org/branch with one user per system role. */
-export async function createTestEnv(): Promise<TestEnv> {
+export async function createTestEnv(opts: { demo?: boolean } = {}): Promise<TestEnv> {
   const database = await openDatabase({ memory: true });
   await database.migrate();
   const db = database.db;
@@ -109,6 +112,7 @@ export async function createTestEnv(): Promise<TestEnv> {
     await db.insert(userRoles).values({ userId: u.id, roleId: boot.roleIds[role], branchId: boot.branch.id });
     userIds[role] = u.id;
   }
+  if (opts.demo) await db.transaction((tx) => seedDemoData(tx, boot.org.id, boot.branch.id, boot.owner.id));
   const cache = new Map<SystemRole, string>();
   return {
     app,
@@ -133,4 +137,14 @@ export async function createTestEnv(): Promise<TestEnv> {
       await database.close();
     },
   };
+}
+
+/** Demo menu item id by SKU (requires createTestEnv({ demo: true })). */
+export async function itemBySku(env: TestEnv, sku: string) {
+  const [i] = await env.db.select().from(menuItems).where(eq(menuItems.sku, sku));
+  return i;
+}
+export async function tableByName(env: TestEnv, name: string) {
+  const [t] = await env.db.select().from(diningTables).where(eq(diningTables.name, name));
+  return t;
 }

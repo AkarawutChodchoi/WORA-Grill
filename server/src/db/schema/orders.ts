@@ -34,6 +34,7 @@ export const orders = pgTable(
     customerPhone: text('customer_phone'),
     externalRef: text('external_ref'),
     mergedIntoOrderId: uuid('merged_into_order_id'),
+    splitFromOrderId: uuid('split_from_order_id'),
     shiftId: uuid('shift_id'),
     openedBy: uuid('opened_by').references(() => users.id),
     closedBy: uuid('closed_by').references(() => users.id),
@@ -124,4 +125,31 @@ export const orderItems = pgTable(
     index('order_items_branch_status_idx').on(t.branchId, t.status),
     index('order_items_menu_idx').on(t.menuItemId),
   ],
+);
+
+/** Discounts applied to a bill or a single line, with who granted/approved them (SPEC §3.1). */
+export const orderDiscounts = pgTable(
+  'order_discounts',
+  {
+    id: pk(),
+    orderId: uuid('order_id').notNull().references(() => orders.id),
+    organizationId: uuid('organization_id').notNull().references(() => organizations.id),
+    branchId: uuid('branch_id').notNull().references(() => branches.id),
+    scope: text('scope', { enum: ['BILL', 'ITEM'] }).notNull(),
+    orderItemId: uuid('order_item_id').references(() => orderItems.id),
+    type: text('type', { enum: ['PERCENT', 'AMOUNT'] }).notNull(),
+    /** bps for PERCENT, satang for AMOUNT */
+    value: integer('value').notNull(),
+    /** Satang actually deducted, snapshotted at each recalculation. */
+    amountSatang: integer('amount_satang').notNull().default(0),
+    reason: text('reason'),
+    promotionId: uuid('promotion_id'),
+    couponCode: text('coupon_code'),
+    createdBy: uuid('created_by').references(() => users.id),
+    approvedBy: uuid('approved_by').references(() => users.id),
+    removedAt: ts('removed_at'),
+    removedBy: uuid('removed_by').references(() => users.id),
+    createdAt: createdAt(),
+  },
+  (t) => [index('order_discounts_order_idx').on(t.orderId)],
 );
