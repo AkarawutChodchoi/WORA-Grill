@@ -9,6 +9,7 @@ import { LoginPage } from './features/auth/LoginPage';
 import { PinPage } from './features/auth/PinPage';
 import { SetupPage } from './features/auth/SetupPage';
 import { HomePage } from './features/home/HomePage';
+import { MenuPage } from './features/menu/MenuPage';
 import { AppLayout, RequireAuth, RequirePermission } from './layouts/AppLayout';
 import type { Permission } from '@shared/permissions';
 import { ApiError } from './lib/api';
@@ -42,6 +43,7 @@ export function AppRoutes() {
         }
       >
         <Route index element={<HomePage />} />
+        <Route path="menu" element={guard(['menu.view'], <MenuPage />)} />
         <Route path="admin/users" element={guard(['user.manage'], <UsersPage />)} />
         <Route path="admin/roles" element={guard(['user.manage'], <RolesPage />)} />
         <Route path="admin/devices" element={guard(['device.manage'], <DevicesPage />)} />

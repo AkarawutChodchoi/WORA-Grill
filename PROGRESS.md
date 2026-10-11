@@ -8,7 +8,7 @@ Status legend: ✅ implemented & verified (tests/typecheck/build run) · 🟡 pa
 | 02 | Architecture & data model | ✅ | `docs/02-data-model.md`, core schema + migration 0000 |
 | 03 | Design system & app shell | ✅ | Tokens in `web/src/styles.css`, UI kit `web/src/components/ui`, role-filtered shell `web/src/layouts/AppLayout.tsx` |
 | 04 | Auth, roles, audit log | ✅ | Email+password, PIN on paired devices, RBAC w/ branch scope, manager-PIN approval, lockout, CSRF header, audit log UI |
-| 05 | Menu, modifiers, pricing | ⬜ | |
+| 05 | Menu, modifiers, pricing | ✅ | Categories/items/modifier groups/combos, th/en/zh names, branch+channel prices, time windows, 86 propagation event, image upload w/ magic-byte check, stations |
 | 06 | Tables & floor plan | ⬜ | |
 | 07 | POS orders | ⬜ | |
 | 08 | Payments, shifts, receipts | ⬜ | |

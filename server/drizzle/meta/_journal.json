@@ -15,6 +15,13 @@
       "when": 1791733903916,
       "tag": "0001_devices",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791734280954,
+      "tag": "0002_menu",
+      "breakpoints": true
     }
   ]
 }
