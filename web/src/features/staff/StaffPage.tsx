@@ -1,3 +1,4 @@
+import { ROLE_LABELS, type SystemRole } from '@shared/permissions';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Clock, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
@@ -46,7 +47,7 @@ export function ClockWidget() {
   if (!can('attendance.self') || !q.data) return null;
   return (
     <div className="mb-5 flex flex-wrap items-center gap-3 rounded-panel border border-line bg-surface px-4 py-3">
-      <Clock className="size-5 text-basil" />
+      <Clock className="size-5 text-brand" />
       <span className="flex-1">{q.data.open ? `เข้างานเมื่อ ${fmtTime(q.data.open.clockInAt)}` : 'ยังไม่ได้ลงเวลาเข้างาน'}</span>
       {q.data.open ? (
         <Button variant="outline" loading={clock.isPending} onClick={() => clock.mutate('out')}>
@@ -158,7 +159,7 @@ function ScheduleTab({ staff }: { staff: StaffRow[] }) {
           </Button>
         </div>
       </Panel>
-      <div className="mb-2 flex items-center gap-2">
+      <div className="mb-2 flex flex-wrap items-center gap-2">
         <Button size="sm" variant="ghost" onClick={() => setWeekStart(addDays(weekStart, -7))}>
           ‹ สัปดาห์ก่อน
         </Button>
@@ -186,8 +187,8 @@ function ScheduleTab({ staff }: { staff: StaffRow[] }) {
                             {fmtTime(s.startsAt)}–{fmtTime(s.endsAt)} {s.position}
                           </span>
                         </span>
-                        <button type="button" aria-label="ลบกะ" className="text-ink-3 hover:text-chili" onClick={() => remove.mutate(s.id)}>
-                          <Trash2 className="size-3.5" />
+                        <button type="button" aria-label="ลบกะ" className="-m-1 rounded p-2 text-ink-3 hover:text-chili" onClick={() => confirm('ลบกะนี้?') && remove.mutate(s.id)}>
+                          <Trash2 className="size-4" />
                         </button>
                       </li>
                     ))}
@@ -304,7 +305,7 @@ export function StaffPage() {
               columns={[
                 { key: 'n', header: 'ชื่อ', cell: (r) => <span className="font-medium">{r.name}</span> },
                 { key: 'p', header: 'ตำแหน่ง', cell: (r) => r.position ?? '—' },
-                { key: 'r', header: 'บทบาท', cell: (r) => r.roles.join(', ') },
+                { key: 'r', header: 'บทบาท', cell: (r) => r.roles.map((x) => ROLE_LABELS[x as SystemRole] ?? x).join(', ') },
                 { key: 'w', header: 'ค่าจ้าง', cell: (r) => (r.wageType ? `${WAGE[r.wageType]} ${r.wageRateSatang ? formatBaht(r.wageRateSatang) : ''}` : '—') },
                 { key: 's', header: 'สถานะ', cell: (r) => (r.isActive ? <Badge tone="success">ใช้งาน</Badge> : <Badge>ปิด</Badge>) },
               ]}

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Download, Plus } from 'lucide-react';
 import { useState } from 'react';
-import { Badge, Button, Checkbox, ConfirmDialog, DataTable, Dialog, EmptyState, Input, PageHeader, Panel, QueryView, Textarea, useToast } from '../../components/ui';
+import { Badge, StatusBadge, Button, Checkbox, ConfirmDialog, DataTable, Dialog, EmptyState, Input, PageHeader, Panel, QueryView, Textarea, useToast } from '../../components/ui';
 import { errorMessage, get, patch, post } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
 import { fmtDate, fmtDateTime, formatBaht } from '../../lib/format';
@@ -164,7 +164,7 @@ function CustomerDrawer({ id, onClose }: { id: string; onClose: () => void }) {
                       ส่งออกข้อมูล (PDPA)
                     </Button>
                     {!d.customer.anonymizedAt && (
-                      <Button size="sm" variant="ghost" className="text-chili" onClick={() => setAnon(true)}>
+                      <Button size="sm" variant="danger-ghost" onClick={() => setAnon(true)}>
                         ลบข้อมูลส่วนบุคคล
                       </Button>
                     )}
@@ -206,7 +206,7 @@ function CustomerDrawer({ id, onClose }: { id: string; onClose: () => void }) {
                     columns={[
                       { key: 'n', header: 'บิล', cell: (r) => `#${r.orderNo}` },
                       { key: 'd', header: 'วันที่', cell: (r) => fmtDate(r.businessDate) },
-                      { key: 's', header: 'สถานะ', cell: (r) => <Badge>{r.status}</Badge> },
+                      { key: 's', header: 'สถานะ', cell: (r) => <StatusBadge status={r.status} /> },
                       { key: 't', header: 'ยอด', align: 'right', cell: (r) => formatBaht(r.grandTotalSatang) },
                     ]}
                   />

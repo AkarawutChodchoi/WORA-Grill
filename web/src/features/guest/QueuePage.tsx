@@ -15,7 +15,7 @@ export function QueuePage() {
     <main className="mx-auto flex min-h-dvh max-w-sm flex-col items-center justify-center gap-3 p-6 text-center">
       <p className="text-ink-2">{d.branchName}</p>
       <p className="text-sm text-ink-3">บัตรคิว / Queue</p>
-      <p className="num text-7xl font-bold text-basil" aria-live="polite">
+      <p className="num text-7xl font-bold text-brand" aria-live="polite">
         {d.queueNo}
       </p>
       <p className="text-ink-2">{d.partySize} ท่าน</p>
@@ -68,7 +68,7 @@ export function BookingPage() {
         >
           <Input label="ชื่อ" required value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
           <Input label="เบอร์โทร" required inputMode="tel" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} />
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             <Input label="จำนวนคน" type="number" min={1} max={20} value={f.partySize} onChange={(e) => setF({ ...f, partySize: Number(e.target.value) })} />
             <Input label="วันที่" type="date" required value={f.date} onChange={(e) => setF({ ...f, date: e.target.value })} />
             <Input label="เวลา" type="time" required value={f.time} onChange={(e) => setF({ ...f, time: e.target.value })} />

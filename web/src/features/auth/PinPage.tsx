@@ -30,7 +30,7 @@ export function PinPad({ value, onChange, onSubmit, disabled }: { value: string;
     <div>
       <div className="mb-4 flex justify-center gap-3" aria-label={`ใส่ PIN แล้ว ${value.length} หลัก`}>
         {Array.from({ length: 6 }, (_, i) => (
-          <span key={i} className={clsx('size-3.5 rounded-full border-2', i < value.length ? 'border-basil bg-basil' : 'border-line-strong', i >= 4 && i >= value.length && 'opacity-40')} />
+          <span key={i} className={clsx('size-3.5 rounded-full border-2', i < value.length ? 'border-brand bg-brand' : 'border-line-strong', i >= 4 && i >= value.length && 'opacity-40')} />
         ))}
       </div>
       <div className="grid grid-cols-3 gap-2">
@@ -124,7 +124,7 @@ export function PinPage() {
           <ul className="grid grid-cols-2 gap-2">
             {staff.data?.users.map((u) => (
               <li key={u.id}>
-                <button type="button" onClick={() => setUserId(u.id)} className="flex w-full items-center gap-2 rounded-control border border-line px-3 py-3 text-left hover:border-basil hover:bg-basil-50">
+                <button type="button" onClick={() => setUserId(u.id)} className="flex w-full items-center gap-2 rounded-control border border-line px-3 py-3 text-left hover:border-brand hover:bg-basil-50">
                   <UserRound className="size-5 text-ink-3" />
                   <span className="truncate font-medium">{u.name}</span>
                 </button>

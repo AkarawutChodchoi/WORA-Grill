@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toSatang } from '@shared/money';
-import { Badge, Button, Checkbox, DataTable, Dialog, EmptyState, Input, MoneyInput, PageHeader, Panel, QueryView, Select, Tabs, Textarea, useToast } from '../../components/ui';
+import { Badge, Button, Checkbox, DataTable, Dialog, EmptyState, ErrorState, Input, LoadingBlock, MoneyInput, PageHeader, Panel, QueryView, Select, Tabs, Textarea, useToast } from '../../components/ui';
 import { errorMessage, get, post, put } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
 import { fmtDate, fmtDateTime, formatBaht, todayISO } from '../../lib/format';
@@ -324,7 +324,12 @@ function PoDetailDialog({ id, suppliers, ingredients, onClose }: { id: string; s
   const [receive, setReceive] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
   const act = useP((a: string) => post(`/purchasing/orders/${id}/${a}`, a === 'reject' ? { reason: rejectReason } : {}), 'อัปเดตสถานะแล้ว');
-  if (!q.data) return null;
+  if (!q.data)
+    return (
+      <Dialog open onClose={onClose} size="xl" title="ใบสั่งซื้อ">
+        {q.error ? <ErrorState error={q.error} onRetry={() => q.refetch()} /> : <LoadingBlock />}
+      </Dialog>
+    );
   const po = q.data;
   return (
     <Dialog open onClose={onClose} size="xl" title={`${po.poNo} · ${po.supplier.name}`}>
@@ -373,7 +378,7 @@ function PoDetailDialog({ id, suppliers, ingredients, onClose }: { id: string; s
         )}
         {['APPROVED', 'ORDERED', 'PARTIAL'].includes(po.status) && can('stock.receive') && <Button onClick={() => setReceive(true)}>รับของ</Button>}
         {['DRAFT', 'SUBMITTED', 'APPROVED', 'ORDERED', 'REJECTED'].includes(po.status) && can('purchase.create') && (
-          <Button variant="ghost" className="text-chili" onClick={() => act.mutate('cancel')}>
+          <Button variant="danger-ghost" onClick={() => confirm(`ยกเลิกใบสั่งซื้อ ${po.poNo ?? ''}?`) && act.mutate('cancel')}>
             ยกเลิกใบสั่งซื้อ
           </Button>
         )}
@@ -425,6 +430,11 @@ function OrdersTab() {
         )}
       </QueryView>
       {creating && sups.data && ings.data && <PoEditor suppliers={sups.data.suppliers} ingredients={ings.data.ingredients} onClose={() => setCreating(false)} />}
+      {open && (!sups.data || !ings.data) && (
+        <Dialog open onClose={() => setOpen(null)} size="xl" title="ใบสั่งซื้อ">
+          <LoadingBlock />
+        </Dialog>
+      )}
       {open && sups.data && ings.data && <PoDetailDialog id={open} suppliers={sups.data.suppliers} ingredients={ings.data.ingredients} onClose={() => setOpen(null)} />}
     </>
   );

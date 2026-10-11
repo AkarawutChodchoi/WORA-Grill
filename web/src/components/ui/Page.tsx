@@ -66,8 +66,8 @@ export function Tabs<T extends string>({ value, onChange, items }: { value: T; o
           aria-selected={value === it.value}
           onClick={() => onChange(it.value)}
           className={clsx(
-            'border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap',
-            value === it.value ? 'border-basil text-basil' : 'border-transparent text-ink-2 hover:text-ink',
+            'min-h-11 border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap',
+            value === it.value ? 'border-brand text-brand' : 'border-transparent text-ink-2 hover:text-ink',
           )}
         >
           {it.label}

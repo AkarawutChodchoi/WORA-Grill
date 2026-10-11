@@ -62,7 +62,7 @@ export const NAV: NavGroup[] = [
       { to: '/admin/users', label: 'ผู้ใช้', icon: Users, anyOf: ['user.manage'] },
       { to: '/admin/roles', label: 'บทบาท', icon: ShieldCheck, anyOf: ['user.manage'] },
       { to: '/admin/devices', label: 'อุปกรณ์', icon: MonitorSmartphone, anyOf: ['device.manage'] },
-      { to: '/admin/audit', label: 'Audit Log', icon: History, anyOf: ['audit.view'] },
+      { to: '/admin/audit', label: 'ประวัติการใช้งาน', icon: History, anyOf: ['audit.view'] },
     ],
   },
 ];

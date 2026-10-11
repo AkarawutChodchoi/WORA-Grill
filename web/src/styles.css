@@ -2,25 +2,36 @@
 
 @theme {
   --font-sans: "IBM Plex Sans Thai", "Leelawadee UI", "Noto Sans Thai", Tahoma, system-ui, sans-serif;
-  --color-bg: #F5F6F4;
+  /* WORA Grill: charcoal black + grill red on white. Contrast checked: ink-3 on bg ≥ 4.9:1, white on brand 6.1:1. */
+  --color-bg: #F6F6F6;
   --color-surface: #FFFFFF;
-  --color-sunken: #ECEFEC;
-  --color-line: #DCE1DE;
-  --color-line-strong: #C2C9C5;
-  --color-ink: #1C2326;
-  --color-ink-2: #4A5559;
-  --color-ink-3: #77827F;
-  --color-basil: #1E6B47;
-  --color-basil-600: #185A3B;
-  --color-basil-50: #E5F1EA;
-  --color-chili: #C2352B;
+  --color-sunken: #EEEEEE;
+  --color-line: #E1E1E1;
+  --color-line-strong: #C6C6C6;
+  --color-ink: #141414;
+  --color-ink-2: #474747;
+  --color-ink-3: #6B6B6B;
+  /* Brand red: primary actions, selection, prices */
+  --color-brand: #C8102E;
+  --color-brand-600: #A30D25;
+  --color-brand-50: #FCEBEE;
+  /* Charcoal: navigation rail, dark surfaces */
+  --color-char: #141414;
+  --color-char-2: #262626;
+  --color-char-3: #3A3A3A;
+  /* Status colours (always paired with text/icon): success, danger, warning, info */
+  --color-basil: #1D7A4C;
+  --color-basil-600: #17633D;
+  --color-basil-50: #E7F4EC;
+  --color-chili: #B3261E;
   --color-chili-50: #FBEAE8;
-  --color-turmeric: #C9930E;
+  --color-turmeric: #B07A00;
   --color-turmeric-50: #FBF3DC;
-  --color-sky: #2C64A8;
-  --color-sky-50: #E6EEF8;
-  --radius-control: 6px;
-  --radius-panel: 10px;
+  --color-turmeric-700: #7A5806;
+  --color-sky: #2A5EA0;
+  --color-sky-50: #E8EFF8;
+  --radius-control: 8px;
+  --radius-panel: 12px;
 }
 
 @layer base {
@@ -32,7 +43,8 @@
     font-size: 15px;
     line-height: 1.55;
   }
-  :focus-visible { outline: 2px solid var(--color-sky); outline-offset: 2px; }
+  :focus-visible { outline: 2px solid var(--color-ink); outline-offset: 2px; }
+  .kds :focus-visible, .on-dark :focus-visible { outline-color: #FFFFFF; }
   .num { font-variant-numeric: tabular-nums; }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
@@ -50,10 +62,10 @@
   background: radial-gradient(circle at 6px -2px, transparent 6px, var(--color-surface) 6.5px) 0 0 / 12px 8px repeat-x;
 }
 
-dialog::backdrop { background: rgb(28 35 38 / 0.45); }
+dialog::backdrop { background: rgb(20 20 20 / 0.55); }
 
 /* KDS dark high-contrast surface */
-.kds { background: #121719; color: #EEF2EF; }
+.kds { background: #121212; color: #F2F2F2; }
 
 @media print {
   .no-print { display: none !important; }

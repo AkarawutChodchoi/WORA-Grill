@@ -141,7 +141,7 @@ export function LiveIndicator() {
   return (
     <span className="inline-flex items-center gap-1.5 text-xs text-ink-3" title={connected ? 'อัปเดตแบบเรียลไทม์' : 'ขาดการเชื่อมต่อเรียลไทม์ — รีเฟรชทุก 10 วินาที'}>
       <span className={`size-2 rounded-full ${connected ? 'bg-basil' : 'bg-turmeric'}`} />
-      {connected ? 'สด' : 'ออฟไลน์เรียลไทม์'}
+      <span className={connected ? 'hidden sm:inline' : undefined}>{connected ? 'สด' : 'ออฟไลน์เรียลไทม์'}</span>
     </span>
   );
 }

@@ -58,7 +58,7 @@ export function BranchSelect({ compact }: { compact?: boolean }) {
       <Store className="size-4 text-ink-3" />
       <span className="sr-only">สาขา</span>
       <select
-        className={clsx('rounded-control border border-line-strong bg-surface px-2 py-1', compact && 'max-w-36')}
+        className={clsx('h-10 rounded-control border border-line-strong bg-surface px-2', compact && 'max-w-36')}
         value={me.branch?.id ?? ''}
         onChange={(e) => switchBranch(e.target.value).catch((err) => toast.error(errorMessage(err)))}
       >
@@ -83,12 +83,13 @@ export function UserMenu() {
         <div className="text-sm font-medium">{me.user.name}</div>
         <div className="text-xs text-ink-3">{role}</div>
       </div>
-      <Button variant="ghost" size="sm" icon={<Lock className="size-4" />} onClick={() => nav('/pin')} title="สลับผู้ใช้ด้วย PIN">
+      <Button variant="ghost" size="sm" icon={<Lock className="size-4" />} onClick={() => nav('/pin')} title="สลับผู้ใช้ด้วย PIN" aria-label="สลับผู้ใช้">
         <span className="hidden md:inline">สลับผู้ใช้</span>
       </Button>
       <Button
         variant="ghost"
         size="sm"
+        aria-label="ออกจากระบบ"
         icon={<LogOut className="size-4" />}
         onClick={async () => {
           await logout();
@@ -106,12 +107,13 @@ function SideNav({ onNavigate }: { onNavigate?: () => void }) {
   const groups = visibleNav(can);
   return (
     <nav aria-label="เมนูหลัก" className="flex flex-col gap-5 px-3 py-4">
-      <div className="px-2">
-        <div className="font-semibold leading-tight">{me?.organization.name}</div>
+      <div className="flex items-center gap-3 px-2">
+        <img src="/brand/mark-white.png" alt="" className="h-9 w-auto" />
+        <div className="font-semibold leading-tight text-white">{me?.organization.name}</div>
       </div>
       {groups.map((g) => (
         <div key={g.label}>
-          <div className="px-2 pb-1 text-xs font-medium text-ink-3">{g.label}</div>
+          <div className="px-2 pb-1 text-xs font-medium text-white/55">{g.label}</div>
           <ul className="flex flex-col gap-0.5">
             {g.items.map((it) => (
               <li key={it.to}>
@@ -121,8 +123,8 @@ function SideNav({ onNavigate }: { onNavigate?: () => void }) {
                   onClick={onNavigate}
                   className={({ isActive }) =>
                     clsx(
-                      'flex items-center gap-2.5 rounded-control px-2 py-1.5 text-[15px]',
-                      isActive ? 'bg-basil-50 font-medium text-basil-600' : 'text-ink-2 hover:bg-sunken hover:text-ink',
+                      'flex min-h-10 items-center gap-2.5 rounded-control px-2.5 py-2 text-[15px] pointer-coarse:min-h-11',
+                      isActive ? 'bg-brand font-medium text-white' : 'text-white/80 hover:bg-char-2 hover:text-white',
                     )
                   }
                 >
@@ -162,23 +164,26 @@ export function AppLayout() {
   return (
     <div className="flex min-h-dvh">
       <FloorNotifier />
-      <aside className="no-print sticky top-0 hidden h-dvh w-60 shrink-0 overflow-y-auto border-r border-line bg-surface lg:block">
+      <aside className="on-dark no-print sticky top-0 hidden h-dvh w-60 shrink-0 overflow-y-auto bg-char lg:block">
         <SideNav />
       </aside>
       {open && (
         <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label="เมนู">
           <div className="absolute inset-0 bg-ink/40" onClick={() => setOpen(false)} />
-          <aside className="absolute inset-y-0 left-0 w-72 overflow-y-auto bg-surface shadow-xl">
+          <aside className="on-dark absolute inset-y-0 left-0 w-72 max-w-[85vw] overflow-y-auto bg-char pb-[env(safe-area-inset-bottom)] shadow-xl">
             <div className="flex justify-end p-2">
-              <Button variant="ghost" size="sm" onClick={() => setOpen(false)} aria-label="ปิดเมนู" icon={<X className="size-5" />} />
+              <button type="button" onClick={() => setOpen(false)} aria-label="ปิดเมนู" className="flex size-11 items-center justify-center rounded-control text-white hover:bg-char-2">
+                <X className="size-5" />
+              </button>
             </div>
             <SideNav onNavigate={() => setOpen(false)} />
           </aside>
         </div>
       )}
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="no-print sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-line bg-surface/95 px-3 backdrop-blur sm:px-5">
+        <header className="no-print sticky top-0 z-30 flex min-h-14 items-center gap-2 border-b border-line bg-surface/95 px-3 pt-[env(safe-area-inset-top)] backdrop-blur sm:gap-3 sm:px-5">
           <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setOpen(true)} aria-label="เปิดเมนู" icon={<Menu className="size-5" />} />
+          <img src="/brand/mark-red.png" alt="" className="h-7 w-auto lg:hidden" />
           <BranchSelect compact />
           <OfflineIndicator />
           <div className="ml-auto flex items-center gap-2">

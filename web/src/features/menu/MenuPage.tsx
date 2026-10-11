@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { clsx } from 'clsx';
-import { ArrowDown, ArrowUp, Archive, ArchiveRestore, Ban, ImageOff, Plus, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, Archive, ArchiveRestore, Ban, Download, ImageOff, Plus, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { ALLERGENS, MENU_TAGS } from '@shared/menu';
 import { toSatang } from '@shared/money';
@@ -12,6 +12,33 @@ import { ItemDialog } from './ItemDialog';
 import type { AdminItem, AdminMenu, Category, ModifierGroup, Station } from './types';
 
 type Tab = 'items' | 'categories' | 'modifiers' | 'stations';
+
+/** One-tap import of the WORA Grill sample menu (50 dishes with photos) for trying the system. */
+function SampleMenuImport({ compact }: { compact: boolean }) {
+  const qc = useQueryClient();
+  const toast = useToast();
+  const run = useMutation({
+    mutationFn: () => post<{ created: number; skipped: number }>('/menu/import-sample'),
+    onSuccess: (r) => {
+      qc.invalidateQueries({ queryKey: ['menu-admin'] });
+      qc.invalidateQueries({ queryKey: ['menu'] });
+      toast.success(r.created ? `เพิ่มเมนูตัวอย่าง ${r.created} รายการแล้ว` : 'มีเมนูตัวอย่างครบแล้ว');
+    },
+    onError: (e) => toast.error(errorMessage(e)),
+  });
+  const button = (
+    <Button variant="outline" icon={<Download className="size-4" />} loading={run.isPending} onClick={() => run.mutate()}>
+      นำเข้าเมนูตัวอย่าง WORA Grill (50 รายการ)
+    </Button>
+  );
+  if (compact) return <div className="mb-3 flex justify-end">{button}</div>;
+  return (
+    <div className="mb-4 flex flex-col items-start gap-2 rounded-panel border border-dashed border-line-strong bg-surface p-4">
+      <p className="text-ink-2">ยังไม่มีเมนู ลองนำเข้าเมนูตัวอย่างพร้อมรูปและตัวเลือกเสริม เพื่อทดลองใช้งานได้ทันที</p>
+      {button}
+    </div>
+  );
+}
 
 export function useAdminMenu() {
   return useQuery({ queryKey: ['menu-admin'], queryFn: () => get<AdminMenu>('/menu/admin') });
@@ -68,16 +95,17 @@ function ItemsTab({ menu, stations }: { menu: AdminMenu; stations: Station[] }) 
             key={c.id}
             type="button"
             onClick={() => setCat(c.id)}
-            className={clsx('rounded-control px-3 py-1.5 text-left text-sm whitespace-nowrap', cat === c.id ? 'bg-basil-50 font-medium text-basil-600' : 'text-ink-2 hover:bg-sunken')}
+            className={clsx('min-h-10 rounded-control px-3 py-1.5 text-left text-sm whitespace-nowrap pointer-coarse:min-h-11', cat === c.id ? 'bg-brand-50 font-medium text-brand' : 'text-ink-2 hover:bg-sunken')}
           >
             {c.name}
           </button>
         ))}
       </nav>
       <div className="min-w-0 flex-1">
+        {can('menu.manage') && !menu.items.some((i) => i.sku === 'S01') && <SampleMenuImport compact={menu.items.length > 0} />}
         <div className="mb-3 flex flex-wrap items-center gap-3">
           <Input placeholder="ค้นหาชื่อหรือ SKU" value={q} onChange={(e) => setQ(e.target.value)} wrapClassName="w-64" aria-label="ค้นหาเมนู" />
-          <Checkbox label="แสดงที่เก็บแล้ว" checked={showArchived} onChange={(e) => setShowArchived(e.target.checked)} />
+          <Checkbox label="แสดงที่ซ่อนแล้ว" checked={showArchived} onChange={(e) => setShowArchived(e.target.checked)} />
           {can('menu.manage') && (
             <Button className="ml-auto" icon={<Plus className="size-4" />} onClick={() => setEditing('new')} disabled={menu.categories.filter((c) => !c.archivedAt).length === 0}>
               เพิ่มเมนู
@@ -95,12 +123,14 @@ function ItemsTab({ menu, stations }: { menu: AdminMenu; stations: Station[] }) 
             columns={[
               {
                 key: 'img',
+                mobile: 'media',
                 header: '',
                 className: 'w-14',
                 cell: (r) => (r.imageUrl ? <img src={r.imageUrl} alt="" className="size-10 rounded object-cover" /> : <div className="flex size-10 items-center justify-center rounded bg-sunken text-ink-3"><ImageOff className="size-4" /></div>),
               },
               {
                 key: 'name',
+                mobile: 'title',
                 header: 'เมนู',
                 cell: (r) => (
                   <button type="button" className="text-left" onClick={() => setEditing(r)}>
@@ -152,16 +182,19 @@ function ItemsTab({ menu, stations }: { menu: AdminMenu; stations: Station[] }) 
                         </Button>
                       )}
                       {can('menu.manage') && !r.archivedAt && (
-                        <Button size="sm" variant="ghost" title={r.branchEnabled ? 'ปิดขายในสาขานี้' : 'เปิดขายในสาขานี้'} icon={<Ban className="size-4" />} onClick={() => branchToggle.mutate({ id: r.id, isEnabled: !r.branchEnabled })} />
+                        <Button size="sm" variant="ghost" icon={<Ban className="size-4" />} onClick={() => branchToggle.mutate({ id: r.id, isEnabled: !r.branchEnabled })}>
+                          {r.branchEnabled ? 'ปิดขายสาขานี้' : 'เปิดขายสาขานี้'}
+                        </Button>
                       )}
                       {can('menu.manage') && (
                         <Button
                           size="sm"
                           variant="ghost"
-                          title={r.archivedAt ? 'นำกลับมาใช้' : 'เก็บเมนู'}
                           icon={r.archivedAt ? <ArchiveRestore className="size-4" /> : <Archive className="size-4" />}
-                          onClick={() => archive.mutate({ id: r.id, archived: !r.archivedAt })}
-                        />
+                          onClick={() => (r.archivedAt || confirm(`ซ่อนเมนู "${r.name}" (เลิกขาย)? นำกลับมาใช้ได้ภายหลัง`)) && archive.mutate({ id: r.id, archived: !r.archivedAt })}
+                        >
+                          {r.archivedAt ? 'นำกลับมาใช้' : 'ซ่อน'}
+                        </Button>
                       )}
                     </div>
                   );
@@ -279,7 +312,7 @@ function CategoriesTab({ menu, stations }: { menu: AdminMenu; stations: Station[
               align: 'right',
               cell: (r) => (
                 <Button size="sm" variant="ghost" onClick={() => archive.mutate({ id: r.id, archived: !r.archivedAt })}>
-                  {r.archivedAt ? 'นำกลับมาใช้' : 'เก็บ'}
+                  {r.archivedAt ? 'นำกลับมาใช้' : 'ซ่อน (เลิกใช้)'}
                 </Button>
               ),
             },
@@ -390,7 +423,7 @@ function ModifiersTab({ menu }: { menu: AdminMenu }) {
                     แก้ไข
                   </Button>
                   <Button size="sm" variant="ghost" onClick={() => archive.mutate({ id: g.id, archived: !g.archivedAt })}>
-                    {g.archivedAt ? 'นำกลับมาใช้' : 'เก็บ'}
+                    {g.archivedAt ? 'นำกลับมาใช้' : 'ซ่อน (เลิกใช้)'}
                   </Button>
                 </div>
               }
@@ -453,13 +486,13 @@ function StationsTab({ stations }: { stations: Station[] }) {
           columns={[
             { key: 'code', header: 'รหัส', cell: (r) => <code>{r.code}</code> },
             { key: 'name', header: 'ชื่อ', cell: (r) => r.name },
-            { key: 'expo', header: '', cell: (r) => (r.isExpo ? <Badge tone="info">Expo</Badge> : null) },
+            { key: 'expo', header: '', cell: (r) => (r.isExpo ? <Badge tone="info">จุดส่งอาหาร (Expo)</Badge> : null) },
             {
               key: 'act',
               header: '',
               align: 'right',
               cell: (r) => (
-                <Button size="sm" variant="ghost" onClick={() => remove.mutate(r.id)}>
+                <Button size="sm" variant="danger-ghost" onClick={() => confirm(`ลบสเตชัน "${r.name}"?`) && remove.mutate(r.id)}>
                   ลบ
                 </Button>
               ),

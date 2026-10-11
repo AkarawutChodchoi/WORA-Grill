@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { clsx } from 'clsx';
-import { ArrowLeft, ImageOff, MoreHorizontal, ReceiptText, Search, Send, UtensilsCrossed, Users } from 'lucide-react';
+import { ArrowLeft, ChefHat, ImageOff, MoreHorizontal, Printer, QrCode, ReceiptText, Search, Send, UtensilsCrossed, Users } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { MENU_TAGS } from '@shared/menu';
 import { useApproval } from '../../components/ApprovalDialog';
-import { Badge, Button, ConfirmDialog, Dialog, EmptyState, ErrorState, Input, LoadingBlock, Select, Textarea, useToast } from '../../components/ui';
+import { Button, ConfirmDialog, Dialog, EmptyState, ErrorState, Input, LoadingBlock, Select, StatusBadge, statusLabel, Textarea, useToast } from '../../components/ui';
 import { errorMessage, get, OfflineQueuedError, patch, post } from '../../lib/api';
 import { OfflineIndicator } from '../../lib/offline';
 import { useAuth } from '../../lib/auth';
@@ -14,6 +14,7 @@ import { LiveIndicator, useLivePolling } from '../../lib/realtime';
 import { CHANNEL_LABEL } from '../menu/ItemDialog';
 import type { BranchMenu, MenuItem } from '../menu/types';
 import { ModifierDialog } from './ModifierDialog';
+import { QrDialog } from './QrDialog';
 import { DraftTicketLine, groupByCourse, TicketLine, TotalsBlock } from './Ticket';
 import type { DraftLine, Order, OrderItem } from './types';
 
@@ -41,14 +42,14 @@ function ItemGrid({ menu, category, search, onPick }: { menu: BranchMenu; catego
             onClick={() => onPick(i)}
             className={clsx(
               'relative flex h-full min-h-24 w-full flex-col overflow-hidden rounded-panel border border-line bg-surface text-left transition-colors',
-              i.available ? 'hover:border-basil active:bg-basil-50' : 'cursor-not-allowed opacity-55',
+              i.available ? 'hover:border-brand active:bg-brand-50' : 'cursor-not-allowed opacity-55',
             )}
           >
             {i.imageUrl ? <img src={i.imageUrl} alt="" className="h-20 w-full object-cover" loading="lazy" /> : null}
             <span className="flex flex-1 flex-col gap-0.5 p-2.5">
               <span className="leading-snug font-medium">{i.name}</span>
               <span className="mt-auto flex items-center justify-between gap-1">
-                <span className="num text-sm font-semibold text-basil-600">{formatBaht(i.priceSatang)}</span>
+                <span className="num text-sm font-semibold text-brand">{formatBaht(i.priceSatang)}</span>
                 {i.tags.includes('spicy') && <span className="text-xs text-chili">{MENU_TAGS.spicy}</span>}
               </span>
             </span>
@@ -85,7 +86,7 @@ function ServerLineDialog({ order, item, onClose }: { order: Order; item: OrderI
     <Dialog open onClose={onClose} title={item.nameSnapshot} size="sm">
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <Badge>{item.status}</Badge>
+          <StatusBadge status={item.status} />
           <span className="num">{formatBaht(item.lineTotalSatang)}</span>
         </div>
         {pending ? (
@@ -98,10 +99,10 @@ function ServerLineDialog({ order, item, onClose }: { order: Order; item: OrderI
               </Button>
               {item.held && (
                 <Button variant="outline" onClick={() => act.mutate(async () => (await post<{ order: Order }>(`/orders/${order.id}/send`, { itemIds: [item.id] })).order)}>
-                  ส่งรายการนี้ (Fire)
+                  ส่งครัวรายการนี้
                 </Button>
               )}
-              <Button variant="ghost" className="ml-auto text-chili" onClick={() => act.mutate(() => post<Order>(`/order-items/${item.id}/cancel`, {}))}>
+              <Button variant="danger-ghost" className="ml-auto" onClick={() => act.mutate(() => post<Order>(`/order-items/${item.id}/cancel`, {}))}>
                 ลบรายการ
               </Button>
             </div>
@@ -134,41 +135,6 @@ function ServerLineDialog({ order, item, onClose }: { order: Order; item: OrderI
       </div>
       {cancelApproval.dialog}
     </Dialog>
-  );
-}
-
-function QrSection({ order }: { order: Order }) {
-  const toast = useToast();
-  const [qr, setQr] = useState<{ url: string; qrDataUrl: string; expiresAt: string } | null>(null);
-  const issue = useMutation({
-    mutationFn: () => post<{ url: string; qrDataUrl: string; expiresAt: string }>(`/orders/${order.id}/qr`),
-    onSuccess: setQr,
-    onError: (e) => toast.error(errorMessage(e)),
-  });
-  return (
-    <section>
-      <h3 className="mb-2 font-semibold">QR ให้ลูกค้าสั่งเอง</h3>
-      {qr ? (
-        <div className="flex flex-col items-center gap-2 text-center">
-          <img src={qr.qrDataUrl} alt="QR สั่งอาหาร" className="size-56" />
-          <p className="text-sm">
-            {order.tableName ? `โต๊ะ ${order.tableName}` : `บิล #${order.orderNo}`} · หมดอายุ {new Date(qr.expiresAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}
-          </p>
-          <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => window.print()}>
-              พิมพ์ QR
-            </Button>
-            <Button size="sm" variant="ghost" onClick={() => window.open(qr.url, '_blank', 'noopener')}>
-              เปิดหน้าลูกค้า (Kiosk)
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <Button variant="outline" loading={issue.isPending} onClick={() => issue.mutate()}>
-          ออก QR ใหม่ (QR เดิมของบิลนี้จะใช้ไม่ได้)
-        </Button>
-      )}
-    </section>
   );
 }
 
@@ -261,20 +227,33 @@ function MoreDialog({ order, onClose }: { order: Order; onClose: () => void }) {
             </Button>
           </section>
         )}
-        {editable && <QrSection order={order} />}
+        <section className="flex flex-wrap gap-2 sm:hidden">
+          <Link to={`/pos/orders/${order.id}/receipt`}>
+            <Button variant="outline" icon={<Printer className="size-4" />}>
+              พิมพ์ใบแจ้งยอด
+            </Button>
+          </Link>
+          {order.items.some((i) => ['SENT', 'PREPARING'].includes(i.status)) && (
+            <Link to={`/kitchen-ticket/${order.id}`}>
+              <Button variant="outline" icon={<ChefHat className="size-4" />}>
+                พิมพ์ใบครัว
+              </Button>
+            </Link>
+          )}
+        </section>
         {editable && order.paidSatang === 0 && (
           <section>
             <Button variant="danger" onClick={() => setVoidOpen(true)}>
-              Void บิลนี้
+              ยกเลิกทั้งบิล (Void)
             </Button>
           </section>
         )}
       </div>
       <ConfirmDialog
         open={voidOpen}
-        title={`Void บิล #${order.orderNo}?`}
-        message="รายการทั้งหมดจะถูกยกเลิก และบันทึกใน Audit Log"
-        confirmLabel="Void บิล"
+        title={`ยกเลิกทั้งบิล #${order.orderNo}?`}
+        message="รายการทั้งหมดจะถูกยกเลิก และบันทึกในประวัติการใช้งาน"
+        confirmLabel="ยกเลิกทั้งบิล"
         danger
         requireReason
         loading={act.isPending}
@@ -285,7 +264,7 @@ function MoreDialog({ order, onClose }: { order: Order; onClose: () => void }) {
               const o = await post<Order>(`/orders/${order.id}/void`, { reason, approval });
               setVoidOpen(false);
               onClose();
-              toast.success('Void บิลแล้ว');
+              toast.success('ยกเลิกบิลแล้ว');
               return o;
             }),
           )
@@ -315,7 +294,7 @@ function QrApprovalBar({ order }: { order: Order }) {
       <Button size="sm" className="ml-auto" loading={act.isPending && act.variables === false} onClick={() => act.mutate(false)}>
         อนุมัติส่งครัว
       </Button>
-      <Button size="sm" variant="ghost" className="text-chili" onClick={() => act.mutate(true)}>
+      <Button size="sm" variant="danger-ghost" onClick={() => act.mutate(true)}>
         ปฏิเสธ
       </Button>
     </div>
@@ -336,6 +315,7 @@ export function OrderScreen() {
   const [editing, setEditing] = useState<{ item: MenuItem; draft?: DraftLine } | null>(null);
   const [serverLine, setServerLine] = useState<OrderItem | null>(null);
   const [more, setMore] = useState(false);
+  const [qrOpen, setQrOpen] = useState(false);
   const [showTicket, setShowTicket] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -414,7 +394,7 @@ export function OrderScreen() {
           <h2 className="text-lg font-semibold">
             บิล <span className="num">#{o.orderNo}</span>
           </h2>
-          <Badge tone={o.status === 'OPEN' ? 'info' : o.status === 'BILL_REQUESTED' ? 'warning' : o.status === 'VOIDED' ? 'danger' : 'success'}>{o.status}</Badge>
+          <StatusBadge status={o.status} />
         </div>
         <p className="flex flex-wrap items-center gap-x-3 text-sm text-ink-2">
           <span>{o.tableName ? `โต๊ะ ${o.tableName}` : CHANNEL_LABEL[o.channel] ?? o.channel}</span>
@@ -531,7 +511,12 @@ export function OrderScreen() {
             พิมพ์ใบแจ้งยอด
           </Button>
         </Link>
-        <Button variant="ghost" size="sm" aria-label="ตัวเลือกบิล" icon={<MoreHorizontal className="size-5" />} onClick={() => setMore(true)} />
+        {['OPEN', 'BILL_REQUESTED'].includes(o.status) && (
+          <Button variant="outline" size="sm" icon={<QrCode className="size-4" />} aria-label="QR ให้ลูกค้าสั่งเอง" onClick={() => setQrOpen(true)}>
+            <span className="hidden sm:inline">QR ลูกค้า</span>
+          </Button>
+        )}
+        <Button variant="ghost" size="sm" aria-label="ตัวเลือกบิล" title="แยก/รวมบิล จำนวนลูกค้า ยกเลิกบิล" icon={<MoreHorizontal className="size-5" />} onClick={() => setMore(true)} />
       </header>
       <div className="flex min-h-0 flex-1">
         <nav aria-label="หมวดหมู่" className="hidden w-44 shrink-0 flex-col gap-1 overflow-y-auto border-r border-line bg-surface p-2 md:flex">
@@ -540,24 +525,30 @@ export function OrderScreen() {
               key={c.id}
               type="button"
               onClick={() => (setCategory(c.id), setSearch(''))}
-              className={clsx('min-h-11 rounded-control px-3 text-left', category === c.id && !search ? 'bg-basil text-white' : 'hover:bg-sunken')}
+              className={clsx('min-h-11 rounded-control px-3 text-left', category === c.id && !search ? 'bg-brand text-white' : 'hover:bg-sunken')}
             >
               {c.name}
             </button>
           ))}
         </nav>
         <main className="min-w-0 flex-1 overflow-y-auto p-3">
-          <div className="mb-3 flex gap-1 overflow-x-auto md:hidden">
+          <div className="-mx-3 mb-3 flex gap-2 overflow-x-auto px-3 pb-1 md:hidden">
             {[{ id: 'all', name: 'ทั้งหมด' }, ...(menu.data?.categories ?? [])].map((c) => (
-              <Button key={c.id} size="sm" variant={category === c.id ? 'primary' : 'outline'} onClick={() => setCategory(c.id)}>
+              <button
+                key={c.id}
+                type="button"
+                aria-pressed={category === c.id && !search}
+                onClick={() => (setCategory(c.id), setSearch(''))}
+                className={clsx('min-h-11 shrink-0 rounded-full border px-4 text-sm whitespace-nowrap', category === c.id && !search ? 'border-brand bg-brand text-white' : 'border-line-strong bg-surface')}
+              >
                 {c.name}
-              </Button>
+              </button>
             ))}
           </div>
           {o.items.some((i) => i.awaitingApproval && i.status === 'PENDING') && can('order.approve_qr') && <QrApprovalBar order={o} />}
           {!editable && (
-            <p className="mb-3 rounded-control bg-turmeric-50 px-3 py-2 text-sm text-[#7A5806]">
-              {o.status === 'BILL_REQUESTED' ? 'เรียกเช็กบิลแล้ว — กด "แก้ไขบิล" เพื่อสั่งเพิ่ม' : `บิลนี้สถานะ ${o.status} แก้ไขรายการไม่ได้`}
+            <p className="mb-3 rounded-control bg-turmeric-50 px-3 py-2 text-sm text-turmeric-700">
+              {o.status === 'BILL_REQUESTED' ? 'เรียกเช็กบิลแล้ว — กด "แก้ไขบิล" เพื่อสั่งเพิ่ม' : `บิลนี้${statusLabel(o.status)} แก้ไขรายการไม่ได้`}
             </p>
           )}
           {menu.isLoading ? <LoadingBlock /> : menu.error ? <ErrorState error={menu.error} onRetry={() => menu.refetch()} /> : menu.data && <ItemGrid menu={menu.data} category={category} search={search} onPick={pick} />}
@@ -569,7 +560,7 @@ export function OrderScreen() {
         </main>
         <aside className="hidden w-[380px] shrink-0 lg:block">{ticket}</aside>
       </div>
-      <div className="no-print border-t border-line bg-surface p-2 lg:hidden">
+      <div className="no-print border-t border-line bg-surface p-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden">
         <Button size="lg" className="w-full" onClick={() => setShowTicket(true)}>
           ดูบิล ({o.items.filter((i) => i.status !== 'CANCELLED').length + drafts.length}) · <span className="num">{formatBaht(o.grandTotalSatang + draftTotal)}</span>
         </Button>
@@ -598,9 +589,10 @@ export function OrderScreen() {
       )}
       {serverLine && <ServerLineDialog order={o} item={serverLine} onClose={() => setServerLine(null)} />}
       {more && <MoreDialog order={o} onClose={() => setMore(false)} />}
+      {qrOpen && <QrDialog orderId={o.id} label={o.tableName ? `โต๊ะ ${o.tableName}` : `บิล #${o.orderNo}`} onClose={() => setQrOpen(false)} />}
       {drafts.length > 0 && (
         <div className="no-print fixed bottom-20 left-3 z-30 lg:bottom-3">
-          <Button variant="ghost" size="sm" className="bg-surface shadow" onClick={() => setDrafts([])}>
+          <Button variant="ghost" size="sm" className="bg-surface shadow" onClick={() => confirm(`ล้าง ${drafts.length} รายการที่ยังไม่บันทึก?`) && setDrafts([])}>
             ล้างรายการที่ยังไม่บันทึก ({drafts.length})
           </Button>
         </div>

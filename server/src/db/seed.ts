@@ -1,15 +1,17 @@
 /**
- * Development seed: creates a clearly-labelled DEMO restaurant. Never run against production data.
+ * Development seed: creates the WORA Grill sample restaurant (50-dish menu with photos, 12 tables).
+ * Never run against production data.
  * Credentials come from env (SEED_OWNER_PASSWORD, SEED_STAFF_PIN) or are randomly generated and printed once.
  */
 import { randomInt } from 'node:crypto';
-import { count } from 'drizzle-orm';
+import { count, eq } from 'drizzle-orm';
 import { loadConfig } from '../config';
 import { hashSecret, randomToken } from '../lib/crypto';
 import { bootstrapOrganization } from '../modules/auth/bootstrap';
 import { openDatabase } from './client';
-import { organizations, userRoles, users } from './schema';
-import { seedDemoData } from './seed-demo';
+import { branches, organizations, userRoles, users } from './schema';
+import { seedTables } from './seed-demo';
+import { seedWoraMenu } from './seed-wora';
 
 const config = loadConfig();
 if (config.NODE_ENV === 'production' && process.env.ALLOW_DEMO_SEED !== 'true') {
@@ -35,8 +37,8 @@ const credentials: { role: string; name: string; email?: string; password?: stri
 await db.transaction(async (tx) => {
   const ownerPin = pin();
   const boot = await bootstrapOrganization(tx, {
-    orgName: 'ร้านตัวอย่าง (DEMO)',
-    branchName: 'สาขาหลัก (DEMO)',
+    orgName: 'WORA Grill',
+    branchName: 'WORA Grill สาขาหลัก',
     branchCode: 'HQ',
     owner: { name: 'เจ้าของร้าน', email: ownerEmail, password: ownerPassword, pin: ownerPin },
   });
@@ -60,9 +62,14 @@ await db.transaction(async (tx) => {
     await tx.insert(userRoles).values({ userId: u.id, roleId: boot.roleIds[role], branchId: boot.branch.id });
     credentials.push({ role, name, email, password, pin: p });
   }
-  await seedDemoData(tx, boot.org.id, boot.branch.id, boot.owner.id);
+  await tx
+    .update(branches)
+    .set({ address: 'ที่อยู่ตัวอย่าง (แก้ได้ที่ ตั้งค่าร้าน)', phone: '02-000-0000', settings: { enabledPaymentMethods: ['CASH', 'CARD', 'TRANSFER'], receiptHeader: 'WORA Grill' } as never })
+    .where(eq(branches.id, boot.branch.id));
+  await seedWoraMenu(tx, boot.org.id, boot.branch.id, config.UPLOAD_DIR);
+  await seedTables(tx, boot.org.id, boot.branch.id);
 });
 
-console.log('\nDEMO restaurant created. Store these credentials safely — they are not shown again:\n');
+console.log('\nWORA Grill sample restaurant created. Store these credentials safely — they are not shown again:\n');
 console.table(credentials);
 await d.close();

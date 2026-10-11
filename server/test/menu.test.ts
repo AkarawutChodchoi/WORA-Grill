@@ -137,3 +137,15 @@ describe('menu management', () => {
     expect(ok.json().imageUrl).toMatch(/^\/uploads\/menu\/[\w-]+\.png$/);
   });
 });
+
+describe('sample menu import', () => {
+  it('lets a manager load the WORA Grill sample menu once; waiters cannot', async () => {
+    const w = await env.as('WAITER');
+    expect((await w.post('/menu/import-sample')).status).toBe(403);
+    const m = await env.as('MANAGER');
+    const first = await m.post('/menu/import-sample');
+    expect(first.status).toBe(200);
+    expect(first.body).toEqual({ created: 50, skipped: 0 });
+    expect((await m.post('/menu/import-sample')).body).toEqual({ created: 0, skipped: 50 });
+  });
+});

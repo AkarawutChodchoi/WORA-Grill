@@ -99,7 +99,10 @@ export function ItemDialog({ item, menu, stations, defaultCategoryId, onClose }:
       onClose();
     },
     onError: (e) => {
-      if (e instanceof ApiError && Array.isArray(e.details)) setErrors(Object.fromEntries((e.details as { path: string; message: string }[]).map((d) => [d.path.split('.')[0], d.message])));
+      if (e instanceof ApiError && Array.isArray(e.details)) {
+        setErrors(Object.fromEntries((e.details as { path: string; message: string }[]).map((d) => [d.path.split('.')[0], d.message])));
+        setTab('basic'); // field errors are shown on the main tab
+      }
       toast.error(errorMessage(e));
     },
   });
@@ -258,7 +261,7 @@ export function ItemDialog({ item, menu, stations, defaultCategoryId, onClose }:
       )}
       {tab === 'options' && (
         <div className="flex flex-col gap-2">
-          {activeGroups.length === 0 && <p className="text-ink-2">ยังไม่มีกลุ่มตัวเลือก สร้างได้ที่แท็บ "ตัวเลือก"</p>}
+          {activeGroups.length === 0 && <p className="text-ink-2">ยังไม่มีกลุ่มตัวเลือก สร้างได้ที่แท็บ "ตัวเลือกเสริม" ในหน้าเมนู</p>}
           {activeGroups.map((g) => (
             <Checkbox
               key={g.id}

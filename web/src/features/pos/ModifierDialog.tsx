@@ -61,7 +61,7 @@ export function ModifierDialog({
       footer={
         <>
           {onRemove && (
-            <Button variant="ghost" className="mr-auto text-chili" onClick={onRemove}>
+            <Button variant="danger-ghost" className="mr-auto" onClick={onRemove}>
               ลบรายการ
             </Button>
           )}
@@ -122,7 +122,7 @@ export function ModifierDialog({
                         type="button"
                         aria-pressed={on}
                         onClick={() => toggle(g.id, m.id)}
-                        className={clsx('min-h-11 rounded-control border px-3 py-2 text-left', on ? 'border-basil bg-basil text-white' : 'border-line-strong bg-surface hover:bg-sunken')}
+                        className={clsx('min-h-11 rounded-control border px-3 py-2 text-left', on ? 'border-brand bg-brand text-white' : 'border-line-strong bg-surface hover:bg-sunken')}
                       >
                         {m.name}
                         {m.priceDeltaSatang !== 0 && <span className="num ml-1 text-sm opacity-80">{m.priceDeltaSatang > 0 ? '+' : ''}{formatBaht(m.priceDeltaSatang)}</span>}
@@ -160,14 +160,14 @@ export function ModifierDialog({
             <option value={3}>3 ของหวาน</option>
           </Select>
           <label className="flex items-center gap-2 pb-2 text-sm">
-            <input type="checkbox" className="size-4 accent-basil" checked={held} onChange={(e) => setHeld(e.target.checked)} />
+            <input type="checkbox" className="size-4 accent-brand" checked={held} onChange={(e) => setHeld(e.target.checked)} />
             พักไว้ก่อน (Hold)
           </label>
         </div>
         <Input label="หมายเหตุถึงครัว" value={note} onChange={(e) => setNote(e.target.value)} placeholder="เช่น ไม่ใส่ผัก, แพ้ถั่ว" maxLength={200} />
         <div className="flex flex-wrap gap-1.5">
           {['ไม่ใส่ผัก', 'ไม่ใส่ผงชูรส', 'แพ้ถั่ว', 'ไม่เผ็ด', 'แยกน้ำ', 'ใส่กล่อง'].map((q) => (
-            <button key={q} type="button" className="rounded-full border border-line-strong px-3 py-1 text-sm hover:bg-sunken" onClick={() => setNote(note ? `${note}, ${q}` : q)}>
+            <button key={q} type="button" className="min-h-10 rounded-full border border-line-strong px-3 text-sm hover:bg-sunken" onClick={() => setNote(note ? `${note}, ${q}` : q)}>
               {q}
             </button>
           ))}

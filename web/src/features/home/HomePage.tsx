@@ -22,9 +22,9 @@ export function HomePage() {
             <li key={it.to}>
               <Link
                 to={it.to}
-                className="flex h-full flex-col gap-3 rounded-panel border border-line bg-surface p-4 hover:border-basil hover:bg-basil-50/40"
+                className="flex h-full flex-col gap-3 rounded-panel border border-line bg-surface p-4 hover:border-brand hover:bg-brand-50/50"
               >
-                <it.icon className="size-6 text-basil" aria-hidden />
+                <it.icon className="size-6 text-brand" aria-hidden />
                 <span className="font-medium">{it.label}</span>
               </Link>
             </li>

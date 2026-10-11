@@ -3,7 +3,7 @@ import { Link2, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { toSatang } from '@shared/money';
-import { Badge, Button, DataTable, Dialog, EmptyState, Input, MoneyInput, PageHeader, Panel, QueryView, Select, StatusBadge, Textarea, useToast } from '../../components/ui';
+import { Badge, Button, ConfirmDialog, DataTable, Dialog, EmptyState, Input, MoneyInput, PageHeader, Panel, QueryView, Select, StatusBadge, Textarea, useToast } from '../../components/ui';
 import { errorMessage, get, patch, post } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
 import { fmtTime, formatBaht, todayISO } from '../../lib/format';
@@ -190,10 +190,11 @@ export function ReservationsPage() {
     },
     onError: (e) => toast.error(errorMessage(e)),
   });
+  const [confirmAct, setConfirmAct] = useState<{ id: string; status: 'CANCELLED' | 'NO_SHOW' } | null>(null);
   const status = (id: string, s: string) => {
-    const reason = s === 'CANCELLED' ? prompt('เหตุผลการยกเลิก') : undefined;
-    if (s === 'CANCELLED' && !reason) return;
-    act.mutate(() => post(`/reservations/${id}/status`, { status: s, reason: reason ?? undefined }));
+    // Cancelling / marking no-show is confirmed in a dialog (cancel also asks for a reason).
+    if (s === 'CANCELLED' || s === 'NO_SHOW') return setConfirmAct({ id, status: s });
+    act.mutate(() => post(`/reservations/${id}/status`, { status: s }));
   };
   const waiting = (queue.data?.entries ?? []).filter((e) => ['WAITING', 'CALLED'].includes(e.status));
   return (
@@ -263,7 +264,7 @@ export function ReservationsPage() {
                             <Button size="sm" variant="ghost" onClick={() => status(r.id, 'NO_SHOW')}>
                               ไม่มา
                             </Button>
-                            <Button size="sm" variant="ghost" className="text-chili" onClick={() => status(r.id, 'CANCELLED')}>
+                            <Button size="sm" variant="danger-ghost" onClick={() => status(r.id, 'CANCELLED')}>
                               ยกเลิก
                             </Button>
                           </>
@@ -301,7 +302,7 @@ export function ReservationsPage() {
           {queue.data?.avgWaitMinutes !== null && queue.data?.avgWaitMinutes !== undefined && <p className="mb-2 text-sm text-ink-2">รอเฉลี่ย {queue.data.avgWaitMinutes} นาที (7 วันล่าสุด)</p>}
           <ul className="flex flex-col gap-2">
             {waiting.map((e) => (
-              <li key={e.id} className="flex items-center gap-2 rounded-control border border-line p-2">
+              <li key={e.id} className="flex flex-wrap items-center gap-2 rounded-control border border-line p-2">
                 <span className="num w-10 text-center text-xl font-bold">{e.queueNo}</span>
                 <span className="flex-1">
                   {e.name} <span className="text-ink-3">· {e.partySize} คน</span>
@@ -316,8 +317,8 @@ export function ReservationsPage() {
                 <Button size="sm" onClick={() => setSeating({ kind: 'queue', id: e.id, name: `คิว ${e.queueNo} ${e.name}`, party: e.partySize })}>
                   ให้นั่ง
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => act.mutate(() => post(`/waitlist/${e.id}/left`))}>
-                  ออก
+                <Button size="sm" variant="danger-ghost" onClick={() => confirm(`ลบคิว ${e.queueNo} ${e.name} ออกจากคิว?`) && act.mutate(() => post(`/waitlist/${e.id}/left`))}>
+                  ลบออกจากคิว
                 </Button>
               </li>
             ))}
@@ -325,6 +326,21 @@ export function ReservationsPage() {
           </ul>
         </Panel>
       </div>
+      <ConfirmDialog
+        open={!!confirmAct}
+        title={confirmAct?.status === 'CANCELLED' ? 'ยกเลิกการจองนี้?' : 'บันทึกว่าลูกค้าไม่มา?'}
+        message={confirmAct?.status === 'NO_SHOW' ? 'โต๊ะที่กันไว้จะว่างทันที' : undefined}
+        confirmLabel={confirmAct?.status === 'CANCELLED' ? 'ยกเลิกการจอง' : 'ลูกค้าไม่มา'}
+        danger
+        requireReason={confirmAct?.status === 'CANCELLED'}
+        loading={act.isPending}
+        onClose={() => setConfirmAct(null)}
+        onConfirm={(reason) => {
+          const c = confirmAct!;
+          act.mutate(() => post(`/reservations/${c.id}/status`, { status: c.status, reason: reason || undefined }));
+          setConfirmAct(null);
+        }}
+      />
       {editing && <ReservationDialog r={editing} date={date} defaultDuration={res.data?.defaultDuration ?? 90} onClose={() => setEditing(null)} />}
       {seating && (
         <SeatDialog

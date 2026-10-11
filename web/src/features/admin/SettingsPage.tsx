@@ -1,8 +1,8 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import type { BranchSettings } from '@shared/settings';
 import { Button, Checkbox, Input, PageHeader, Panel, QueryView, Select, Textarea, useToast } from '../../components/ui';
-import { errorMessage, put } from '../../lib/api';
+import { errorMessage, get, put } from '../../lib/api';
 import { METHOD_LABEL, useBranchSettings, type BranchInfo } from '../../lib/settings';
 import { CHANNEL_LABEL } from '../menu/ItemDialog';
 
@@ -127,11 +127,43 @@ function SettingsForm({ data }: { data: BranchInfo }) {
   );
 }
 
+/** How to open the system (and guest QR links) from phones and tablets on the shop Wi-Fi. */
+export function MobileAccessPanel() {
+  const q = useQuery({ queryKey: ['access-url'], queryFn: () => get<{ baseUrl: string; lanAddress: string | null; qrDataUrl: string }>('/qr/base-url') });
+  if (!q.data) return null;
+  const local = /\/\/(localhost|127\.0\.0\.1)[:/]?/.test(q.data.baseUrl);
+  return (
+    <Panel title="ใช้งานบนมือถือ / แท็บเล็ต">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+        {!local && <img src={q.data.qrDataUrl} alt="QR เปิดระบบบนมือถือ" className="size-40 shrink-0 self-center rounded-control border border-line" />}
+        <div className="flex flex-col gap-2 text-sm text-ink-2">
+          {local ? (
+            <p className="rounded-control bg-chili-50 px-3 py-2 text-chili">ไม่พบเครือข่าย Wi-Fi/LAN ของเครื่องนี้ มือถือจะเชื่อมต่อไม่ได้ ตรวจว่าคอมต่อ Wi-Fi ของร้านอยู่</p>
+          ) : (
+            <p>
+              สแกน QR นี้ หรือพิมพ์ <strong className="break-all text-ink">{q.data.baseUrl}</strong> ในเบราว์เซอร์มือถือ
+            </p>
+          )}
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>มือถือต้องต่อ Wi-Fi เดียวกับเครื่องนี้ และต้องเปิดโปรแกรมนี้ค้างไว้</li>
+            <li>ครั้งแรก Windows อาจถามสิทธิ์ไฟร์วอลล์ของ Node.js ให้กด "อนุญาต" (Private network)</li>
+            <li>เพิ่มลงหน้าจอหลัก: iPhone กดปุ่มแชร์ › "เพิ่มไปยังหน้าจอโฮม" / Android กดเมนู ⋮ › "ติดตั้งแอป"</li>
+            <li>QR สั่งอาหารของลูกค้าใช้ที่อยู่เดียวกันนี้ (ลูกค้าต้องต่อ Wi-Fi ร้าน จนกว่าจะตั้งโดเมนจริงใน PUBLIC_BASE_URL)</li>
+          </ol>
+        </div>
+      </div>
+    </Panel>
+  );
+}
+
 export function SettingsPage() {
   const q = useBranchSettings();
   return (
     <>
       <PageHeader title="ตั้งค่าร้าน" crumbs={[{ label: 'ระบบ' }]} description="การเปลี่ยนภาษี/ค่าบริการจะมีผลกับบิลที่เปิดหลังบันทึก บิลเดิมใช้ค่าที่บันทึกไว้ตอนเปิดบิล" />
+      <div className="mb-4">
+        <MobileAccessPanel />
+      </div>
       <QueryView query={q}>{(d) => <SettingsForm data={d} />}</QueryView>
     </>
   );

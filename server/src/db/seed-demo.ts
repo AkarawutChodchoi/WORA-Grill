@@ -15,7 +15,7 @@ export async function seedDemoData(db: DbOrTx, orgId: string, branchId: string, 
   await seedTables(db, orgId, branchId);
 }
 
-async function seedTables(db: DbOrTx, orgId: string, branchId: string) {
+export async function seedTables(db: DbOrTx, orgId: string, branchId: string) {
   const [inside] = await db.insert(zones).values({ organizationId: orgId, branchId, name: 'ในร้าน', floor: '1', sort: 10 }).returning();
   const [terrace] = await db.insert(zones).values({ organizationId: orgId, branchId, name: 'ระเบียง', floor: '1', sort: 20 }).returning();
   const rows: (typeof diningTables.$inferInsert)[] = [];

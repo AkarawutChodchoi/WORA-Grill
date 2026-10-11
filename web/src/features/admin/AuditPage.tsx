@@ -21,7 +21,7 @@ export function AuditPage() {
   const logs = useQuery({ queryKey: ['audit', action], queryFn: () => get<{ logs: Log[] }>(`/audit-logs${qs({ action, limit: 200 })}`) });
   return (
     <>
-      <PageHeader title="Audit Log" crumbs={[{ label: 'ระบบ' }]} description="บันทึกการกระทำสำคัญ: ใคร ทำอะไร เมื่อไร (200 รายการล่าสุด)" />
+      <PageHeader title="ประวัติการใช้งาน" crumbs={[{ label: 'ระบบ' }]} description="บันทึกการกระทำสำคัญ: ใคร ทำอะไร เมื่อไร (200 รายการล่าสุด)" />
       <Input placeholder="กรองตาม action เช่น order.void" value={action} onChange={(e) => setAction(e.target.value)} wrapClassName="mb-3 max-w-sm" aria-label="กรอง action" />
       <QueryView query={logs} isEmpty={(d) => d.logs.length === 0} empty={<EmptyState title="ไม่พบรายการ" />}>
         {(d) => (

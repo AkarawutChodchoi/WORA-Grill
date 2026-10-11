@@ -7,7 +7,7 @@ export interface BarDatum {
 }
 
 /**
- * Single-series vertical bar chart: one hue (basil), thin bars with rounded data-ends on a zero
+ * Single-series vertical bar chart: one hue (brand red), thin bars with rounded data-ends on a zero
  * baseline, recessive grid, per-bar hover/focus tooltip, and an always-available table view.
  */
 export function BarChart({ data, format, height = 200, title, emptyText = 'ไม่มีข้อมูลในช่วงนี้' }: { data: BarDatum[]; format: (v: number) => string; height?: number; title: string; emptyText?: string }) {
@@ -74,7 +74,7 @@ export function BarChart({ data, format, height = 200, title, emptyText = 'ไ�
                 {h > 0 && (
                   <path
                     d={`M${cx - bw / 2},${y(0)} V${top + r} Q${cx - bw / 2},${top} ${cx - bw / 2 + r},${top} H${cx + bw / 2 - r} Q${cx + bw / 2},${top} ${cx + bw / 2},${top + r} V${y(0)} Z`}
-                    fill={hover === i ? 'var(--color-basil-600)' : 'var(--color-basil)'}
+                    fill={hover === i ? 'var(--color-brand-600)' : 'var(--color-brand)'}
                     pointerEvents="none"
                   />
                 )}
@@ -116,7 +116,7 @@ export function BarList({ items, format }: { items: { key: string; label: string
             <span className="num">{format(i.value)}</span>
           </div>
           <div className="mt-0.5 h-2 rounded-full bg-sunken">
-            <div className="h-2 rounded-full bg-basil" style={{ width: `${(i.value / max) * 100}%` }} />
+            <div className="h-2 rounded-full bg-brand" style={{ width: `${(i.value / max) * 100}%` }} />
           </div>
         </li>
       ))}

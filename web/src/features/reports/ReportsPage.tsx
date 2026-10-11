@@ -12,10 +12,10 @@ import { CHANNEL_LABEL } from '../menu/ItemDialog';
 type Tab = 'sales' | 'items' | 'costs' | 'staff' | 'tax';
 
 const CLASS_LABEL: Record<string, [string, 'success' | 'info' | 'warning' | 'danger']> = {
-  STAR: ['Star — ขายดี กำไรดี', 'success'],
-  PLOWHORSE: ['Plowhorse — ขายดี กำไรน้อย', 'info'],
-  PUZZLE: ['Puzzle — กำไรดี ขายน้อย', 'warning'],
-  DOG: ['Dog — ขายน้อย กำไรน้อย', 'danger'],
+  STAR: ['ขายดี กำไรดี', 'success'],
+  PLOWHORSE: ['ขายดี กำไรน้อย', 'info'],
+  PUZZLE: ['กำไรดี ขายน้อย', 'warning'],
+  DOG: ['ขายน้อย กำไรน้อย', 'danger'],
 };
 
 function addDaysISO(d: string, n: number) {
@@ -76,7 +76,7 @@ function SalesTab({ params }: { params: string }) {
               <Stat label="ส่วนลด" value={formatBaht(r.totals.discountSatang)} />
               <Stat label="ค่าบริการ / VAT" value={`${formatBaht(r.totals.serviceChargeSatang)} / ${formatBaht(r.totals.vatSatang)}`} />
               <Stat label="คืนเงิน" value={formatBaht(r.totals.refunds.amountSatang)} hint={`${r.totals.refunds.count} รายการ (ตามวันที่คืน)`} />
-              <Stat label="Void" value={formatBaht(r.totals.voids.amountSatang)} hint={`${r.totals.voids.count} บิล`} />
+              <Stat label="ยกเลิกบิล" value={formatBaht(r.totals.voids.amountSatang)} hint={`${r.totals.voids.count} บิล`} />
             </div>
             <div className="grid gap-4 lg:grid-cols-2">
               <Panel title="ยอดขายรายวัน">
@@ -84,7 +84,7 @@ function SalesTab({ params }: { params: string }) {
                 <ul className="mt-2 flex flex-wrap gap-1">
                   {r.daily.map((d: any) => (
                     <li key={d.date}>
-                      <button type="button" className="rounded border border-line px-2 py-0.5 text-xs hover:bg-sunken" onClick={() => setDay(d.date)}>
+                      <button type="button" className="min-h-9 rounded border border-line px-2 text-xs hover:bg-sunken pointer-coarse:min-h-11" onClick={() => setDay(d.date)}>
                         {fmtDate(d.date)}
                       </button>
                     </li>
@@ -153,8 +153,8 @@ function ItemsTab({ params }: { params: string }) {
                 ? [
                     { key: 'c', header: 'ต้นทุน', align: 'right' as const, cell: (x: any) => (x.costSatang === null ? <span className="text-ink-3">ไม่มีสูตร</span> : formatBaht(x.costSatang)) },
                     { key: 'g', header: 'กำไรขั้นต้น', align: 'right' as const, cell: (x: any) => (x.marginSatang === null ? '—' : formatBaht(x.marginSatang)) },
-                    { key: 'f', header: 'Food cost', align: 'right' as const, cell: (x: any) => (x.foodCostPct === null ? '—' : `${x.foodCostPct}%`) },
-                    { key: 'e', header: 'Menu engineering', cell: (x: any) => (x.menuClass ? <Badge tone={CLASS_LABEL[x.menuClass][1]}>{CLASS_LABEL[x.menuClass][0]}</Badge> : '—') },
+                    { key: 'f', header: 'ต้นทุนวัตถุดิบ %', align: 'right' as const, cell: (x: any) => (x.foodCostPct === null ? '—' : `${x.foodCostPct}%`) },
+                    { key: 'e', header: 'กลุ่มเมนู', cell: (x: any) => (x.menuClass ? <Badge tone={CLASS_LABEL[x.menuClass][1]}>{CLASS_LABEL[x.menuClass][0]}</Badge> : '—') },
                   ]
                 : []),
             ]}
@@ -175,10 +175,10 @@ function CostsTab({ params }: { params: string }) {
       {(r) => (
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <Stat label="Food cost %" value={r.foodCostPct === null ? '—' : `${r.foodCostPct}%`} hint={`ต้นทุนขาย ${formatBaht(r.cogsSatang)}`} />
+            <Stat label="ต้นทุนวัตถุดิบ %" value={r.foodCostPct === null ? '—' : `${r.foodCostPct}%`} hint={`ต้นทุนขาย ${formatBaht(r.cogsSatang)}`} />
             <Stat label="ของเสีย" value={formatBaht(r.wasteSatang)} />
             <Stat label="ส่วนต่างสต็อก (นับ/ปรับ)" value={formatBaht(r.varianceSatang)} />
-            <Stat label="Labor cost %" value={r.laborCostPct === null ? '—' : `${r.laborCostPct}%`} hint={r.labor.available ? formatBaht(r.labor.costSatang) : r.labor.note} />
+            <Stat label="ต้นทุนค่าแรง %" value={r.laborCostPct === null ? '—' : `${r.laborCostPct}%`} hint={r.labor.available ? formatBaht(r.labor.costSatang) : r.labor.note} />
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
             <Panel title="ของเสียตามวัตถุดิบ">
@@ -201,7 +201,7 @@ function CostsTab({ params }: { params: string }) {
               )}
             </Panel>
           </div>
-          <Definition>Food cost % = ต้นทุนวัตถุดิบที่ตัดจากการขาย ÷ ยอดขายสุทธิ (เฉพาะเมนูที่มีสูตร — ถ้าบางเมนูยังไม่มีสูตร ตัวเลขจะต่ำกว่าความจริง) · ซื้อเข้าในช่วงนี้ {formatBaht(r.purchasesSatang)}</Definition>
+          <Definition>ต้นทุนวัตถุดิบ % = ต้นทุนวัตถุดิบที่ตัดจากการขาย ÷ ยอดขายสุทธิ (เฉพาะเมนูที่มีสูตร — ถ้าบางเมนูยังไม่มีสูตร ตัวเลขจะต่ำกว่าความจริง) · ซื้อเข้าในช่วงนี้ {formatBaht(r.purchasesSatang)}</Definition>
         </div>
       )}
     </QueryView>
@@ -219,7 +219,7 @@ function StaffTab({ params }: { params: string }) {
       {(r) => (
         <div className="grid gap-4 lg:grid-cols-2">
           <T title="ยอดขายตามพนักงานที่เปิดบิล" rows={r.salesByStaff} cols={[{ key: 'n', header: 'พนักงาน', cell: (x: any) => x.name ?? '—' }, { key: 'o', header: 'บิล', align: 'right', cell: (x: any) => x.orders }, { key: 't', header: 'ยอด', align: 'right', cell: (x: any) => formatBaht(x.totalSatang) }]} />
-          <T title="Void บิล" rows={r.voids} cols={[{ key: 'n', header: 'ผู้ Void', cell: (x: any) => x.name ?? '—' }, { key: 'c', header: 'จำนวน', align: 'right', cell: (x: any) => x.count }, money]} />
+          <T title="บิลที่ถูกยกเลิก" rows={r.voids} cols={[{ key: 'n', header: 'ผู้ยกเลิก', cell: (x: any) => x.name ?? '—' }, { key: 'c', header: 'จำนวน', align: 'right', cell: (x: any) => x.count }, money]} />
           <T title="ยกเลิกรายการหลังส่งครัว" rows={r.cancelledItems} cols={[{ key: 'n', header: 'ผู้ยกเลิก', cell: (x: any) => x.name ?? '—' }, { key: 'c', header: 'จำนวน', align: 'right', cell: (x: any) => x.count }, money]} />
           <T
             title="ส่วนลด"
@@ -256,7 +256,7 @@ function TaxTab({ params }: { params: string }) {
     <QueryView query={q}>
       {(r) => (
         <div className="flex flex-col gap-4">
-          <p className="rounded-control bg-turmeric-50 px-3 py-2 text-sm text-[#7A5806]">{r.disclaimer}</p>
+          <p className="rounded-control bg-turmeric-50 px-3 py-2 text-sm text-turmeric-700">{r.disclaimer}</p>
           <DataTable
             rows={r.days}
             rowKey={(x: any) => x.date}

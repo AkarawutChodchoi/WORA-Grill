@@ -34,7 +34,8 @@ docs/     Plan, data model, module decisions, operations guide
 npm install
 cp .env.example .env            # then set NODE_ENV=development
 npm run db:migrate              # creates ./data/pglite and applies migrations
-npm run db:seed                 # optional DEMO restaurant; prints the generated owner password + staff PINs
+npm run db:seed                 # optional WORA Grill sample restaurant (50 dishes + photos, 12 tables); prints owner password + staff PINs
+npm run db:seed:wora            # add only the 50-dish sample menu to an existing database (stop the dev server first)
 npm run dev                     # API on :3000, web on http://localhost:5173
 ```
 
@@ -77,12 +78,20 @@ until their variables are set.
 | `SESSION_TTL_HOURS` | Session lifetime |
 | `COOKIE_SECURE` | `true` behind HTTPS (Secure cookies, HSTS, CSP upgrade) |
 | `TRUST_PROXY` | `true` only behind your own reverse proxy |
-| `PUBLIC_BASE_URL` | Base URL printed in QR codes |
+| `PUBLIC_BASE_URL` | Address printed in guest QR codes. Empty = automatic (the address staff use, with `localhost` swapped for this PC's Wi-Fi IP). Set it once you have a real domain |
 | `OPN_SECRET_KEY`, `OPN_WEBHOOK_SECRET` | PromptPay auto-confirmation via Opn Payments |
 | `DELIVERY_WEBHOOK_SECRET` | HMAC secret for the delivery-platform order webhook |
 | `LINE_CHANNEL_ACCESS_TOKEN`, `LINE_NOTIFY_TO` | LINE staff alerts |
 | `AUTO_KITCHEN_PRINT` | Auto-print kitchen tickets to LAN printers |
 | `SEED_*` | Demo seed only |
+
+## Phones, tablets and guest QR codes
+
+- The system is a web app / PWA: open it in the phone's browser and "Add to Home Screen" (iPhone) / "Install app" (Android). There is no separate app-store app.
+- Phones must be on the same Wi-Fi as the computer running the server. Open `http://<PC Wi-Fi IP>:5173` (dev) or `:3000` (`npm start`). **Settings › ใช้งานบนมือถือ** shows the exact address and a QR to scan.
+- The first time, Windows Firewall asks whether Node.js may accept connections: allow it on *Private networks*.
+- Guest QR codes (POS › "QR ลูกค้า") use the same address. Older builds printed `http://localhost:…`, which a phone can never open — that is why scanning failed.
+- Sample photos in `server/src/db/wora/images` come from Wikimedia Commons (CC BY-SA / public domain; sources are listed in the owner's workbook). Replace them with the restaurant's own photos before going live. The Menu page has a one-tap "นำเข้าเมนูตัวอย่าง WORA Grill" button.
 
 ## Quality checks
 

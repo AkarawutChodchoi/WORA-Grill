@@ -79,8 +79,8 @@ function IngredientDialog({ ing, onClose }: { ing: Ingredient | 'new'; onClose: 
       footer={
         <>
           {i && (
-            <Button variant="ghost" className="mr-auto text-chili" onClick={() => archive.mutate(undefined)}>
-              เก็บวัตถุดิบ
+            <Button variant="danger-ghost" className="mr-auto" onClick={() => confirm(`ซ่อนวัตถุดิบ "${i.name}" (เลิกใช้)?`) && archive.mutate(undefined)}>
+              ซ่อนวัตถุดิบ (เลิกใช้)
             </Button>
           )}
           <Button variant="ghost" onClick={onClose}>
@@ -189,7 +189,8 @@ interface LineDraft {
 }
 
 /** Shared editor for multi-line stock documents. */
-export function LinesEditor({ lines, setLines, ingredients, withCost }: { lines: LineDraft[]; setLines: (l: LineDraft[]) => void; ingredients: Ingredient[]; withCost?: boolean }) {
+/** `baseUnitOnly`: quantities are counted in the ingredient's base unit (stock adjust sets the new on-hand amount). */
+export function LinesEditor({ lines, setLines, ingredients, withCost, baseUnitOnly }: { lines: LineDraft[]; setLines: (l: LineDraft[]) => void; ingredients: Ingredient[]; withCost?: boolean; baseUnitOnly?: boolean }) {
   const byId = useMemo(() => new Map(ingredients.map((i) => [i.id, i])), [ingredients]);
   const set = (idx: number, patch: Partial<LineDraft>) => setLines(lines.map((x, j) => (j === idx ? { ...x, ...patch } : x)));
   return (
@@ -215,14 +216,25 @@ export function LinesEditor({ lines, setLines, ingredients, withCost }: { lines:
                 </option>
               ))}
             </Select>
-            <Input aria-label="จำนวน" placeholder="จำนวน" inputMode="decimal" wrapClassName="w-24" value={l.qty} onChange={(e) => set(idx, { qty: e.target.value })} />
-            <Select aria-label="หน่วย" wrapClassName="w-28" value={l.unit} onChange={(e) => set(idx, { unit: e.target.value })}>
-              {unitOpts.map((u) => (
-                <option key={u} value={u}>
-                  {u}
-                </option>
-              ))}
-            </Select>
+            <Input
+              aria-label={baseUnitOnly ? 'ยอดคงเหลือจริง' : 'จำนวน'}
+              placeholder={baseUnitOnly ? 'ยอดจริง' : 'จำนวน'}
+              inputMode="decimal"
+              wrapClassName="w-24"
+              value={l.qty}
+              onChange={(e) => set(idx, { qty: e.target.value })}
+            />
+            {baseUnitOnly ? (
+              <span className="flex h-10 items-center text-sm text-ink-2">{ing?.baseUnit ?? ''}</span>
+            ) : (
+              <Select aria-label="หน่วย" wrapClassName="w-28" value={l.unit} onChange={(e) => set(idx, { unit: e.target.value })}>
+                {unitOpts.map((u) => (
+                  <option key={u} value={u}>
+                    {u}
+                  </option>
+                ))}
+              </Select>
+            )}
             {withCost && (
               <>
                 <MoneyInput aria-label="ราคาต่อหน่วย" placeholder="ราคา/หน่วย" wrapClassName="w-28" value={l.cost ?? ''} onChange={(e) => set(idx, { cost: e.target.value })} />
@@ -293,7 +305,7 @@ function StockOpsTab() {
             {kind === 'waste' && 'บันทึกของเสีย/หมดอายุ/ทำตก พร้อมเหตุผล — ใช้ในรายงานของเสีย'}
             {kind === 'adjust' && 'ตั้งยอดคงเหลือใหม่ (กรอกจำนวนในหน่วยหลัก) — ต้องมีสิทธิ์ปรับยอดหรือ PIN ผู้จัดการ'}
           </p>
-          <LinesEditor lines={lines} setLines={setLines} ingredients={d.ingredients} withCost={kind === 'receive'} />
+          <LinesEditor lines={lines} setLines={setLines} ingredients={d.ingredients} withCost={kind === 'receive'} baseUnitOnly={kind === 'adjust'} />
           <Textarea label={kind === 'receive' ? 'หมายเหตุ / ผู้ขาย' : 'เหตุผล'} required={kind !== 'receive'} value={reason} onChange={(e) => setReason(e.target.value)} wrapClassName="mt-3" />
           <Button
             className="mt-3"
@@ -486,7 +498,7 @@ function CountsTab() {
                         <input
                           aria-label={`นับได้ ${r.name}`}
                           inputMode="decimal"
-                          className="h-9 w-24 rounded-control border border-line-strong px-2 text-right"
+                          className="h-11 w-28 rounded-control border border-line-strong px-2 text-right text-base"
                           value={counted[r.ingredientId] ?? (r.countedQty == null ? '' : String(Number(r.countedQty)))}
                           onChange={(e) => setCounted({ ...counted, [r.ingredientId]: e.target.value })}
                         />

@@ -71,7 +71,7 @@ function GuestItemDialog({ item, lang, onClose, onAdd }: { item: MenuItem; lang:
           </legend>
           <div className="flex flex-wrap gap-2">
             {g.modifiers.map((m) => (
-              <button key={m.id} type="button" aria-pressed={!!mods[m.id]} onClick={() => toggle(g.id, m.id)} className={clsx('min-h-11 rounded-full border px-4', mods[m.id] ? 'border-basil bg-basil text-white' : 'border-line-strong')}>
+              <button key={m.id} type="button" aria-pressed={!!mods[m.id]} onClick={() => toggle(g.id, m.id)} className={clsx('min-h-11 rounded-full border px-4', mods[m.id] ? 'border-basil bg-brand text-white' : 'border-line-strong')}>
                 {localName(lang, m)}
                 {m.priceDeltaSatang !== 0 && ` +${formatBaht(m.priceDeltaSatang)}`}
               </button>
@@ -85,9 +85,9 @@ function GuestItemDialog({ item, lang, onClose, onAdd }: { item: MenuItem; lang:
       </label>
       {!v.ok && <p className="mb-2 text-sm text-chili">{v.errors.join(' · ')}</p>}
       <div className="flex items-center gap-3">
-        <Button variant="outline" size="lg" aria-label="-" icon={<Minus className="size-5" />} onClick={() => setQty(Math.max(1, qty - 1))} />
+        <Button variant="outline" size="lg" aria-label="ลด / less" icon={<Minus className="size-5" />} onClick={() => setQty(Math.max(1, qty - 1))} />
         <span className="num w-8 text-center text-xl font-semibold">{qty}</span>
-        <Button variant="outline" size="lg" aria-label="+" icon={<Plus className="size-5" />} onClick={() => setQty(Math.min(20, qty + 1))} />
+        <Button variant="outline" size="lg" aria-label="เพิ่ม / more" icon={<Plus className="size-5" />} onClick={() => setQty(Math.min(20, qty + 1))} />
         <Button size="lg" className="flex-1" disabled={!v.ok} onClick={() => onAdd({ item, qty, mods, note })}>
           {L.add} · {formatBaht(unit * qty)}
         </Button>
@@ -111,7 +111,23 @@ export function GuestMenuPage() {
   const L = t(lang);
   const [cat, setCat] = useState('all');
   const [picking, setPicking] = useState<MenuItem | null>(null);
-  const [cart, setCart] = useState<CartLine[]>([]);
+  // The cart survives a reload / accidental back on the guest's phone (per QR token).
+  const cartKey = `rms.guest.cart.${token}`;
+  const [cart, setCart] = useState<CartLine[]>(() => {
+    try {
+      return JSON.parse(sessionStorage.getItem(cartKey) ?? '[]') as CartLine[];
+    } catch {
+      return [];
+    }
+  });
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(cartKey, JSON.stringify(cart));
+    } catch {
+      /* private mode: cart just isn't kept */
+    }
+  }, [cart, cartKey]);
+  const [cooldown, setCooldown] = useState<Record<string, boolean>>({});
   const [cartOpen, setCartOpen] = useState(false);
   const [pay, setPay] = useState<{ dataUrl: string; amountSatang: number } | null>(null);
   const q = useQuery({ queryKey: ['guest', token], queryFn: () => get<GuestData>(`/public/qr/${token}`), refetchInterval: 20_000, retry: false });
@@ -152,7 +168,12 @@ export function GuestMenuPage() {
   });
   const request = useMutation({
     mutationFn: (type: string) => post(`/public/qr/${token}/requests`, { type }),
-    onSuccess: () => toast.success(L.sent),
+    onSuccess: (_r, type) => {
+      toast.success(L.sent);
+      // One tap is enough: the same request button rests for 30 s so staff aren't spammed.
+      setCooldown((c) => ({ ...c, [type]: true }));
+      setTimeout(() => setCooldown((c) => ({ ...c, [type]: false })), 30_000);
+    },
     onError: (e) => toast.error(errorMessage(e)),
   });
 
@@ -173,30 +194,56 @@ export function GuestMenuPage() {
 
   return (
     <div className="mx-auto min-h-dvh max-w-2xl pb-28">
-      <header className="sticky top-0 z-20 border-b border-line bg-surface/95 px-4 py-3 backdrop-blur">
-        <div className="flex items-center justify-between gap-2">
-          <div>
-            <h1 className="font-semibold">{d.branchName}</h1>
-            <p className="text-sm text-ink-2">
-              {d.tableName ? `${L.table} ${d.tableName}` : `${L.order} #${d.orderNo}`}
-            </p>
+      <header className="sticky top-0 z-20 bg-char text-white shadow-md">
+        <div className="on-dark flex items-center justify-between gap-2 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-2">
+          <div className="flex min-w-0 items-center gap-3">
+            <img src="/brand/mark-white.png" alt="" className="h-9 w-auto shrink-0" />
+            <div className="min-w-0">
+              <h1 className="truncate font-semibold">{d.branchName}</h1>
+              <p className="text-sm text-white/75">{d.tableName ? `${L.table} ${d.tableName}` : `${L.order} #${d.orderNo}`}</p>
+            </div>
           </div>
-          <div className="flex gap-1" role="group" aria-label="Language">
+          <div className="flex shrink-0 gap-1" role="group" aria-label="Language">
             {(['th', 'en', 'zh'] as Lang[]).map((l) => (
-              <button key={l} type="button" onClick={() => setLang(l)} aria-pressed={lang === l} className={clsx('rounded px-2 py-1 text-sm', lang === l ? 'bg-ink text-white' : 'bg-sunken')}>
+              <button key={l} type="button" onClick={() => setLang(l)} aria-pressed={lang === l} className={clsx('min-h-10 min-w-10 rounded-control px-2 text-sm', lang === l ? 'bg-brand text-white' : 'bg-char-2 text-white/85')}>
                 {l === 'th' ? 'ไทย' : l === 'en' ? 'EN' : '中文'}
               </button>
             ))}
           </div>
         </div>
-        <nav className="-mx-4 mt-2 flex gap-1 overflow-x-auto px-4" aria-label="categories">
+        <nav className="flex gap-2 overflow-x-auto bg-surface px-4 py-2 text-ink shadow-sm" aria-label="categories">
           {[{ id: 'all', name: L.all, nameEn: L.all, nameZh: L.all }, ...d.menu.categories].map((c) => (
-            <button key={c.id} type="button" onClick={() => setCat(c.id)} className={clsx('rounded-full px-3 py-1.5 text-sm whitespace-nowrap', cat === c.id ? 'bg-basil text-white' : 'bg-sunken')}>
+            <button
+              key={c.id}
+              type="button"
+              aria-pressed={cat === c.id}
+              onClick={() => setCat(c.id)}
+              className={clsx('min-h-10 shrink-0 rounded-full border px-4 text-sm whitespace-nowrap', cat === c.id ? 'border-brand bg-brand text-white' : 'border-line-strong bg-surface')}
+            >
               {localName(lang, c)}
             </button>
           ))}
         </nav>
       </header>
+
+      {/* Service requests and "my order" sit at the top so guests don't scroll past 50 dishes to find them. */}
+      <div className="flex gap-2 overflow-x-auto px-4 pt-3">
+        {[
+          ['CALL_WAITER', L.callWaiter, Bell],
+          ['WATER', L.water, GlassWater],
+          ['ICE', L.ice, Snowflake],
+          ['BILL', L.bill, Receipt],
+        ].map(([type, label, Icon]: any) => (
+          <Button key={type} variant="outline" className="shrink-0" icon={<Icon className="size-4" />} disabled={cooldown[type]} loading={request.isPending && request.variables === type} onClick={() => request.mutate(type)}>
+            {label}
+          </Button>
+        ))}
+        {d.order.items.length > 0 && (
+          <a href="#my-order" className="inline-flex min-h-11 shrink-0 items-center rounded-control border border-line-strong bg-surface px-4 font-medium">
+            {L.myOrder} ({d.order.items.filter((i) => i.status !== 'CANCELLED').length})
+          </a>
+        )}
+      </div>
 
       {!d.orderingEnabled && <p className="m-4 rounded-control bg-turmeric-50 p-3 text-sm">{L.orderingOff}</p>}
 
@@ -209,11 +256,12 @@ export function GuestMenuPage() {
               onClick={() => setPicking(i)}
               className="flex w-full gap-3 overflow-hidden rounded-panel border border-line bg-surface text-left disabled:opacity-60"
             >
-              {i.imageUrl ? <img src={i.imageUrl} alt="" className="h-24 w-24 shrink-0 object-cover" loading="lazy" /> : <div className="h-24 w-2 shrink-0 bg-basil-50" />}
+              {i.imageUrl ? <img src={i.imageUrl} alt="" className="h-28 w-28 shrink-0 object-cover" loading="lazy" /> : <div className="h-28 w-2 shrink-0 bg-brand-50" />}
               <span className="flex min-w-0 flex-1 flex-col py-2 pr-3">
                 <span className="font-medium">{localName(lang, i)}</span>
+                {lang === 'th' && i.description && <span className="line-clamp-2 text-sm text-ink-3">{i.description}</span>}
                 {i.allergens.length > 0 && <span className="text-xs text-chili">{i.allergens.map((a) => ALLERGEN_I18N[a]?.[lang] ?? a).join(', ')}</span>}
-                <span className="num mt-auto font-semibold text-basil-600">{i.available ? formatBaht(i.priceSatang) : i.soldOut ? L.soldOut : L.unavailable}</span>
+                <span className="num mt-auto font-semibold text-brand">{i.available ? formatBaht(i.priceSatang) : i.soldOut ? L.soldOut : L.unavailable}</span>
               </span>
             </button>
           </li>
@@ -222,7 +270,7 @@ export function GuestMenuPage() {
       <p className="px-4 text-xs text-ink-3">{L.prices}</p>
 
       {d.order.items.length > 0 && (
-        <section className="m-4 rounded-panel border border-line bg-surface p-4" aria-live="polite">
+        <section id="my-order" className="m-4 scroll-mt-32 rounded-panel border border-line bg-surface p-4" aria-live="polite">
           <h2 className="mb-2 font-semibold">{L.myOrder}</h2>
           <ul className="flex flex-col gap-1.5 text-sm">
             {d.order.items.map((i) => (
@@ -257,21 +305,8 @@ export function GuestMenuPage() {
         </section>
       )}
 
-      <div className="mx-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {[
-          ['CALL_WAITER', L.callWaiter, Bell],
-          ['WATER', L.water, GlassWater],
-          ['ICE', L.ice, Snowflake],
-          ['BILL', L.bill, Receipt],
-        ].map(([type, label, Icon]: any) => (
-          <Button key={type} variant="outline" icon={<Icon className="size-4" />} loading={request.isPending && request.variables === type} onClick={() => request.mutate(type)}>
-            {label}
-          </Button>
-        ))}
-      </div>
-
       {cart.length > 0 && (
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface p-3">
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
           <Button size="lg" className="mx-auto flex w-full max-w-2xl" icon={<ShoppingBasket className="size-5" />} onClick={() => setCartOpen(true)}>
             {L.cart} ({cart.reduce((a, c) => a + c.qty, 0)}) · <span className="num">{formatBaht(cartTotal)}</span>
           </Button>
@@ -306,11 +341,20 @@ export function GuestMenuPage() {
             <ul className="flex flex-col gap-2">
               {cart.map((c) => (
                 <li key={c.id} className="flex items-center gap-2">
-                  <span className="flex-1">
-                    {c.qty}× {localName(lang, c.item)}
+                  <span className="flex items-center gap-1">
+                    <button type="button" aria-label="ลด / less" className="flex size-11 items-center justify-center rounded-control border border-line-strong" onClick={() => setCart(c.qty <= 1 ? cart.filter((x) => x.id !== c.id) : cart.map((x) => (x.id === c.id ? { ...x, qty: x.qty - 1 } : x)))}>
+                      <Minus className="size-4" />
+                    </button>
+                    <span className="num w-7 text-center font-semibold">{c.qty}</span>
+                    <button type="button" aria-label="เพิ่ม / more" className="flex size-11 items-center justify-center rounded-control border border-line-strong" onClick={() => setCart(cart.map((x) => (x.id === c.id ? { ...x, qty: Math.min(20, x.qty + 1) } : x)))}>
+                      <Plus className="size-4" />
+                    </button>
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    {localName(lang, c.item)}
                     {c.note && <span className="block text-xs text-ink-3">{c.note}</span>}
                   </span>
-                  <button type="button" aria-label="remove" className="rounded p-2 hover:bg-sunken" onClick={() => setCart(cart.filter((x) => x.id !== c.id))}>
+                  <button type="button" aria-label="ลบ / remove" className="flex size-11 items-center justify-center rounded-control hover:bg-sunken" onClick={() => setCart(cart.filter((x) => x.id !== c.id))}>
                     <X className="size-4" />
                   </button>
                 </li>

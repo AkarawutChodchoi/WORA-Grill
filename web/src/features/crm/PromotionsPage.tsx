@@ -31,7 +31,12 @@ interface Promotion {
 
 const TYPE_LABEL = { PERCENT_BILL: 'ลด % ทั้งบิล', AMOUNT_BILL: 'ลดเป็นบาท', PERCENT_ITEM: 'ลด % เฉพาะรายการ/หมวด', BUY_X_GET_Y: 'ซื้อ X แถม Y' };
 const DAYS = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
-const toLocalInput = (iso: string | null) => (iso ? new Date(iso).toISOString().slice(0, 16) : '');
+/** ISO → value for <input type="datetime-local"> in the device's own time zone (the same zone used when saving). */
+const toLocalInput = (iso: string | null) => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return new Date(d.getTime() - d.getTimezoneOffset() * 60_000).toISOString().slice(0, 16);
+};
 
 function PromotionDialog({ p, menu, onClose }: { p: Promotion | 'new'; menu?: AdminMenu; onClose: () => void }) {
   const x = p === 'new' ? null : p;
@@ -265,11 +270,11 @@ function LoyaltySettings() {
         <Button loading={save.isPending} disabled={!draft} onClick={() => save.mutate()}>
           บันทึก
         </Button>
-        <Button variant="outline" onClick={() => run.mutate('/crm/birthday-coupons')}>
+        <Button variant="outline" onClick={() => confirm('ออกคูปองวันเกิดให้สมาชิกที่เกิดเดือนนี้ทุกคน?') && run.mutate('/crm/birthday-coupons')}>
           ออกคูปองวันเกิดเดือนนี้
         </Button>
         {l.expiryMonths > 0 && (
-          <Button variant="outline" onClick={() => run.mutate('/crm/expire-points')}>
+          <Button variant="outline" onClick={() => confirm('ตัดแต้มที่หมดอายุของสมาชิกทุกคน? ย้อนกลับไม่ได้') && run.mutate('/crm/expire-points')}>
             ตัดแต้มหมดอายุ
           </Button>
         )}

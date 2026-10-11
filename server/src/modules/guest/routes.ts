@@ -1,13 +1,14 @@
 import { and, asc, eq, inArray, sql } from 'drizzle-orm';
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyRequest } from 'fastify';
 import QRCode from 'qrcode';
 import { z } from 'zod';
 import { dateString, nonEmpty, satang, uuid } from '@shared/validation';
 import { customers, diningTables, orderItems, orders, reservations, serviceRequests, waitlistEntries } from '../../db/schema';
 import { audit } from '../../lib/audit';
-import { requireAnyPerm, requireBranch, requirePerm } from '../../lib/auth';
+import { requireAnyPerm, requireAuth, requireBranch, requirePerm } from '../../lib/auth';
 import { randomToken } from '../../lib/crypto';
 import { badRequest, conflict, isUniqueViolation, notFound, parse } from '../../lib/errors';
+import { pickLanAddress, resolvePublicBaseUrl } from '../../lib/public-url';
 import { businessDate, localRange } from '../../lib/time';
 import { branchSettings } from '../menu/service';
 import { orderHooks, runItemsHook } from '../orders/hooks';
@@ -55,6 +56,18 @@ const NEXT: Record<string, string[]> = {
 
 export default async function guestRoutes(app: FastifyInstance) {
   const { db, bus, config } = app.deps;
+  /** Base URL for guest links, as seen from the staff device that asked (see lib/public-url). */
+  const baseUrl = (req: FastifyRequest) => {
+    const h = req.headers;
+    const referer = typeof h.referer === 'string' ? h.referer : undefined;
+    return resolvePublicBaseUrl({
+      configured: config.PUBLIC_BASE_URL,
+      origin: typeof h.origin === 'string' ? h.origin : referer,
+      host: typeof h['x-forwarded-host'] === 'string' ? h['x-forwarded-host'] : h.host,
+      protocol: req.protocol,
+      lanAddress: pickLanAddress(),
+    });
+  };
   registerGuestHooks();
   const emitRes = (orgId: string, branchId: string) => bus.publish({ type: 'reservation.updated', organizationId: orgId, branchId, payload: {} });
   const emitQueue = (orgId: string, branchId: string) => bus.publish({ type: 'waitlist.updated', organizationId: orgId, branchId, payload: {} });
@@ -179,7 +192,7 @@ export default async function guestRoutes(app: FastifyInstance) {
       .from(waitlistEntries)
       .where(and(eq(waitlistEntries.branchId, branchId), eq(waitlistEntries.businessDate, businessDate(s.timezone))))
       .orderBy(asc(waitlistEntries.queueNo));
-    return { entries: list.map((e) => ({ ...e, publicUrl: `${config.PUBLIC_BASE_URL}/q/${e.publicToken}` })), avgWaitMinutes: await averageWaitMinutes(db, branchId) };
+    return { entries: list.map((e) => ({ ...e, publicUrl: `${baseUrl(req)}/q/${e.publicToken}` })), avgWaitMinutes: await averageWaitMinutes(db, branchId) };
   });
 
   app.post('/waitlist', async (req) => {
@@ -199,7 +212,7 @@ export default async function guestRoutes(app: FastifyInstance) {
           return e;
         });
         emitQueue(a.orgId, branchId);
-        return { ...e, publicUrl: `${config.PUBLIC_BASE_URL}/q/${e.publicToken}`, qrDataUrl: await QRCode.toDataURL(`${config.PUBLIC_BASE_URL}/q/${e.publicToken}`, { margin: 1, width: 220 }) };
+        return { ...e, publicUrl: `${baseUrl(req)}/q/${e.publicToken}`, qrDataUrl: await QRCode.toDataURL(`${baseUrl(req)}/q/${e.publicToken}`, { margin: 1, width: 220 }) };
       } catch (e) {
         if (!isUniqueViolation(e) || attempt === 2) throw e; // concurrent ticket: retry with the next number
       }
@@ -264,6 +277,13 @@ export default async function guestRoutes(app: FastifyInstance) {
   });
 
   // ---------- QR ordering (staff side) ----------
+  /** Where phones on the shop Wi-Fi can open this system (shown next to QR codes and in settings). */
+  app.get('/qr/base-url', async (req) => {
+    requireAuth(req);
+    const url = baseUrl(req);
+    return { baseUrl: url, lanAddress: pickLanAddress(), qrDataUrl: await QRCode.toDataURL(url, { margin: 1, width: 220 }) };
+  });
+
   /** Issue / rotate the QR for an open bill (table or kiosk/takeaway). Returns the URL to print. */
   app.post('/orders/:id/qr', async (req) => {
     const a = requirePerm(req, 'order.create');
@@ -278,7 +298,7 @@ export default async function guestRoutes(app: FastifyInstance) {
       await audit(tx, a, { action: 'qr.issue', targetType: 'order', targetId: id }, req.ip);
       return q;
     });
-    const url = `${config.PUBLIC_BASE_URL}/m/${r.token}`;
+    const url = `${baseUrl(req)}/m/${r.token}`;
     return { url, expiresAt: r.expiresAt, qrDataUrl: await QRCode.toDataURL(url, { margin: 1, width: 280 }) };
   });
 

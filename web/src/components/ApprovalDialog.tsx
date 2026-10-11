@@ -30,7 +30,7 @@ export function ApprovalDialog({ open, permission, onApproved, onClose }: { open
   return (
     <Dialog open={open} onClose={onClose} title="ต้องให้ผู้จัดการอนุมัติ" size="sm">
       <p className="mb-3 flex items-center gap-2 text-sm text-ink-2">
-        <ShieldCheck className="size-4 text-basil" />
+        <ShieldCheck className="size-4 text-brand" />
         {PERMISSIONS[permission]}
       </p>
       {approvers.isLoading ? (

@@ -7,6 +7,8 @@ export interface Column<T> {
   cell: (row: T) => ReactNode;
   className?: string;
   align?: 'left' | 'right' | 'center';
+  /** Phone card layout: 'title' = card heading (default: first column), 'media' = thumbnail beside the heading, 'hide' = not shown on phones. */
+  mobile?: 'title' | 'media' | 'hide';
 }
 
 export function DataTable<T>({
@@ -22,41 +24,79 @@ export function DataTable<T>({
   onRowClick?: (r: T) => void;
   caption?: string;
 }) {
+  // Phones get one card per row instead of a table that only scrolls sideways.
+  const mediaCol = columns.find((c) => c.mobile === 'media');
+  const titleCol = columns.find((c) => c.mobile === 'title') ?? columns.find((c) => c !== mediaCol)!;
+  const isAction = (c: Column<T>) => c.header === '' || c.header == null;
+  const rest = columns.filter((c) => c !== titleCol && c !== mediaCol && c.mobile !== 'hide');
+  const fields = rest.filter((c) => !isAction(c));
+  const actions = rest.filter(isAction);
   return (
-    <div className="overflow-x-auto rounded-panel border border-line bg-surface">
-      <table className="w-full border-collapse text-sm">
-        {caption && <caption className="sr-only">{caption}</caption>}
-        <thead>
-          <tr className="border-b border-line bg-sunken/60 text-left text-ink-2">
-            {columns.map((c) => (
-              <th
-                key={c.key}
-                scope="col"
-                className={clsx('px-3 py-2 font-medium whitespace-nowrap', c.align === 'right' && 'text-right', c.align === 'center' && 'text-center', c.className)}
-              >
-                {c.header}
-              </th>
+    <>
+      <ul className="divide-y divide-line rounded-panel border border-line bg-surface sm:hidden" aria-label={caption}>
+        {rows.map((r) => (
+          <li
+            key={rowKey(r)}
+            className={clsx('flex flex-col gap-1 px-3 py-3', onRowClick && 'cursor-pointer active:bg-sunken/60')}
+            onClick={onRowClick ? () => onRowClick(r) : undefined}
+            onKeyDown={onRowClick ? (e) => e.key === 'Enter' && onRowClick(r) : undefined}
+            tabIndex={onRowClick ? 0 : undefined}
+          >
+            <div className="flex items-center gap-3">
+              {mediaCol && <div className="shrink-0">{mediaCol.cell(r)}</div>}
+              <div className="min-w-0 font-medium">{titleCol.cell(r)}</div>
+            </div>
+            {fields.map((c) => (
+              <div key={c.key} className="flex items-start justify-between gap-3 text-sm">
+                <span className="shrink-0 text-ink-3">{c.header}</span>
+                <span className={clsx('min-w-0 text-right', c.align === 'right' && 'num')}>{c.cell(r)}</span>
+              </div>
             ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr
-              key={rowKey(r)}
-              className={clsx('border-b border-line last:border-0', onRowClick && 'cursor-pointer hover:bg-sunken/50')}
-              onClick={onRowClick ? () => onRowClick(r) : undefined}
-              onKeyDown={onRowClick ? (e) => e.key === 'Enter' && onRowClick(r) : undefined}
-              tabIndex={onRowClick ? 0 : undefined}
-            >
+            {actions.length > 0 && (
+              <div className="flex flex-wrap justify-end gap-2 pt-1" onClick={(e) => e.stopPropagation()}>
+                {actions.map((c) => (
+                  <span key={c.key}>{c.cell(r)}</span>
+                ))}
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+      <div className="hidden overflow-x-auto rounded-panel border border-line bg-surface sm:block">
+        <table className="w-full border-collapse text-sm">
+          {caption && <caption className="sr-only">{caption}</caption>}
+          <thead>
+            <tr className="border-b border-line bg-sunken/60 text-left text-ink-2">
               {columns.map((c) => (
-                <td key={c.key} className={clsx('px-3 py-2 align-middle', c.align === 'right' && 'num text-right', c.align === 'center' && 'text-center', c.className)}>
-                  {c.cell(r)}
-                </td>
+                <th
+                  key={c.key}
+                  scope="col"
+                  className={clsx('px-3 py-2 font-medium whitespace-nowrap', c.align === 'right' && 'text-right', c.align === 'center' && 'text-center', c.className)}
+                >
+                  {c.header}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr
+                key={rowKey(r)}
+                className={clsx('border-b border-line last:border-0', onRowClick && 'cursor-pointer hover:bg-sunken/50')}
+                onClick={onRowClick ? () => onRowClick(r) : undefined}
+                onKeyDown={onRowClick ? (e) => e.key === 'Enter' && onRowClick(r) : undefined}
+                tabIndex={onRowClick ? 0 : undefined}
+              >
+                {columns.map((c) => (
+                  <td key={c.key} className={clsx('px-3 py-2 align-middle', c.align === 'right' && 'num text-right', c.align === 'center' && 'text-center', c.className)}>
+                    {c.cell(r)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }

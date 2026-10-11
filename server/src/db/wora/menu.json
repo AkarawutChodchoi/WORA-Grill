@@ -1,0 +1,3784 @@
+{
+ "source": "เมนูอาหาร 50 รายการ พร้อมรูป.xlsx (ข้อมูลตัวอย่างจากเจ้าของร้าน)",
+ "imageLicenseNote": "รูปจาก Wikimedia Commons (CC BY-SA / Public domain) — ใช้เป็นตัวอย่างทดสอบ ควรเปลี่ยนเป็นรูปของร้านก่อนใช้งานจริง",
+ "categories": [
+  {
+   "name": "ต้ม / แกง",
+   "nameEn": "Soups & Curries"
+  },
+  {
+   "name": "ผัด",
+   "nameEn": "Stir-fries"
+  },
+  {
+   "name": "ยำ / อีสาน",
+   "nameEn": "Salads & Grill"
+  },
+  {
+   "name": "ข้าว / จานเดียว",
+   "nameEn": "Rice dishes"
+  },
+  {
+   "name": "ก๋วยเตี๋ยว",
+   "nameEn": "Noodles"
+  },
+  {
+   "name": "ของทานเล่น",
+   "nameEn": "Starters"
+  },
+  {
+   "name": "ของหวาน",
+   "nameEn": "Desserts"
+  },
+  {
+   "name": "เครื่องดื่ม",
+   "nameEn": "Drinks"
+  }
+ ],
+ "items": [
+  {
+   "sku": "S01",
+   "name": "ต้มยำกุ้งน้ำข้น",
+   "nameEn": "Tom Yum Goong",
+   "category": "ต้ม / แกง",
+   "price": 18000,
+   "description": "ต้มยำกุ้งแม่น้ำ น้ำข้นรสจัด หอมสมุนไพร",
+   "tags": [
+    "spicy",
+    "signature"
+   ],
+   "allergens": [
+    "shellfish"
+   ],
+   "image": "S01.jpg",
+   "imageCredit": {
+    "file": "Tom yam kung maenam.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Tom_yam_kung_maenam.jpg"
+   },
+   "groups": [
+    {
+     "name": "ระดับความเผ็ด",
+     "nameEn": "Spice level",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไม่เผ็ด",
+       "nameEn": "Not spicy",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดน้อย",
+       "nameEn": "Mild",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดกลาง",
+       "nameEn": "Medium",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดมาก",
+       "nameEn": "Hot",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "แบบน้ำ",
+     "nameEn": "Broth",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "น้ำข้น",
+       "nameEn": "Creamy",
+       "priceDelta": 0
+      },
+      {
+       "name": "น้ำใส",
+       "nameEn": "Clear",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "ขนาด",
+     "nameEn": "Size",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ปกติ",
+       "nameEn": "Regular",
+       "priceDelta": 0
+      },
+      {
+       "name": "พิเศษ",
+       "nameEn": "Large",
+       "priceDelta": 2000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "S02",
+   "name": "ต้มข่าไก่",
+   "nameEn": "Tom Kha Gai",
+   "category": "ต้ม / แกง",
+   "price": 15000,
+   "description": "ไก่ต้มกะทิกับข่า ตะไคร้ ใบมะกรูด",
+   "tags": [
+    "spicy"
+   ],
+   "allergens": [],
+   "image": "S02.jpg",
+   "imageCredit": {
+    "file": "Flickr preppybyday 4711943668--Tom kha gai.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Flickr_preppybyday_4711943668--Tom_kha_gai.jpg"
+   },
+   "groups": [
+    {
+     "name": "ระดับความเผ็ด",
+     "nameEn": "Spice level",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไม่เผ็ด",
+       "nameEn": "Not spicy",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดน้อย",
+       "nameEn": "Mild",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดกลาง",
+       "nameEn": "Medium",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดมาก",
+       "nameEn": "Hot",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "เลือกเนื้อสัตว์",
+     "nameEn": "Protein",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไก่",
+       "nameEn": "Chicken",
+       "priceDelta": 0
+      },
+      {
+       "name": "กุ้ง",
+       "nameEn": "Shrimp",
+       "priceDelta": 3000
+      },
+      {
+       "name": "เห็ด (เจ)",
+       "nameEn": null,
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "ขนาด",
+     "nameEn": "Size",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ปกติ",
+       "nameEn": "Regular",
+       "priceDelta": 0
+      },
+      {
+       "name": "พิเศษ",
+       "nameEn": "Large",
+       "priceDelta": 2000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "S03",
+   "name": "แกงเขียวหวานไก่",
+   "nameEn": "Green Curry Chicken",
+   "category": "ต้ม / แกง",
+   "price": 14000,
+   "description": "แกงเขียวหวานกะทิสด มะเขือเปราะ โหระพา",
+   "tags": [
+    "spicy"
+   ],
+   "allergens": [],
+   "image": "S03.jpg",
+   "imageCredit": {
+    "file": "Thai green chicken curry and roti.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Thai_green_chicken_curry_and_roti.jpg"
+   },
+   "groups": [
+    {
+     "name": "ระดับความเผ็ด",
+     "nameEn": "Spice level",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไม่เผ็ด",
+       "nameEn": "Not spicy",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดน้อย",
+       "nameEn": "Mild",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดกลาง",
+       "nameEn": "Medium",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดมาก",
+       "nameEn": "Hot",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "เลือกเนื้อสัตว์",
+     "nameEn": "Protein",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "หมู",
+       "nameEn": "Pork",
+       "priceDelta": 0
+      },
+      {
+       "name": "ไก่",
+       "nameEn": "Chicken",
+       "priceDelta": 0
+      },
+      {
+       "name": "เนื้อ",
+       "nameEn": "Beef",
+       "priceDelta": 2000
+      },
+      {
+       "name": "กุ้ง",
+       "nameEn": "Shrimp",
+       "priceDelta": 3000
+      },
+      {
+       "name": "ทะเล",
+       "nameEn": "Seafood",
+       "priceDelta": 4000
+      }
+     ]
+    },
+    {
+     "name": "เพิ่ม",
+     "nameEn": "Add-ons",
+     "min": 0,
+     "max": 2,
+     "options": [
+      {
+       "name": "ขนมจีน",
+       "nameEn": null,
+       "priceDelta": 1500
+      },
+      {
+       "name": "โรตี",
+       "nameEn": null,
+       "priceDelta": 2000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "S04",
+   "name": "แกงมัสมั่นเนื้อ",
+   "nameEn": "Massaman Beef",
+   "category": "ต้ม / แกง",
+   "price": 18000,
+   "description": "เนื้อตุ๋นนุ่ม มันฝรั่ง ถั่วลิสง รสกลมกล่อม",
+   "tags": [],
+   "allergens": [],
+   "image": "S04.jpg",
+   "imageCredit": {
+    "file": "Kaeng matsaman kai.JPG",
+    "source": "https://commons.wikimedia.org/wiki/File:Kaeng_matsaman_kai.JPG"
+   },
+   "groups": [
+    {
+     "name": "เลือกเนื้อสัตว์",
+     "nameEn": "Protein",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "เนื้อ",
+       "nameEn": "Beef",
+       "priceDelta": 0
+      },
+      {
+       "name": "ไก่",
+       "nameEn": "Chicken",
+       "priceDelta": -3000
+      },
+      {
+       "name": "แพะ",
+       "nameEn": null,
+       "priceDelta": 2000
+      }
+     ]
+    },
+    {
+     "name": "ข้าว",
+     "nameEn": "Rice",
+     "min": 0,
+     "max": 1,
+     "options": [
+      {
+       "name": "ข้าวสวย",
+       "nameEn": "Steamed rice",
+       "priceDelta": 1000
+      },
+      {
+       "name": "ข้าวกล้อง",
+       "nameEn": "Brown rice",
+       "priceDelta": 1500
+      },
+      {
+       "name": "ข้าวเหนียว",
+       "nameEn": "Sticky rice",
+       "priceDelta": 1000
+      }
+     ]
+    },
+    {
+     "name": "เพิ่ม",
+     "nameEn": "Add-ons",
+     "min": 0,
+     "max": 1,
+     "options": [
+      {
+       "name": "โรตี",
+       "nameEn": null,
+       "priceDelta": 2000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "S05",
+   "name": "แกงแดง",
+   "nameEn": "Red Curry",
+   "category": "ต้ม / แกง",
+   "price": 14000,
+   "description": "แกงเผ็ดกะทิ หน่อไม้ ใบโหระพา",
+   "tags": [
+    "spicy"
+   ],
+   "allergens": [],
+   "image": "S05.jpg",
+   "imageCredit": {
+    "file": "Kaeng phet mu.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Kaeng_phet_mu.jpg"
+   },
+   "groups": [
+    {
+     "name": "ระดับความเผ็ด",
+     "nameEn": "Spice level",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไม่เผ็ด",
+       "nameEn": "Not spicy",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดน้อย",
+       "nameEn": "Mild",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดกลาง",
+       "nameEn": "Medium",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดมาก",
+       "nameEn": "Hot",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "เลือกเนื้อสัตว์",
+     "nameEn": "Protein",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "หมู",
+       "nameEn": "Pork",
+       "priceDelta": 0
+      },
+      {
+       "name": "ไก่",
+       "nameEn": "Chicken",
+       "priceDelta": 0
+      },
+      {
+       "name": "เนื้อ",
+       "nameEn": "Beef",
+       "priceDelta": 2000
+      },
+      {
+       "name": "กุ้ง",
+       "nameEn": "Shrimp",
+       "priceDelta": 3000
+      },
+      {
+       "name": "ทะเล",
+       "nameEn": "Seafood",
+       "priceDelta": 4000
+      }
+     ]
+    },
+    {
+     "name": "ข้าว",
+     "nameEn": "Rice",
+     "min": 0,
+     "max": 1,
+     "options": [
+      {
+       "name": "ข้าวสวย",
+       "nameEn": "Steamed rice",
+       "priceDelta": 1000
+      },
+      {
+       "name": "ข้าวกล้อง",
+       "nameEn": "Brown rice",
+       "priceDelta": 1500
+      },
+      {
+       "name": "ข้าวเหนียว",
+       "nameEn": "Sticky rice",
+       "priceDelta": 1000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "S06",
+   "name": "พะแนงหมู",
+   "nameEn": "Panang Curry Pork",
+   "category": "ต้ม / แกง",
+   "price": 14000,
+   "description": "พะแนงเข้มข้น ใบมะกรูดซอย",
+   "tags": [
+    "spicy"
+   ],
+   "allergens": [],
+   "image": "S06.jpg",
+   "imageCredit": {
+    "file": "Panang curry (42943883862).jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Panang_curry_(42943883862).jpg"
+   },
+   "groups": [
+    {
+     "name": "ระดับความเผ็ด",
+     "nameEn": "Spice level",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไม่เผ็ด",
+       "nameEn": "Not spicy",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดน้อย",
+       "nameEn": "Mild",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดกลาง",
+       "nameEn": "Medium",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดมาก",
+       "nameEn": "Hot",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "เลือกเนื้อสัตว์",
+     "nameEn": "Protein",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "หมู",
+       "nameEn": "Pork",
+       "priceDelta": 0
+      },
+      {
+       "name": "ไก่",
+       "nameEn": "Chicken",
+       "priceDelta": 0
+      },
+      {
+       "name": "เนื้อ",
+       "nameEn": "Beef",
+       "priceDelta": 2000
+      },
+      {
+       "name": "กุ้ง",
+       "nameEn": "Shrimp",
+       "priceDelta": 3000
+      },
+      {
+       "name": "ทะเล",
+       "nameEn": "Seafood",
+       "priceDelta": 4000
+      }
+     ]
+    },
+    {
+     "name": "ข้าว",
+     "nameEn": "Rice",
+     "min": 0,
+     "max": 1,
+     "options": [
+      {
+       "name": "ข้าวสวย",
+       "nameEn": "Steamed rice",
+       "priceDelta": 1000
+      },
+      {
+       "name": "ข้าวกล้อง",
+       "nameEn": "Brown rice",
+       "priceDelta": 1500
+      },
+      {
+       "name": "ข้าวเหนียว",
+       "nameEn": "Sticky rice",
+       "priceDelta": 1000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "S07",
+   "name": "แกงส้มชะอมไข่กุ้ง",
+   "nameEn": "Sour Curry",
+   "category": "ต้ม / แกง",
+   "price": 16000,
+   "description": "แกงส้มรสเปรี้ยวจัด ชะอมทอดไข่และกุ้ง",
+   "tags": [
+    "spicy"
+   ],
+   "allergens": [
+    "shellfish",
+    "egg"
+   ],
+   "image": "S07.jpg",
+   "imageCredit": {
+    "file": "Kaeng som-marum63.JPG",
+    "source": "https://commons.wikimedia.org/wiki/File:Kaeng_som-marum63.JPG"
+   },
+   "groups": [
+    {
+     "name": "ระดับความเผ็ด",
+     "nameEn": "Spice level",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไม่เผ็ด",
+       "nameEn": "Not spicy",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดน้อย",
+       "nameEn": "Mild",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดกลาง",
+       "nameEn": "Medium",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดมาก",
+       "nameEn": "Hot",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "ผัก",
+     "nameEn": "Vegetable",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ชะอมไข่",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "ผักรวม",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "มะละกอ",
+       "nameEn": null,
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "ขนาด",
+     "nameEn": "Size",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ปกติ",
+       "nameEn": "Regular",
+       "priceDelta": 0
+      },
+      {
+       "name": "พิเศษ",
+       "nameEn": "Large",
+       "priceDelta": 2000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "S08",
+   "name": "ต้มจืดเต้าหู้หมูสับ",
+   "nameEn": "Clear Tofu Soup",
+   "category": "ต้ม / แกง",
+   "price": 12000,
+   "description": "ต้มจืดรสละมุน เต้าหู้ไข่ หมูสับ สาหร่าย",
+   "tags": [],
+   "allergens": [],
+   "image": "S08.jpg",
+   "imageCredit": {
+    "file": "Tom chuet taohu.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Tom_chuet_taohu.jpg"
+   },
+   "groups": [
+    {
+     "name": "เพิ่ม",
+     "nameEn": "Add-ons",
+     "min": 0,
+     "max": 2,
+     "options": [
+      {
+       "name": "วุ้นเส้น",
+       "nameEn": "Glass noodle",
+       "priceDelta": 1000
+      },
+      {
+       "name": "สาหร่าย",
+       "nameEn": null,
+       "priceDelta": 1000
+      }
+     ]
+    },
+    {
+     "name": "ขนาด",
+     "nameEn": "Size",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ปกติ",
+       "nameEn": "Regular",
+       "priceDelta": 0
+      },
+      {
+       "name": "พิเศษ",
+       "nameEn": "Large",
+       "priceDelta": 2000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "F01",
+   "name": "ผัดไทยกุ้งสด",
+   "nameEn": "Pad Thai Shrimp",
+   "category": "ผัด",
+   "price": 12000,
+   "description": "เส้นจันท์ผัดซอสมะขาม กุ้งสด ถั่วงอก กุยช่าย",
+   "tags": [
+    "signature"
+   ],
+   "allergens": [
+    "shellfish",
+    "peanut",
+    "egg"
+   ],
+   "image": "F01.jpg",
+   "imageCredit": {
+    "file": "Phat Thai kung Chang Khien street stall.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Phat_Thai_kung_Chang_Khien_street_stall.jpg"
+   },
+   "groups": [
+    {
+     "name": "เลือกเนื้อสัตว์",
+     "nameEn": "Protein",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "กุ้ง",
+       "nameEn": "Shrimp",
+       "priceDelta": 0
+      },
+      {
+       "name": "หมู",
+       "nameEn": "Pork",
+       "priceDelta": -2000
+      },
+      {
+       "name": "ไก่",
+       "nameEn": "Chicken",
+       "priceDelta": -2000
+      },
+      {
+       "name": "เต้าหู้",
+       "nameEn": null,
+       "priceDelta": -2000
+      }
+     ]
+    },
+    {
+     "name": "แบบ",
+     "nameEn": "Style",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ปกติ",
+       "nameEn": "Regular",
+       "priceDelta": 0
+      },
+      {
+       "name": "ห่อไข่",
+       "nameEn": null,
+       "priceDelta": 1500
+      }
+     ]
+    },
+    {
+     "name": "ไม่ใส่",
+     "nameEn": "Leave out",
+     "min": 0,
+     "max": 3,
+     "options": [
+      {
+       "name": "ถั่วลิสง",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "ถั่วงอก",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "กุ้งแห้ง",
+       "nameEn": null,
+       "priceDelta": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "F02",
+   "name": "ผัดกะเพราหมูสับ",
+   "nameEn": "Pad Kra Pao",
+   "category": "ผัด",
+   "price": 7000,
+   "description": "กะเพราผัดพริกกระเทียม หอมใบกะเพรา",
+   "tags": [
+    "spicy",
+    "signature"
+   ],
+   "allergens": [],
+   "image": "F02.jpg",
+   "imageCredit": {
+    "file": "Basil fried crispy pork with rice - Chiang Mai - 2017-07-11 (002).jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Basil_fried_crispy_pork_with_rice_-_Chiang_Mai_-_2017-07-11_(002).jpg"
+   },
+   "groups": [
+    {
+     "name": "ระดับความเผ็ด",
+     "nameEn": "Spice level",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไม่เผ็ด",
+       "nameEn": "Not spicy",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดน้อย",
+       "nameEn": "Mild",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดกลาง",
+       "nameEn": "Medium",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดมาก",
+       "nameEn": "Hot",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "เลือกเนื้อสัตว์",
+     "nameEn": "Protein",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "หมู",
+       "nameEn": "Pork",
+       "priceDelta": 0
+      },
+      {
+       "name": "ไก่",
+       "nameEn": "Chicken",
+       "priceDelta": 0
+      },
+      {
+       "name": "เนื้อ",
+       "nameEn": "Beef",
+       "priceDelta": 2000
+      },
+      {
+       "name": "กุ้ง",
+       "nameEn": "Shrimp",
+       "priceDelta": 3000
+      },
+      {
+       "name": "ทะเล",
+       "nameEn": "Seafood",
+       "priceDelta": 4000
+      }
+     ]
+    },
+    {
+     "name": "ท็อปปิ้ง",
+     "nameEn": "Topping",
+     "min": 0,
+     "max": 3,
+     "options": [
+      {
+       "name": "ไข่ดาว",
+       "nameEn": "Fried egg",
+       "priceDelta": 1000
+      },
+      {
+       "name": "ไข่เจียว",
+       "nameEn": "Omelette",
+       "priceDelta": 1500
+      },
+      {
+       "name": "ไข่ข้น",
+       "nameEn": "Soft scrambled egg",
+       "priceDelta": 1500
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "F03",
+   "name": "ผัดซีอิ๊ว",
+   "nameEn": "Pad See Ew",
+   "category": "ผัด",
+   "price": 8000,
+   "description": "เส้นใหญ่ผัดซีอิ๊วดำ คะน้า ไข่",
+   "tags": [],
+   "allergens": [],
+   "image": "F03.jpg",
+   "imageCredit": {
+    "file": "Pad see ew.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Pad_see_ew.jpg"
+   },
+   "groups": [
+    {
+     "name": "เลือกเนื้อสัตว์",
+     "nameEn": "Protein",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "หมู",
+       "nameEn": "Pork",
+       "priceDelta": 0
+      },
+      {
+       "name": "ไก่",
+       "nameEn": "Chicken",
+       "priceDelta": 0
+      },
+      {
+       "name": "เนื้อ",
+       "nameEn": "Beef",
+       "priceDelta": 2000
+      },
+      {
+       "name": "กุ้ง",
+       "nameEn": "Shrimp",
+       "priceDelta": 3000
+      },
+      {
+       "name": "ทะเล",
+       "nameEn": "Seafood",
+       "priceDelta": 4000
+      }
+     ]
+    },
+    {
+     "name": "เส้น",
+     "nameEn": "Noodle",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "เส้นใหญ่",
+       "nameEn": "Wide rice noodle",
+       "priceDelta": 0
+      },
+      {
+       "name": "เส้นหมี่",
+       "nameEn": "Vermicelli",
+       "priceDelta": 0
+      },
+      {
+       "name": "มาม่า",
+       "nameEn": null,
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "ท็อปปิ้ง",
+     "nameEn": "Topping",
+     "min": 0,
+     "max": 3,
+     "options": [
+      {
+       "name": "ไข่ดาว",
+       "nameEn": "Fried egg",
+       "priceDelta": 1000
+      },
+      {
+       "name": "ไข่เจียว",
+       "nameEn": "Omelette",
+       "priceDelta": 1500
+      },
+      {
+       "name": "ไข่ข้น",
+       "nameEn": "Soft scrambled egg",
+       "priceDelta": 1500
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "F04",
+   "name": "ราดหน้า",
+   "nameEn": "Rad Na",
+   "category": "ผัด",
+   "price": 8000,
+   "description": "เส้นใหญ่ราดน้ำเกรวี่ คะน้า",
+   "tags": [],
+   "allergens": [],
+   "image": "F04.jpg",
+   "imageCredit": {
+    "file": "Kuai-tiao rat na mu.JPG",
+    "source": "https://commons.wikimedia.org/wiki/File:Kuai-tiao_rat_na_mu.JPG"
+   },
+   "groups": [
+    {
+     "name": "เลือกเนื้อสัตว์",
+     "nameEn": "Protein",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "หมู",
+       "nameEn": "Pork",
+       "priceDelta": 0
+      },
+      {
+       "name": "ไก่",
+       "nameEn": "Chicken",
+       "priceDelta": 0
+      },
+      {
+       "name": "เนื้อ",
+       "nameEn": "Beef",
+       "priceDelta": 2000
+      },
+      {
+       "name": "กุ้ง",
+       "nameEn": "Shrimp",
+       "priceDelta": 3000
+      },
+      {
+       "name": "ทะเล",
+       "nameEn": "Seafood",
+       "priceDelta": 4000
+      }
+     ]
+    },
+    {
+     "name": "เส้น",
+     "nameEn": "Noodle",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "เส้นใหญ่",
+       "nameEn": "Wide rice noodle",
+       "priceDelta": 0
+      },
+      {
+       "name": "เส้นหมี่กรอบ",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "บะหมี่กรอบ",
+       "nameEn": null,
+       "priceDelta": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "F05",
+   "name": "ผัดขี้เมา",
+   "nameEn": "Drunken Noodles",
+   "category": "ผัด",
+   "price": 9000,
+   "description": "เส้นใหญ่ผัดเผ็ด กะเพรา พริกไทยอ่อน",
+   "tags": [
+    "spicy"
+   ],
+   "allergens": [],
+   "image": "F05.jpg",
+   "imageCredit": {
+    "file": "Sen yai phat khi mao.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Sen_yai_phat_khi_mao.jpg"
+   },
+   "groups": [
+    {
+     "name": "ระดับความเผ็ด",
+     "nameEn": "Spice level",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไม่เผ็ด",
+       "nameEn": "Not spicy",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดน้อย",
+       "nameEn": "Mild",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดกลาง",
+       "nameEn": "Medium",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดมาก",
+       "nameEn": "Hot",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "เลือกเนื้อสัตว์",
+     "nameEn": "Protein",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "หมู",
+       "nameEn": "Pork",
+       "priceDelta": 0
+      },
+      {
+       "name": "ไก่",
+       "nameEn": "Chicken",
+       "priceDelta": 0
+      },
+      {
+       "name": "เนื้อ",
+       "nameEn": "Beef",
+       "priceDelta": 2000
+      },
+      {
+       "name": "กุ้ง",
+       "nameEn": "Shrimp",
+       "priceDelta": 3000
+      },
+      {
+       "name": "ทะเล",
+       "nameEn": "Seafood",
+       "priceDelta": 4000
+      }
+     ]
+    },
+    {
+     "name": "เส้น",
+     "nameEn": "Noodle",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "เส้นเล็ก",
+       "nameEn": "Thin rice noodle",
+       "priceDelta": 0
+      },
+      {
+       "name": "เส้นใหญ่",
+       "nameEn": "Wide rice noodle",
+       "priceDelta": 0
+      },
+      {
+       "name": "เส้นหมี่",
+       "nameEn": "Vermicelli",
+       "priceDelta": 0
+      },
+      {
+       "name": "บะหมี่",
+       "nameEn": "Egg noodle",
+       "priceDelta": 0
+      },
+      {
+       "name": "วุ้นเส้น",
+       "nameEn": "Glass noodle",
+       "priceDelta": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "F06",
+   "name": "ข้าวผัดปู",
+   "nameEn": "Crab Fried Rice",
+   "category": "ผัด",
+   "price": 13000,
+   "description": "ข้าวผัดไข่ เนื้อปูก้อน ต้นหอม มะนาว",
+   "tags": [],
+   "allergens": [
+    "shellfish",
+    "egg"
+   ],
+   "image": "F06.jpg",
+   "imageCredit": {
+    "file": "Thaifriedrice.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Thaifriedrice.jpg"
+   },
+   "groups": [
+    {
+     "name": "ขนาด",
+     "nameEn": "Size",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ปกติ",
+       "nameEn": "Regular",
+       "priceDelta": 0
+      },
+      {
+       "name": "พิเศษ",
+       "nameEn": "Large",
+       "priceDelta": 3000
+      }
+     ]
+    },
+    {
+     "name": "เพิ่มเติม",
+     "nameEn": "Extras",
+     "min": 0,
+     "max": 1,
+     "options": [
+      {
+       "name": "เพิ่มเนื้อปู",
+       "nameEn": null,
+       "priceDelta": 5000
+      }
+     ]
+    },
+    {
+     "name": "ท็อปปิ้ง",
+     "nameEn": "Topping",
+     "min": 0,
+     "max": 3,
+     "options": [
+      {
+       "name": "ไข่ดาว",
+       "nameEn": "Fried egg",
+       "priceDelta": 1000
+      },
+      {
+       "name": "ไข่เจียว",
+       "nameEn": "Omelette",
+       "priceDelta": 1500
+      },
+      {
+       "name": "ไข่ข้น",
+       "nameEn": "Soft scrambled egg",
+       "priceDelta": 1500
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "F07",
+   "name": "ผัดผักบุ้งไฟแดง",
+   "nameEn": "Morning Glory Stir-fry",
+   "category": "ผัด",
+   "price": 7000,
+   "description": "ผักบุ้งผัดเต้าเจี้ยว ไฟแรงหอมกระทะ",
+   "tags": [
+    "spicy"
+   ],
+   "allergens": [],
+   "image": "F07.jpg",
+   "imageCredit": {
+    "file": "Stir fried morning glory at Kualao Restaurant.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Stir_fried_morning_glory_at_Kualao_Restaurant.jpg"
+   },
+   "groups": [
+    {
+     "name": "ระดับความเผ็ด",
+     "nameEn": "Spice level",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไม่เผ็ด",
+       "nameEn": "Not spicy",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดน้อย",
+       "nameEn": "Mild",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดกลาง",
+       "nameEn": "Medium",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดมาก",
+       "nameEn": "Hot",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "เพิ่ม",
+     "nameEn": "Add-ons",
+     "min": 0,
+     "max": 2,
+     "options": [
+      {
+       "name": "หมูกรอบ",
+       "nameEn": null,
+       "priceDelta": 3000
+      },
+      {
+       "name": "กุ้ง",
+       "nameEn": "Shrimp",
+       "priceDelta": 3000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "F08",
+   "name": "ไก่ผัดเม็ดมะม่วงหิมพานต์",
+   "nameEn": "Cashew Chicken",
+   "category": "ผัด",
+   "price": 13000,
+   "description": "ไก่ทอดผัดซอส เม็ดมะม่วง พริกแห้ง",
+   "tags": [
+    "spicy"
+   ],
+   "allergens": [
+    "peanut"
+   ],
+   "image": "F08.jpg",
+   "imageCredit": {
+    "file": "Cashewchickenphoto.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Cashewchickenphoto.jpg"
+   },
+   "groups": [
+    {
+     "name": "ระดับความเผ็ด",
+     "nameEn": "Spice level",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไม่เผ็ด",
+       "nameEn": "Not spicy",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดน้อย",
+       "nameEn": "Mild",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดกลาง",
+       "nameEn": "Medium",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดมาก",
+       "nameEn": "Hot",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "เลือกเนื้อสัตว์",
+     "nameEn": "Protein",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไก่",
+       "nameEn": "Chicken",
+       "priceDelta": 0
+      },
+      {
+       "name": "กุ้ง",
+       "nameEn": "Shrimp",
+       "priceDelta": 3000
+      },
+      {
+       "name": "หมู",
+       "nameEn": "Pork",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "ข้าว",
+     "nameEn": "Rice",
+     "min": 0,
+     "max": 1,
+     "options": [
+      {
+       "name": "ข้าวสวย",
+       "nameEn": "Steamed rice",
+       "priceDelta": 1000
+      },
+      {
+       "name": "ข้าวกล้อง",
+       "nameEn": "Brown rice",
+       "priceDelta": 1500
+      },
+      {
+       "name": "ข้าวเหนียว",
+       "nameEn": "Sticky rice",
+       "priceDelta": 1000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "F09",
+   "name": "ผัดพริกแกงหมูกรอบ",
+   "nameEn": "Stir-fried Crispy Pork with Curry Paste",
+   "category": "ผัด",
+   "price": 11000,
+   "description": "หมูกรอบผัดพริกแกง ถั่วฝักยาว ใบมะกรูด",
+   "tags": [
+    "spicy"
+   ],
+   "allergens": [],
+   "image": "F09.jpg",
+   "imageCredit": {
+    "file": "Phrik khing fried crispy pork with rice - Chiang Mai - 2017-07-09.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Phrik_khing_fried_crispy_pork_with_rice_-_Chiang_Mai_-_2017-07-09.jpg"
+   },
+   "groups": [
+    {
+     "name": "ระดับความเผ็ด",
+     "nameEn": "Spice level",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไม่เผ็ด",
+       "nameEn": "Not spicy",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดน้อย",
+       "nameEn": "Mild",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดกลาง",
+       "nameEn": "Medium",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดมาก",
+       "nameEn": "Hot",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "ท็อปปิ้ง",
+     "nameEn": "Topping",
+     "min": 0,
+     "max": 3,
+     "options": [
+      {
+       "name": "ไข่ดาว",
+       "nameEn": "Fried egg",
+       "priceDelta": 1000
+      },
+      {
+       "name": "ไข่เจียว",
+       "nameEn": "Omelette",
+       "priceDelta": 1500
+      },
+      {
+       "name": "ไข่ข้น",
+       "nameEn": "Soft scrambled egg",
+       "priceDelta": 1500
+      }
+     ]
+    },
+    {
+     "name": "ข้าว",
+     "nameEn": "Rice",
+     "min": 0,
+     "max": 1,
+     "options": [
+      {
+       "name": "ข้าวสวย",
+       "nameEn": "Steamed rice",
+       "priceDelta": 1000
+      },
+      {
+       "name": "ข้าวกล้อง",
+       "nameEn": "Brown rice",
+       "priceDelta": 1500
+      },
+      {
+       "name": "ข้าวเหนียว",
+       "nameEn": "Sticky rice",
+       "priceDelta": 1000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "F10",
+   "name": "หอยทอด",
+   "nameEn": "Oyster Omelette",
+   "category": "ผัด",
+   "price": 12000,
+   "description": "แป้งทอดกรอบ หอยนางรม ถั่วงอก",
+   "tags": [],
+   "allergens": [
+    "shellfish",
+    "egg"
+   ],
+   "image": "F10.jpg",
+   "imageCredit": {
+    "file": "Billyfoodoysteromelette.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Billyfoodoysteromelette.jpg"
+   },
+   "groups": [
+    {
+     "name": "หอย",
+     "nameEn": "Shellfish",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "หอยนางรม",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "หอยแมลงภู่",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "ทะเลรวม",
+       "nameEn": null,
+       "priceDelta": 2000
+      }
+     ]
+    },
+    {
+     "name": "แบบ",
+     "nameEn": "Style",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "กรอบ",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "นิ่ม",
+       "nameEn": null,
+       "priceDelta": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "Y01",
+   "name": "ส้มตำไทย",
+   "nameEn": "Som Tam Thai",
+   "category": "ยำ / อีสาน",
+   "price": 7000,
+   "description": "ตำมะละกอ ถั่วลิสง กุ้งแห้ง รสเปรี้ยวหวาน",
+   "tags": [
+    "spicy"
+   ],
+   "allergens": [
+    "peanut",
+    "shellfish",
+    "fish"
+   ],
+   "image": "Y01.jpg",
+   "imageCredit": {
+    "file": "2013 Tam Lao.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:2013_Tam_Lao.jpg"
+   },
+   "groups": [
+    {
+     "name": "ระดับความเผ็ด",
+     "nameEn": "Spice level",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไม่เผ็ด",
+       "nameEn": "Not spicy",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดน้อย",
+       "nameEn": "Mild",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดกลาง",
+       "nameEn": "Medium",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดมาก",
+       "nameEn": "Hot",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "แบบ",
+     "nameEn": "Style",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ตำไทย",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "ตำปู",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "ตำปลาร้า",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "ตำซั่ว",
+       "nameEn": null,
+       "priceDelta": 2000
+      }
+     ]
+    },
+    {
+     "name": "เพิ่ม",
+     "nameEn": "Add-ons",
+     "min": 0,
+     "max": 2,
+     "options": [
+      {
+       "name": "ไข่เค็ม",
+       "nameEn": null,
+       "priceDelta": 1500
+      },
+      {
+       "name": "ข้าวเหนียว",
+       "nameEn": "Sticky rice",
+       "priceDelta": 1000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "Y02",
+   "name": "ลาบหมู",
+   "nameEn": "Larb Moo",
+   "category": "ยำ / อีสาน",
+   "price": 9000,
+   "description": "ลาบหมูสับ ข้าวคั่ว สะระแหน่",
+   "tags": [
+    "spicy"
+   ],
+   "allergens": [],
+   "image": "Y02.jpg",
+   "imageCredit": {
+    "file": "LaoFood LarbNeua.JPG",
+    "source": "https://commons.wikimedia.org/wiki/File:LaoFood_LarbNeua.JPG"
+   },
+   "groups": [
+    {
+     "name": "ระดับความเผ็ด",
+     "nameEn": "Spice level",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไม่เผ็ด",
+       "nameEn": "Not spicy",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดน้อย",
+       "nameEn": "Mild",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดกลาง",
+       "nameEn": "Medium",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดมาก",
+       "nameEn": "Hot",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "เลือกเนื้อสัตว์",
+     "nameEn": "Protein",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "หมู",
+       "nameEn": "Pork",
+       "priceDelta": 0
+      },
+      {
+       "name": "ไก่",
+       "nameEn": "Chicken",
+       "priceDelta": 0
+      },
+      {
+       "name": "เป็ด",
+       "nameEn": null,
+       "priceDelta": 2000
+      },
+      {
+       "name": "ปลาดุก",
+       "nameEn": null,
+       "priceDelta": 1000
+      }
+     ]
+    },
+    {
+     "name": "เพิ่มเติม",
+     "nameEn": "Extras",
+     "min": 0,
+     "max": 1,
+     "options": [
+      {
+       "name": "เพิ่มข้าวเหนียว",
+       "nameEn": null,
+       "priceDelta": 1000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "Y03",
+   "name": "น้ำตกหมู",
+   "nameEn": "Nam Tok Moo",
+   "category": "ยำ / อีสาน",
+   "price": 10000,
+   "description": "หมูย่างหั่นชิ้น คลุกพริกป่น ข้าวคั่ว",
+   "tags": [
+    "spicy"
+   ],
+   "allergens": [],
+   "image": "Y03.jpg",
+   "imageCredit": {
+    "file": "Namtok-noodles102.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Namtok-noodles102.jpg"
+   },
+   "groups": [
+    {
+     "name": "ระดับความเผ็ด",
+     "nameEn": "Spice level",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไม่เผ็ด",
+       "nameEn": "Not spicy",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดน้อย",
+       "nameEn": "Mild",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดกลาง",
+       "nameEn": "Medium",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดมาก",
+       "nameEn": "Hot",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "เลือกเนื้อสัตว์",
+     "nameEn": "Protein",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "หมู",
+       "nameEn": "Pork",
+       "priceDelta": 0
+      },
+      {
+       "name": "เนื้อ",
+       "nameEn": "Beef",
+       "priceDelta": 3000
+      }
+     ]
+    },
+    {
+     "name": "เพิ่มเติม",
+     "nameEn": "Extras",
+     "min": 0,
+     "max": 1,
+     "options": [
+      {
+       "name": "เพิ่มข้าวเหนียว",
+       "nameEn": null,
+       "priceDelta": 1000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "Y04",
+   "name": "ยำวุ้นเส้น",
+   "nameEn": "Glass Noodle Salad",
+   "category": "ยำ / อีสาน",
+   "price": 11000,
+   "description": "วุ้นเส้นยำ หมูสับ กุ้ง ปลาหมึก",
+   "tags": [
+    "spicy"
+   ],
+   "allergens": [
+    "shellfish"
+   ],
+   "image": "Y04.jpg",
+   "imageCredit": {
+    "file": "Yam wun sen 20171028 154834750.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Yam_wun_sen_20171028_154834750.jpg"
+   },
+   "groups": [
+    {
+     "name": "ระดับความเผ็ด",
+     "nameEn": "Spice level",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไม่เผ็ด",
+       "nameEn": "Not spicy",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดน้อย",
+       "nameEn": "Mild",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดกลาง",
+       "nameEn": "Medium",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดมาก",
+       "nameEn": "Hot",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "เลือก",
+     "nameEn": "Choice",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "รวมมิตร",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "หมูสับ",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "ทะเล",
+       "nameEn": "Seafood",
+       "priceDelta": 3000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "Y05",
+   "name": "ไก่ย่าง",
+   "nameEn": "Grilled Chicken",
+   "category": "ยำ / อีสาน",
+   "price": 15000,
+   "description": "ไก่ย่างหมักสมุนไพร น้ำจิ้มแจ่ว",
+   "tags": [
+    "signature"
+   ],
+   "allergens": [],
+   "image": "Y05.jpg",
+   "imageCredit": {
+    "file": "Kai yang 1.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Kai_yang_1.jpg"
+   },
+   "groups": [
+    {
+     "name": "ขนาด",
+     "nameEn": "Size",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ครึ่งตัว",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "ทั้งตัว",
+       "nameEn": null,
+       "priceDelta": 12000
+      }
+     ]
+    },
+    {
+     "name": "น้ำจิ้ม",
+     "nameEn": "Dipping sauce",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "แจ่ว",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "ซีฟู้ด",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "ไก่หวาน",
+       "nameEn": null,
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "เพิ่มเติม",
+     "nameEn": "Extras",
+     "min": 0,
+     "max": 1,
+     "options": [
+      {
+       "name": "เพิ่มข้าวเหนียว",
+       "nameEn": null,
+       "priceDelta": 1000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "Y06",
+   "name": "คอหมูย่าง",
+   "nameEn": "Grilled Pork Neck",
+   "category": "ยำ / อีสาน",
+   "price": 12000,
+   "description": "คอหมูย่างถ่าน นุ่มฉ่ำ น้ำจิ้มแจ่ว",
+   "tags": [
+    "spicy",
+    "signature"
+   ],
+   "allergens": [],
+   "image": "Y06.jpg",
+   "imageCredit": {
+    "file": "Kho mu yang kratha ron.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Kho_mu_yang_kratha_ron.jpg"
+   },
+   "groups": [
+    {
+     "name": "ระดับความเผ็ด",
+     "nameEn": "Spice level",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไม่เผ็ด",
+       "nameEn": "Not spicy",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดน้อย",
+       "nameEn": "Mild",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดกลาง",
+       "nameEn": "Medium",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดมาก",
+       "nameEn": "Hot",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "เพิ่มเติม",
+     "nameEn": "Extras",
+     "min": 0,
+     "max": 1,
+     "options": [
+      {
+       "name": "เพิ่มข้าวเหนียว",
+       "nameEn": null,
+       "priceDelta": 1000
+      }
+     ]
+    },
+    {
+     "name": "ขนาด",
+     "nameEn": "Size",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ปกติ",
+       "nameEn": "Regular",
+       "priceDelta": 0
+      },
+      {
+       "name": "พิเศษ",
+       "nameEn": "Large",
+       "priceDelta": 2000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "Y07",
+   "name": "ไส้กรอกอีสาน",
+   "nameEn": "Isan Sausage",
+   "category": "ยำ / อีสาน",
+   "price": 8000,
+   "description": "ไส้กรอกเปรี้ยว เสิร์ฟพร้อมขิง พริก กะหล่ำ",
+   "tags": [],
+   "allergens": [],
+   "image": "Y07.jpg",
+   "imageCredit": {
+    "file": "Sai krok Isan.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Sai_krok_Isan.jpg"
+   },
+   "groups": [
+    {
+     "name": "แบบ",
+     "nameEn": "Style",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "หมู",
+       "nameEn": "Pork",
+       "priceDelta": 0
+      },
+      {
+       "name": "วุ้นเส้น",
+       "nameEn": "Glass noodle",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "ขนาด",
+     "nameEn": "Size",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ปกติ",
+       "nameEn": "Regular",
+       "priceDelta": 0
+      },
+      {
+       "name": "พิเศษ",
+       "nameEn": "Large",
+       "priceDelta": 2000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "Y08",
+   "name": "ยำมะม่วงปลาดุกฟู",
+   "nameEn": "Crispy Catfish Salad",
+   "category": "ยำ / อีสาน",
+   "price": 13000,
+   "description": "ปลาดุกฟูกรอบ ยำมะม่วงเปรี้ยว",
+   "tags": [
+    "spicy"
+   ],
+   "allergens": [],
+   "image": "Y08.jpg",
+   "imageCredit": {
+    "file": "Yum pladook foo.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Yum_pladook_foo.jpg"
+   },
+   "groups": [
+    {
+     "name": "ระดับความเผ็ด",
+     "nameEn": "Spice level",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไม่เผ็ด",
+       "nameEn": "Not spicy",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดน้อย",
+       "nameEn": "Mild",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดกลาง",
+       "nameEn": "Medium",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดมาก",
+       "nameEn": "Hot",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "แยกน้ำยำ",
+     "nameEn": "Dressing on the side",
+     "min": 0,
+     "max": 1,
+     "options": [
+      {
+       "name": "ใช่",
+       "nameEn": "Yes",
+       "priceDelta": 0
+      },
+      {
+       "name": "ไม่",
+       "nameEn": "No",
+       "priceDelta": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "R01",
+   "name": "ข้าวมันไก่",
+   "nameEn": "Hainanese Chicken Rice",
+   "category": "ข้าว / จานเดียว",
+   "price": 7000,
+   "description": "ไก่ต้มนุ่ม ข้าวมันหอม น้ำจิ้มเต้าเจี้ยว",
+   "tags": [],
+   "allergens": [],
+   "image": "R01.jpg",
+   "imageCredit": {
+    "file": "Hainanese Chicken Rice.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Hainanese_Chicken_Rice.jpg"
+   },
+   "groups": [
+    {
+     "name": "ไก่",
+     "nameEn": "Chicken",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ต้ม",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "ทอด",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "ผสม",
+       "nameEn": null,
+       "priceDelta": 1000
+      }
+     ]
+    },
+    {
+     "name": "ขนาด",
+     "nameEn": "Size",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ปกติ",
+       "nameEn": "Regular",
+       "priceDelta": 0
+      },
+      {
+       "name": "พิเศษ",
+       "nameEn": "Large",
+       "priceDelta": 2000
+      }
+     ]
+    },
+    {
+     "name": "เพิ่ม",
+     "nameEn": "Add-ons",
+     "min": 0,
+     "max": 2,
+     "options": [
+      {
+       "name": "ตับ",
+       "nameEn": null,
+       "priceDelta": 1000
+      },
+      {
+       "name": "เลือด",
+       "nameEn": null,
+       "priceDelta": 1000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "R02",
+   "name": "ข้าวขาหมู",
+   "nameEn": "Braised Pork Leg Rice",
+   "category": "ข้าว / จานเดียว",
+   "price": 7000,
+   "description": "ขาหมูพะโล้ ผักกาดดอง ไข่ต้ม",
+   "tags": [],
+   "allergens": [],
+   "image": "R02.jpg",
+   "imageCredit": {
+    "file": "Khao kha mu thailand.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Khao_kha_mu_thailand.jpg"
+   },
+   "groups": [
+    {
+     "name": "ขนาด",
+     "nameEn": "Size",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ปกติ",
+       "nameEn": "Regular",
+       "priceDelta": 0
+      },
+      {
+       "name": "พิเศษ",
+       "nameEn": "Large",
+       "priceDelta": 2000
+      }
+     ]
+    },
+    {
+     "name": "เพิ่ม",
+     "nameEn": "Add-ons",
+     "min": 0,
+     "max": 2,
+     "options": [
+      {
+       "name": "ไข่พะโล้",
+       "nameEn": null,
+       "priceDelta": 1000
+      },
+      {
+       "name": "คากิ",
+       "nameEn": null,
+       "priceDelta": 3000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "R03",
+   "name": "ข้าวหมูแดง",
+   "nameEn": "Red Pork Rice",
+   "category": "ข้าว / จานเดียว",
+   "price": 7000,
+   "description": "หมูแดง หมูกรอบ กุนเชียง ราดน้ำแดง",
+   "tags": [],
+   "allergens": [],
+   "image": "R03.jpg",
+   "imageCredit": {
+    "file": "Khao mu krop mu daeng.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Khao_mu_krop_mu_daeng.jpg"
+   },
+   "groups": [
+    {
+     "name": "ขนาด",
+     "nameEn": "Size",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ปกติ",
+       "nameEn": "Regular",
+       "priceDelta": 0
+      },
+      {
+       "name": "พิเศษ",
+       "nameEn": "Large",
+       "priceDelta": 2000
+      }
+     ]
+    },
+    {
+     "name": "เพิ่ม",
+     "nameEn": "Add-ons",
+     "min": 0,
+     "max": 2,
+     "options": [
+      {
+       "name": "หมูกรอบ",
+       "nameEn": null,
+       "priceDelta": 2000
+      },
+      {
+       "name": "ไข่ต้ม",
+       "nameEn": null,
+       "priceDelta": 1000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "R04",
+   "name": "ข้าวซอยไก่",
+   "nameEn": "Khao Soi Chicken",
+   "category": "ข้าว / จานเดียว",
+   "price": 9000,
+   "description": "บะหมี่น้ำแกงกะทิสไตล์เหนือ ไก่น่อง",
+   "tags": [
+    "spicy"
+   ],
+   "allergens": [],
+   "image": "R04.jpg",
+   "imageCredit": {
+    "file": "Khao Soi Northern Thai food ข้าวซอย ผักดอง.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Khao_Soi_Northern_Thai_food_ข้าวซอย_ผักดอง.jpg"
+   },
+   "groups": [
+    {
+     "name": "ระดับความเผ็ด",
+     "nameEn": "Spice level",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไม่เผ็ด",
+       "nameEn": "Not spicy",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดน้อย",
+       "nameEn": "Mild",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดกลาง",
+       "nameEn": "Medium",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดมาก",
+       "nameEn": "Hot",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "เลือกเนื้อสัตว์",
+     "nameEn": "Protein",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไก่",
+       "nameEn": "Chicken",
+       "priceDelta": 0
+      },
+      {
+       "name": "เนื้อ",
+       "nameEn": "Beef",
+       "priceDelta": 2000
+      },
+      {
+       "name": "หมู",
+       "nameEn": "Pork",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "ขนาด",
+     "nameEn": "Size",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ปกติ",
+       "nameEn": "Regular",
+       "priceDelta": 0
+      },
+      {
+       "name": "พิเศษ",
+       "nameEn": "Large",
+       "priceDelta": 2000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "R05",
+   "name": "ข้าวหมกไก่",
+   "nameEn": "Chicken Biryani",
+   "category": "ข้าว / จานเดียว",
+   "price": 9000,
+   "description": "ข้าวหมกขมิ้น ไก่นุ่ม น้ำจิ้มเขียว",
+   "tags": [],
+   "allergens": [],
+   "image": "R05.jpg",
+   "imageCredit": {
+    "file": "\"Hyderabadi Dum Biryani\".jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:\"Hyderabadi_Dum_Biryani\".jpg"
+   },
+   "groups": [
+    {
+     "name": "ขนาด",
+     "nameEn": "Size",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ปกติ",
+       "nameEn": "Regular",
+       "priceDelta": 0
+      },
+      {
+       "name": "พิเศษ",
+       "nameEn": "Large",
+       "priceDelta": 2000
+      }
+     ]
+    },
+    {
+     "name": "เพิ่ม",
+     "nameEn": "Add-ons",
+     "min": 0,
+     "max": 1,
+     "options": [
+      {
+       "name": "ซุปหางวัว",
+       "nameEn": null,
+       "priceDelta": 6000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "R06",
+   "name": "ข้าวคลุกกะปิ",
+   "nameEn": "Shrimp Paste Rice",
+   "category": "ข้าว / จานเดียว",
+   "price": 9000,
+   "description": "ข้าวคลุกกะปิ หมูหวาน ไข่ฝอย มะม่วง",
+   "tags": [],
+   "allergens": [],
+   "image": "R06.jpg",
+   "imageCredit": {
+    "file": "Khao.kluke.kapi-01.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Khao.kluke.kapi-01.jpg"
+   },
+   "groups": [
+    {
+     "name": "ขนาด",
+     "nameEn": "Size",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ปกติ",
+       "nameEn": "Regular",
+       "priceDelta": 0
+      },
+      {
+       "name": "พิเศษ",
+       "nameEn": "Large",
+       "priceDelta": 2000
+      }
+     ]
+    },
+    {
+     "name": "เพิ่มเติม",
+     "nameEn": "Extras",
+     "min": 0,
+     "max": 1,
+     "options": [
+      {
+       "name": "เพิ่มหมูหวาน",
+       "nameEn": null,
+       "priceDelta": 2000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "R07",
+   "name": "โจ๊กหมู",
+   "nameEn": "Rice Porridge",
+   "category": "ข้าว / จานเดียว",
+   "price": 6000,
+   "description": "โจ๊กข้าวหอมมะลิ หมูสับ ขิงซอย",
+   "tags": [],
+   "allergens": [],
+   "image": "R07.jpg",
+   "imageCredit": {
+    "file": "Chinese rice congee.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Chinese_rice_congee.jpg"
+   },
+   "groups": [
+    {
+     "name": "เพิ่ม",
+     "nameEn": "Add-ons",
+     "min": 0,
+     "max": 3,
+     "options": [
+      {
+       "name": "ไข่ลวก",
+       "nameEn": null,
+       "priceDelta": 1000
+      },
+      {
+       "name": "ไข่เยี่ยวม้า",
+       "nameEn": null,
+       "priceDelta": 1500
+      },
+      {
+       "name": "ปาท่องโก๋",
+       "nameEn": null,
+       "priceDelta": 1000
+      }
+     ]
+    },
+    {
+     "name": "ขนาด",
+     "nameEn": "Size",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ปกติ",
+       "nameEn": "Regular",
+       "priceDelta": 0
+      },
+      {
+       "name": "พิเศษ",
+       "nameEn": "Large",
+       "priceDelta": 2000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "N01",
+   "name": "ก๋วยเตี๋ยวเรือ",
+   "nameEn": "Boat Noodles",
+   "category": "ก๋วยเตี๋ยว",
+   "price": 6000,
+   "description": "น้ำซุปเข้มข้น หมูตุ๋น ลูกชิ้น",
+   "tags": [],
+   "allergens": [],
+   "image": "N01.jpg",
+   "imageCredit": {
+    "file": "Boat noodles.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Boat_noodles.jpg"
+   },
+   "groups": [
+    {
+     "name": "เส้น",
+     "nameEn": "Noodle",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "เส้นเล็ก",
+       "nameEn": "Thin rice noodle",
+       "priceDelta": 0
+      },
+      {
+       "name": "เส้นใหญ่",
+       "nameEn": "Wide rice noodle",
+       "priceDelta": 0
+      },
+      {
+       "name": "เส้นหมี่",
+       "nameEn": "Vermicelli",
+       "priceDelta": 0
+      },
+      {
+       "name": "บะหมี่",
+       "nameEn": "Egg noodle",
+       "priceDelta": 0
+      },
+      {
+       "name": "วุ้นเส้น",
+       "nameEn": "Glass noodle",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "เนื้อสัตว์",
+     "nameEn": "Protein",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "หมู",
+       "nameEn": "Pork",
+       "priceDelta": 0
+      },
+      {
+       "name": "เนื้อ",
+       "nameEn": "Beef",
+       "priceDelta": 1000
+      }
+     ]
+    },
+    {
+     "name": "น้ำ",
+     "nameEn": "Soup",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "น้ำตก",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "น้ำใส",
+       "nameEn": "Clear",
+       "priceDelta": 0
+      },
+      {
+       "name": "แห้ง",
+       "nameEn": "Dry",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "ขนาด",
+     "nameEn": "Size",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ปกติ",
+       "nameEn": "Regular",
+       "priceDelta": 0
+      },
+      {
+       "name": "พิเศษ",
+       "nameEn": "Large",
+       "priceDelta": 2000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "N02",
+   "name": "ก๋วยเตี๋ยวต้มยำ",
+   "nameEn": "Tom Yum Noodles",
+   "category": "ก๋วยเตี๋ยว",
+   "price": 7000,
+   "description": "ต้มยำน้ำข้น หมูสับ ลูกชิ้น ถั่วป่น",
+   "tags": [
+    "spicy"
+   ],
+   "allergens": [
+    "peanut"
+   ],
+   "image": "N02.jpg",
+   "imageCredit": {
+    "file": "Kuai tiao tom yam 1.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Kuai_tiao_tom_yam_1.jpg"
+   },
+   "groups": [
+    {
+     "name": "เส้น",
+     "nameEn": "Noodle",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "เส้นเล็ก",
+       "nameEn": "Thin rice noodle",
+       "priceDelta": 0
+      },
+      {
+       "name": "เส้นใหญ่",
+       "nameEn": "Wide rice noodle",
+       "priceDelta": 0
+      },
+      {
+       "name": "เส้นหมี่",
+       "nameEn": "Vermicelli",
+       "priceDelta": 0
+      },
+      {
+       "name": "บะหมี่",
+       "nameEn": "Egg noodle",
+       "priceDelta": 0
+      },
+      {
+       "name": "วุ้นเส้น",
+       "nameEn": "Glass noodle",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "ระดับความเผ็ด",
+     "nameEn": "Spice level",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไม่เผ็ด",
+       "nameEn": "Not spicy",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดน้อย",
+       "nameEn": "Mild",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดกลาง",
+       "nameEn": "Medium",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดมาก",
+       "nameEn": "Hot",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "ขนาด",
+     "nameEn": "Size",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ปกติ",
+       "nameEn": "Regular",
+       "priceDelta": 0
+      },
+      {
+       "name": "พิเศษ",
+       "nameEn": "Large",
+       "priceDelta": 2000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "N03",
+   "name": "เย็นตาโฟ",
+   "nameEn": "Yen Ta Fo",
+   "category": "ก๋วยเตี๋ยว",
+   "price": 7000,
+   "description": "น้ำซุปเต้าหู้ยี้สีชมพู ลูกชิ้นปลา",
+   "tags": [],
+   "allergens": [],
+   "image": "N03.jpg",
+   "imageCredit": {
+    "file": "Hakka yong tau foo with noodles.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Hakka_yong_tau_foo_with_noodles.jpg"
+   },
+   "groups": [
+    {
+     "name": "เส้น",
+     "nameEn": "Noodle",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "เส้นเล็ก",
+       "nameEn": "Thin rice noodle",
+       "priceDelta": 0
+      },
+      {
+       "name": "เส้นใหญ่",
+       "nameEn": "Wide rice noodle",
+       "priceDelta": 0
+      },
+      {
+       "name": "เส้นหมี่",
+       "nameEn": "Vermicelli",
+       "priceDelta": 0
+      },
+      {
+       "name": "บะหมี่",
+       "nameEn": "Egg noodle",
+       "priceDelta": 0
+      },
+      {
+       "name": "วุ้นเส้น",
+       "nameEn": "Glass noodle",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "น้ำ",
+     "nameEn": "Soup",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "น้ำ",
+       "nameEn": "Soup",
+       "priceDelta": 0
+      },
+      {
+       "name": "แห้ง",
+       "nameEn": "Dry",
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "ขนาด",
+     "nameEn": "Size",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ปกติ",
+       "nameEn": "Regular",
+       "priceDelta": 0
+      },
+      {
+       "name": "พิเศษ",
+       "nameEn": "Large",
+       "priceDelta": 2000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "N04",
+   "name": "บะหมี่หมูแดงเกี๊ยว",
+   "nameEn": "Wonton Egg Noodles",
+   "category": "ก๋วยเตี๋ยว",
+   "price": 7000,
+   "description": "บะหมี่ไข่ หมูแดง เกี๊ยวกุ้ง",
+   "tags": [],
+   "allergens": [
+    "shellfish",
+    "egg",
+    "gluten"
+   ],
+   "image": "N04.jpg",
+   "imageCredit": {
+    "file": "HK SW 上環 Sheung Wan 皇后大道中 303 Queen's Road Central 權記雲吞麵 Wonton noodle soup shop June 2020 SS2 10.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:HK_SW_上環_Sheung_Wan_皇后大道中_303_Queen's_Road_Central_權記雲吞麵_Wonton_noodle_soup_shop_June_2020_SS2_10.jpg"
+   },
+   "groups": [
+    {
+     "name": "น้ำ",
+     "nameEn": "Soup",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "น้ำ",
+       "nameEn": "Soup",
+       "priceDelta": 0
+      },
+      {
+       "name": "แห้ง",
+       "nameEn": "Dry",
+       "priceDelta": 0
+      },
+      {
+       "name": "ต้มยำ",
+       "nameEn": null,
+       "priceDelta": 1000
+      }
+     ]
+    },
+    {
+     "name": "ขนาด",
+     "nameEn": "Size",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ปกติ",
+       "nameEn": "Regular",
+       "priceDelta": 0
+      },
+      {
+       "name": "พิเศษ",
+       "nameEn": "Large",
+       "priceDelta": 2000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "N05",
+   "name": "ก๋วยจั๊บน้ำข้น",
+   "nameEn": "Kuay Jab",
+   "category": "ก๋วยเตี๋ยว",
+   "price": 7000,
+   "description": "เส้นม้วน หมูกรอบ เครื่องในพะโล้",
+   "tags": [],
+   "allergens": [],
+   "image": "N05.jpg",
+   "imageCredit": {
+    "file": "Kuaichap.JPG",
+    "source": "https://commons.wikimedia.org/wiki/File:Kuaichap.JPG"
+   },
+   "groups": [
+    {
+     "name": "เลือก",
+     "nameEn": "Choice",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "รวม",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "หมูกรอบล้วน",
+       "nameEn": null,
+       "priceDelta": 2000
+      },
+      {
+       "name": "ไม่เอาเครื่องใน",
+       "nameEn": null,
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "ขนาด",
+     "nameEn": "Size",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ปกติ",
+       "nameEn": "Regular",
+       "priceDelta": 0
+      },
+      {
+       "name": "พิเศษ",
+       "nameEn": "Large",
+       "priceDelta": 2000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "N06",
+   "name": "ขนมจีนน้ำยา",
+   "nameEn": "Khanom Jeen Nam Ya",
+   "category": "ก๋วยเตี๋ยว",
+   "price": 6000,
+   "description": "ขนมจีนน้ำยาปลา ผักเคียง",
+   "tags": [
+    "spicy"
+   ],
+   "allergens": [],
+   "image": "N06.jpg",
+   "imageCredit": {
+    "file": "Khanom Chin - Thai rice noodles.JPG",
+    "source": "https://commons.wikimedia.org/wiki/File:Khanom_Chin_-_Thai_rice_noodles.JPG"
+   },
+   "groups": [
+    {
+     "name": "น้ำ",
+     "nameEn": "Soup",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "น้ำยากะทิ",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "น้ำยาป่า",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "แกงเขียวหวาน",
+       "nameEn": null,
+       "priceDelta": 1000
+      }
+     ]
+    },
+    {
+     "name": "ระดับความเผ็ด",
+     "nameEn": "Spice level",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ไม่เผ็ด",
+       "nameEn": "Not spicy",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดน้อย",
+       "nameEn": "Mild",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดกลาง",
+       "nameEn": "Medium",
+       "priceDelta": 0
+      },
+      {
+       "name": "เผ็ดมาก",
+       "nameEn": "Hot",
+       "priceDelta": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "A01",
+   "name": "ปอเปี๊ยะทอด",
+   "nameEn": "Spring Rolls",
+   "category": "ของทานเล่น",
+   "price": 8000,
+   "description": "ปอเปี๊ยะไส้ผัก วุ้นเส้น ทอดกรอบ (6 ชิ้น)",
+   "tags": [],
+   "allergens": [],
+   "image": "A01.jpg",
+   "imageCredit": {
+    "file": "Spring Rolls (3357696061).jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Spring_Rolls_(3357696061).jpg"
+   },
+   "groups": [
+    {
+     "name": "จำนวน",
+     "nameEn": "Portion",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "6 ชิ้น",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "10 ชิ้น",
+       "nameEn": null,
+       "priceDelta": 4000
+      }
+     ]
+    },
+    {
+     "name": "ไส้",
+     "nameEn": "Filling",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ผัก",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "หมู",
+       "nameEn": "Pork",
+       "priceDelta": 1000
+      },
+      {
+       "name": "กุ้ง",
+       "nameEn": "Shrimp",
+       "priceDelta": 2000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "A02",
+   "name": "สะเต๊ะหมู",
+   "nameEn": "Pork Satay",
+   "category": "ของทานเล่น",
+   "price": 9000,
+   "description": "หมูย่างเสียบไม้ น้ำจิ้มถั่ว อาจาด (10 ไม้)",
+   "tags": [],
+   "allergens": [
+    "peanut"
+   ],
+   "image": "A02.jpg",
+   "imageCredit": {
+    "file": "Sate Udang.JPG",
+    "source": "https://commons.wikimedia.org/wiki/File:Sate_Udang.JPG"
+   },
+   "groups": [
+    {
+     "name": "เลือก",
+     "nameEn": "Choice",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "หมู",
+       "nameEn": "Pork",
+       "priceDelta": 0
+      },
+      {
+       "name": "ไก่",
+       "nameEn": "Chicken",
+       "priceDelta": 0
+      },
+      {
+       "name": "เนื้อ",
+       "nameEn": "Beef",
+       "priceDelta": 2000
+      }
+     ]
+    },
+    {
+     "name": "จำนวน",
+     "nameEn": "Portion",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "10 ไม้",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "20 ไม้",
+       "nameEn": null,
+       "priceDelta": 8000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "A03",
+   "name": "ทอดมันปลา",
+   "nameEn": "Fish Cakes",
+   "category": "ของทานเล่น",
+   "price": 10000,
+   "description": "ทอดมันปลากราย ถั่วฝักยาว น้ำจิ้มอาจาด",
+   "tags": [],
+   "allergens": [
+    "fish"
+   ],
+   "image": "A03.jpg",
+   "imageCredit": {
+    "file": "Thanin market tod man pla.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Thanin_market_tod_man_pla.jpg"
+   },
+   "groups": [
+    {
+     "name": "เลือก",
+     "nameEn": "Choice",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ปลา",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "กุ้ง",
+       "nameEn": "Shrimp",
+       "priceDelta": 3000
+      }
+     ]
+    },
+    {
+     "name": "จำนวน",
+     "nameEn": "Portion",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "6 ชิ้น",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "10 ชิ้น",
+       "nameEn": null,
+       "priceDelta": 5000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "A04",
+   "name": "หมูปิ้ง",
+   "nameEn": "Grilled Pork Skewers",
+   "category": "ของทานเล่น",
+   "price": 5000,
+   "description": "หมูหมักนมสด ย่างถ่าน (5 ไม้)",
+   "tags": [],
+   "allergens": [],
+   "image": "A04.jpg",
+   "imageCredit": {
+    "file": "Mu ping.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Mu_ping.jpg"
+   },
+   "groups": [
+    {
+     "name": "จำนวน",
+     "nameEn": "Portion",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "5 ไม้",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "10 ไม้",
+       "nameEn": null,
+       "priceDelta": 4500
+      }
+     ]
+    },
+    {
+     "name": "เพิ่มเติม",
+     "nameEn": "Extras",
+     "min": 0,
+     "max": 1,
+     "options": [
+      {
+       "name": "เพิ่มข้าวเหนียว",
+       "nameEn": null,
+       "priceDelta": 1000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "A05",
+   "name": "ไก่ทอดหาดใหญ่",
+   "nameEn": "Hat Yai Fried Chicken",
+   "category": "ของทานเล่น",
+   "price": 12000,
+   "description": "ไก่ทอดกรอบ หอมเจียว",
+   "tags": [],
+   "allergens": [],
+   "image": "A05.jpg",
+   "imageCredit": {
+    "file": "Fried-Chicken-Set.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Fried-Chicken-Set.jpg"
+   },
+   "groups": [
+    {
+     "name": "ส่วน",
+     "nameEn": "Cut",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "น่อง",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "สะโพก",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "ปีก",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "รวม",
+       "nameEn": null,
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "ซอส",
+     "nameEn": "Sauce",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "น้ำจิ้มไก่",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "ศรีราชา",
+       "nameEn": null,
+       "priceDelta": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "D01",
+   "name": "ข้าวเหนียวมะม่วง",
+   "nameEn": "Mango Sticky Rice",
+   "category": "ของหวาน",
+   "price": 12000,
+   "description": "มะม่วงน้ำดอกไม้ ข้าวเหนียวมูน ราดกะทิ",
+   "tags": [
+    "signature"
+   ],
+   "allergens": [
+    "milk"
+   ],
+   "image": "D01.jpg",
+   "imageCredit": {
+    "file": "Mango sticy rice (3859549574).jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Mango_sticy_rice_(3859549574).jpg"
+   },
+   "groups": [
+    {
+     "name": "ข้าวเหนียว",
+     "nameEn": "Sticky rice",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ขาว",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "อัญชัน",
+       "nameEn": null,
+       "priceDelta": 1000
+      }
+     ]
+    },
+    {
+     "name": "เพิ่ม",
+     "nameEn": "Add-ons",
+     "min": 0,
+     "max": 2,
+     "options": [
+      {
+       "name": "กะทิ",
+       "nameEn": null,
+       "priceDelta": 1000
+      },
+      {
+       "name": "ถั่วทอง",
+       "nameEn": null,
+       "priceDelta": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "D02",
+   "name": "บัวลอย",
+   "nameEn": "Bua Loy",
+   "category": "ของหวาน",
+   "price": 5000,
+   "description": "แป้งกลมหลากสี ในน้ำกะทิอุ่น",
+   "tags": [],
+   "allergens": [
+    "milk",
+    "egg"
+   ],
+   "image": "D02.jpg",
+   "imageCredit": {
+    "file": "Bua loi - 2009-08-01 - 001.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Bua_loi_-_2009-08-01_-_001.jpg"
+   },
+   "groups": [
+    {
+     "name": "เพิ่ม",
+     "nameEn": "Add-ons",
+     "min": 0,
+     "max": 2,
+     "options": [
+      {
+       "name": "ไข่หวาน",
+       "nameEn": null,
+       "priceDelta": 1000
+      },
+      {
+       "name": "เผือก",
+       "nameEn": null,
+       "priceDelta": 1000
+      }
+     ]
+    },
+    {
+     "name": "แบบ",
+     "nameEn": "Style",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ร้อน",
+       "nameEn": "Hot",
+       "priceDelta": 0
+      },
+      {
+       "name": "เย็น",
+       "nameEn": "Iced",
+       "priceDelta": 0
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "D03",
+   "name": "ทับทิมกรอบ",
+   "nameEn": "Tub Tim Grob",
+   "category": "ของหวาน",
+   "price": 5000,
+   "description": "แห้วกรอบสีแดง น้ำกะทิ น้ำแข็งไส",
+   "tags": [],
+   "allergens": [],
+   "image": "D03.jpg",
+   "imageCredit": {
+    "file": "Tub tim krob in Singapore - 20050520.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Tub_tim_krob_in_Singapore_-_20050520.jpg"
+   },
+   "groups": [
+    {
+     "name": "เพิ่ม",
+     "nameEn": "Add-ons",
+     "min": 0,
+     "max": 2,
+     "options": [
+      {
+       "name": "ขนุน",
+       "nameEn": null,
+       "priceDelta": 1000
+      },
+      {
+       "name": "ลอดช่อง",
+       "nameEn": null,
+       "priceDelta": 1000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "D04",
+   "name": "ขนมครก",
+   "nameEn": "Kanom Krok",
+   "category": "ของหวาน",
+   "price": 4000,
+   "description": "ขนมครกกะทิ หน้าข้าวโพด/ต้นหอม (8 ฝา)",
+   "tags": [],
+   "allergens": [],
+   "image": "D04.jpg",
+   "imageCredit": {
+    "file": "Khanom Krok.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Khanom_Krok.jpg"
+   },
+   "groups": [
+    {
+     "name": "หน้า",
+     "nameEn": "Topping",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "ข้าวโพด",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "ต้นหอม",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "เผือก",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "เปล่า",
+       "nameEn": null,
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "จำนวน",
+     "nameEn": "Portion",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "8 ฝา",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "16 ฝา",
+       "nameEn": null,
+       "priceDelta": 3500
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "B01",
+   "name": "ชาไทยเย็น",
+   "nameEn": "Thai Iced Tea",
+   "category": "เครื่องดื่ม",
+   "price": 5000,
+   "description": "ชาไทยเข้มข้น นมข้นหวาน",
+   "tags": [],
+   "allergens": [
+    "milk"
+   ],
+   "image": "B01.jpg",
+   "imageCredit": {
+    "file": "Cha yen.JPG",
+    "source": "https://commons.wikimedia.org/wiki/File:Cha_yen.JPG"
+   },
+   "groups": [
+    {
+     "name": "แบบ",
+     "nameEn": "Style",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "เย็น",
+       "nameEn": "Iced",
+       "priceDelta": 0
+      },
+      {
+       "name": "ปั่น",
+       "nameEn": "Blended",
+       "priceDelta": 1000
+      }
+     ]
+    },
+    {
+     "name": "ความหวาน",
+     "nameEn": "Sweetness",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "0%",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "25%",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "50%",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "100%",
+       "nameEn": null,
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "เพิ่ม",
+     "nameEn": "Add-ons",
+     "min": 0,
+     "max": 2,
+     "options": [
+      {
+       "name": "ไข่มุก",
+       "nameEn": null,
+       "priceDelta": 1000
+      },
+      {
+       "name": "วิปครีม",
+       "nameEn": null,
+       "priceDelta": 1000
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "sku": "B02",
+   "name": "กาแฟโบราณ",
+   "nameEn": "Thai Iced Coffee (Oliang)",
+   "category": "เครื่องดื่ม",
+   "price": 4500,
+   "description": "กาแฟสูตรโบราณ เข้มหอม",
+   "tags": [],
+   "allergens": [
+    "milk"
+   ],
+   "image": "B02.jpg",
+   "imageCredit": {
+    "file": "Oliang โอเลี้ยง oleang olieng Thai iced coffee at Ayutthaya.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Oliang_โอเลี้ยง_oleang_olieng_Thai_iced_coffee_at_Ayutthaya.jpg"
+   },
+   "groups": [
+    {
+     "name": "แบบ",
+     "nameEn": "Style",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "เย็น",
+       "nameEn": "Iced",
+       "priceDelta": 0
+      },
+      {
+       "name": "ปั่น",
+       "nameEn": "Blended",
+       "priceDelta": 1000
+      }
+     ]
+    },
+    {
+     "name": "ความหวาน",
+     "nameEn": "Sweetness",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "0%",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "25%",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "50%",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "100%",
+       "nameEn": null,
+       "priceDelta": 0
+      }
+     ]
+    },
+    {
+     "name": "นม",
+     "nameEn": "Milk",
+     "min": 1,
+     "max": 1,
+     "options": [
+      {
+       "name": "นมข้น",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "นมสด",
+       "nameEn": null,
+       "priceDelta": 0
+      },
+      {
+       "name": "ไม่ใส่นม",
+       "nameEn": null,
+       "priceDelta": 0
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

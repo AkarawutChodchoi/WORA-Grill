@@ -11,6 +11,8 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: { alias: { '@shared': fileURLToPath(new URL('./shared/src', import.meta.url)) } },
   server: {
+    // Listen on the LAN too, so phones/tablets on the shop Wi-Fi can open the app and guest QR links.
+    host: true,
     port: 5173,
     proxy: {
       '/api': { target: `http://localhost:${apiPort}`, ws: true },

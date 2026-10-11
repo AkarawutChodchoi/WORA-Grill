@@ -20,6 +20,7 @@ import { audit } from '../../lib/audit';
 import { requireAnyPerm, requireBranch, requirePerm, type AuthContext } from '../../lib/auth';
 import { badRequest, conflict, isUniqueViolation, notFound, parse } from '../../lib/errors';
 import { storeImage } from '../../lib/uploads';
+import { seedWoraMenu } from '../../db/seed-wora';
 import { loadBranchMenu } from './service';
 
 const optText = (max = 500) => z.string().trim().max(max).nullable().optional().transform((v) => (v === '' ? null : v));
@@ -222,6 +223,18 @@ export default async function menuRoutes(app: FastifyInstance) {
   });
 
   // ---- Items ----
+  /** Adds the WORA Grill sample menu (50 dishes + photos). Dishes whose SKU already exists are skipped. */
+  app.post('/menu/import-sample', async (req) => {
+    const a = requirePerm(req, 'menu.manage');
+    const branchId = requireBranch(a);
+    const r = await db.transaction(async (tx) => {
+      const res = await seedWoraMenu(tx, a.orgId, branchId, config.UPLOAD_DIR);
+      await audit(tx, a, { action: 'menu.import_sample', targetType: 'menu', data: res, branchId: null }, req.ip);
+      return res;
+    });
+    return r;
+  });
+
   app.post('/menu/items', async (req) => {
     const a = requirePerm(req, 'menu.manage');
     const body = parse(itemBody, req.body);

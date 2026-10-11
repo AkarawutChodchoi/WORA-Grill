@@ -107,7 +107,7 @@ export function OfflineIndicator() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className={`inline-flex items-center gap-1.5 rounded-control px-2 py-1 text-xs font-medium ${failed.length ? 'bg-chili text-white' : 'bg-turmeric-50 text-[#7A5806]'}`}
+        className={`inline-flex items-center gap-1.5 rounded-control px-2 py-1 text-xs font-medium ${failed.length ? 'bg-chili text-white' : 'bg-turmeric-50 text-turmeric-700'}`}
       >
         <CloudOff className="size-4" />
         {!online ? 'ออฟไลน์' : 'กำลังซิงก์'}
@@ -147,7 +147,7 @@ export function OfflineIndicator() {
                 </div>
                 {e.error && <div className="text-xs text-chili">{e.error}</div>}
                 {e.status === 'FAILED' && (
-                  <Button size="sm" variant="ghost" className="mt-1 text-chili" onClick={() => void outbox.discard(e.id)}>
+                  <Button size="sm" variant="danger-ghost" className="mt-1" onClick={() => void outbox.discard(e.id)}>
                     ทิ้งรายการนี้ (แก้ไขที่หน้าบิลแทน)
                   </Button>
                 )}

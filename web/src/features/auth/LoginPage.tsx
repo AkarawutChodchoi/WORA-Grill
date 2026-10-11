@@ -7,17 +7,17 @@ import { useAuth } from '../../lib/auth';
 
 export function AuthCard({ title, children, footer }: { title: string; children: React.ReactNode; footer?: React.ReactNode }) {
   return (
-    <div className="flex min-h-dvh items-center justify-center px-4 py-10">
+    <div className="on-dark flex min-h-dvh items-center justify-center bg-char px-4 py-10">
       <div className="w-full max-w-sm">
-        <div className="mb-6 flex items-center gap-2">
-          <img src="/icon.svg" alt="" className="size-9" />
-          <span className="text-lg font-semibold">ระบบจัดการร้านอาหาร</span>
+        <div className="mb-6 flex flex-col items-center gap-2">
+          <img src="/brand/logo-white.png" alt="WORA Grill" className="h-28 w-auto" />
+          <span className="text-sm text-white/70">ระบบจัดการร้าน</span>
         </div>
-        <div className="rounded-panel border border-line bg-surface p-6">
+        <div className="rounded-panel bg-surface p-6 text-ink shadow-xl [&_:focus-visible]:outline-ink">
           <h1 className="mb-4 text-xl font-semibold">{title}</h1>
           {children}
         </div>
-        {footer && <div className="mt-4 text-center text-sm text-ink-2">{footer}</div>}
+        {footer && <div className="mt-4 text-center text-sm text-white/75 [&_a]:text-white [&_a]:underline">{footer}</div>}
       </div>
     </div>
   );

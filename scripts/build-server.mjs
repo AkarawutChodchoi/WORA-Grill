@@ -15,3 +15,5 @@ await build({
   logLevel: 'info',
 });
 cpSync('server/drizzle', 'dist/server/drizzle', { recursive: true });
+// Sample menu data (seed-wora.ts resolves it next to the bundle).
+cpSync('server/src/db/wora', 'dist/server/wora', { recursive: true });

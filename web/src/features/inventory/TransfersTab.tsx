@@ -83,7 +83,7 @@ export function TransfersTab() {
                 </Select>
               </div>
               {ings.data && <LinesEditor lines={lines} setLines={setLines as any} ingredients={ings.data.ingredients} />}
-              <Button className="mt-3" loading={create.isPending} disabled={!other} onClick={() => create.mutate()}>
+              <Button className="mt-3" loading={create.isPending} disabled={!other} onClick={() => (mode !== 'SHIP' || confirm('ส่งของและตัดสต็อกสาขานี้ทันที?')) && create.mutate()}>
                 {mode === 'SHIP' ? 'ยืนยันส่งของ' : 'ส่งคำขอเบิก'}
               </Button>
             </Panel>
@@ -114,7 +114,7 @@ export function TransfersTab() {
                         </Button>
                       )}
                       {r.status === 'REQUESTED' && (
-                        <Button size="sm" variant="ghost" onClick={() => act.mutate(() => post(`/transfers/${r.id}/cancel`))}>
+                        <Button size="sm" variant="danger-ghost" onClick={() => confirm('ยกเลิกคำขอเบิกนี้?') && act.mutate(() => post(`/transfers/${r.id}/cancel`))}>
                           ยกเลิก
                         </Button>
                       )}

@@ -32,7 +32,7 @@ export function TicketLine({ item, onClick }: { item: OrderItem; onClick?: () =>
           <span className={clsx('font-medium', cancelled && 'line-through')}>{item.nameSnapshot}</span>
           <Mods mods={item.modifiers} />
           {item.comboComponents.length > 0 && <span className="block text-xs text-ink-3">ชุด: {item.comboComponents.map((c) => c.name).join(', ')}</span>}
-          {item.note && <span className="block text-sm text-[#7A5806]">“{item.note}”</span>}
+          {item.note && <span className="block text-sm text-turmeric-700">“{item.note}”</span>}
           {item.allergens.length > 0 && (
             <span className="flex items-center gap-1 text-xs text-chili">
               <AlertTriangle className="size-3" /> {item.allergens.map((a) => ALLERGENS[a] ?? a).join(', ')}
@@ -65,7 +65,7 @@ export function DraftTicketLine({ line, onClick }: { line: DraftLine; onClick: (
         <span className="min-w-0 flex-1">
           <span className="font-medium">{line.name}</span>
           <Mods mods={line.modifiers} />
-          {line.note && <span className="block text-sm text-[#7A5806]">“{line.note}”</span>}
+          {line.note && <span className="block text-sm text-turmeric-700">“{line.note}”</span>}
           <span className="flex items-center gap-1 text-xs text-sky">
             <Clock className="size-3" />
             {line.queued ? 'บันทึกในเครื่อง รอซิงก์' : 'ยังไม่บันทึก'}

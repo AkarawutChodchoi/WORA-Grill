@@ -41,7 +41,7 @@ export function ShiftReportView({ report, kind }: { report: ShiftReport; kind: '
   return (
     <article className="flex flex-col gap-3 text-sm">
       <header>
-        <h3 className="text-base font-semibold">{kind === 'X' ? 'X-Report (ระหว่างกะ)' : 'Z-Report (ปิดกะ)'}</h3>
+        <h3 className="text-base font-semibold">{kind === 'X' ? 'สรุประหว่างกะ (X)' : 'สรุปปิดกะ (Z)'}</h3>
         <p className="text-ink-2">
           {report.cashier} · เปิด {fmtDateTime(report.openedAt)} {report.closedAt && `· ปิด ${fmtDateTime(report.closedAt)}`}
         </p>
@@ -71,7 +71,7 @@ export function ShiftReportView({ report, kind }: { report: ShiftReport; kind: '
       </section>
       <section>
         <h4 className="font-medium">ควบคุม</h4>
-        <R l={`Void ${report.voids.count} บิล`} v={report.voids.amountSatang} />
+        <R l={`ยกเลิกบิล ${report.voids.count} บิล`} v={report.voids.amountSatang} />
         <R l={`คืนเงิน ${report.refunds.count} รายการ`} v={report.refunds.amountSatang} />
         <p>เปิดลิ้นชักโดยไม่ขาย {report.cashMovements.noSaleCount} ครั้ง</p>
         {report.pendingPayments > 0 && <p className="text-chili">มีการชำระรอยืนยัน {report.pendingPayments} รายการ</p>}
@@ -168,7 +168,7 @@ function CloseDialog({ shiftId, report, onClose }: { shiftId: string; report: Sh
       <Dialog
         open
         onClose={onClose}
-        title="Z-Report"
+        title="สรุปปิดกะ (Z)"
         footer={
           <Button icon={<Printer className="size-4" />} onClick={() => window.print()}>
             พิมพ์
@@ -262,7 +262,7 @@ export function ShiftPage() {
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   <Stat label="ยอดขายกะนี้" value={formatBaht(d.report!.orders.totalSatang)} hint={`${d.report!.orders.count} บิล`} />
                   <Stat label="เงินสดรับ" value={formatBaht(d.report!.byMethod.find((m) => m.method === 'CASH')?.amountSatang ?? 0)} />
-                  <Stat label="Void" value={d.report!.voids.count} />
+                  <Stat label="ยกเลิกบิล" value={d.report!.voids.count} />
                   <Stat label="คืนเงิน" value={formatBaht(d.report!.refunds.amountSatang)} />
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -270,7 +270,7 @@ export function ShiftPage() {
                     นำเงินเข้า/ออก
                   </Button>
                   <Button variant="outline" icon={<Printer className="size-4" />} onClick={() => setViewing(d.shift!.id)}>
-                    X-Report
+                    สรุประหว่างกะ (X)
                   </Button>
                   {can('shift.close') && (
                     <Button variant="danger" onClick={() => setClosing(true)}>
@@ -314,7 +314,7 @@ export function ShiftPage() {
         <Dialog
           open
           onClose={() => setViewing(null)}
-          title={viewReport.data.kind === 'X' ? 'X-Report' : 'Z-Report'}
+          title={viewReport.data.kind === 'X' ? 'สรุประหว่างกะ (X)' : 'สรุปปิดกะ (Z)'}
           footer={
             <Button icon={<Printer className="size-4" />} onClick={() => window.print()}>
               พิมพ์

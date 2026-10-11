@@ -11,8 +11,8 @@ const envSchema = z.object({
   SESSION_TTL_HOURS: z.coerce.number().int().min(1).max(24 * 30).default(12),
   /** Set to "true" behind HTTPS so cookies get the Secure flag. */
   COOKIE_SECURE: z.enum(['true', 'false']).default('false'),
-  /** Public URL used when generating QR-menu links, e.g. https://pos.example.com */
-  PUBLIC_BASE_URL: z.string().default('http://localhost:5173'),
+  /** Public address for guest QR links (e.g. https://order.example.com). Empty = automatic: the address staff use, with localhost swapped for this machine's Wi-Fi/LAN IP. */
+  PUBLIC_BASE_URL: z.string().default(''),
   LOG_LEVEL: z.string().default('info'),
   /**
    * Behind a reverse proxy you control: number of proxy hops to trust in X-Forwarded-For

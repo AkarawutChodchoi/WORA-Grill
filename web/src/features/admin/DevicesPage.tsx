@@ -105,7 +105,7 @@ export function DevicesPage() {
                   !r.revokedAt && (
                     <div className="flex justify-end gap-1">
                       <DeviceActions d={r} />
-                      <Button size="sm" variant="ghost" className="text-chili" onClick={() => setRevoke(r)}>
+                      <Button size="sm" variant="danger-ghost" onClick={() => setRevoke(r)}>
                         ยกเลิก
                       </Button>
                     </div>

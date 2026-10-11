@@ -271,7 +271,7 @@ export function PaymentScreen() {
             <p className="rounded-control bg-chili-50 px-3 py-2 text-sm text-chili">ออฟไลน์ — รับได้เฉพาะเงินสด ระบบจะบันทึกในเครื่องและยืนยันกับเซิร์ฟเวอร์เมื่อกลับมาออนไลน์</p>
           )}
           {payable && noShift && online && (
-            <p className="rounded-control bg-turmeric-50 px-3 py-2 text-[#7A5806]">
+            <p className="rounded-control bg-turmeric-50 px-3 py-2 text-turmeric-700">
               ยังไม่ได้เปิดกะ — <Link to="/shift" className="underline">เปิดกะก่อนรับเงิน</Link>
             </p>
           )}
@@ -289,16 +289,16 @@ export function PaymentScreen() {
                     role="radio"
                     aria-checked={method === m}
                     onClick={() => setMethod(m)}
-                    className={clsx('min-h-12 rounded-control border px-4 font-medium', method === m ? 'border-basil bg-basil text-white' : 'border-line-strong bg-surface hover:bg-sunken')}
+                    className={clsx('min-h-12 rounded-control border px-4 font-medium', method === m ? 'border-brand bg-brand text-white' : 'border-line-strong bg-surface hover:bg-sunken')}
                   >
                     {METHOD_LABEL[m] ?? m}
                   </button>
                 ))}
               </div>
-              <div className="mb-3 flex items-center gap-2 text-sm">
+              <div className="mb-3 flex flex-wrap items-center gap-2 text-sm">
                 <span className="text-ink-2">แบ่งจ่าย</span>
                 {[1, 2, 3, 4, 5, 6].map((n) => (
-                  <button key={n} type="button" onClick={() => (setSplit(n), setAmount(''))} className={clsx('size-9 rounded-control border', split === n ? 'border-basil bg-basil-50 font-semibold text-basil-600' : 'border-line')}>
+                  <button key={n} type="button" onClick={() => (setSplit(n), setAmount(''))} className={clsx('size-11 rounded-control border', split === n ? 'border-brand bg-brand-50 font-semibold text-brand' : 'border-line')}>
                     {n}
                   </button>
                 ))}
@@ -430,7 +430,7 @@ export function PaymentScreen() {
                             </Button>
                           </>
                         )}
-                        <Button size="sm" variant="ghost" onClick={() => act.mutate(() => post<Order>(`/payments/${p.id}/cancel`))}>
+                        <Button size="sm" variant="danger-ghost" onClick={() => confirm('ยกเลิกการชำระที่รอยืนยันนี้?') && act.mutate(() => post<Order>(`/payments/${p.id}/cancel`))}>
                           ยกเลิก
                         </Button>
                       </div>
@@ -479,7 +479,7 @@ export function PaymentScreen() {
                   <span className="flex items-center gap-1">
                     <span className="num">-{formatBaht(d.amountSatang)}</span>
                     {payable && o.paidSatang === 0 && can('bill.discount') && (
-                      <button type="button" aria-label="ลบส่วนลด" className="rounded p-1 hover:bg-chili-50" onClick={() => act.mutate(() => del<Order>(`/discounts/${d.id}`))}>
+                      <button type="button" aria-label="ลบส่วนลด" className="flex size-11 items-center justify-center rounded-control text-chili hover:bg-chili-50" onClick={() => confirm('ลบส่วนลดนี้?') && act.mutate(() => del<Order>(`/discounts/${d.id}`))}>
                         <Trash2 className="size-4" />
                       </button>
                     )}

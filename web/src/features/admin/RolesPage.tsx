@@ -110,7 +110,7 @@ export function RolesPage() {
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {d.roles.map((r) => (
               <button key={r.id} type="button" onClick={() => setEditing(r)} className="text-left">
-                <Panel className="h-full hover:border-basil">
+                <Panel className="h-full hover:border-brand">
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-semibold">{r.name}</span>
                     {r.isSystem && <Badge>ระบบ</Badge>}

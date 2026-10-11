@@ -42,7 +42,7 @@ export interface FloorData {
 export const STATUS_STYLE: Record<TableStatus, string> = {
   AVAILABLE: 'border-basil/50 bg-basil-50 text-basil-600',
   OCCUPIED: 'border-sky/50 bg-sky-50 text-sky',
-  WAITING_FOOD: 'border-turmeric bg-turmeric-50 text-[#7A5806]',
+  WAITING_FOOD: 'border-turmeric bg-turmeric-50 text-turmeric-700',
   DINING: 'border-sky bg-sky text-white',
   BILL_REQUESTED: 'border-chili bg-chili text-white',
   CLEANING: 'border-line-strong bg-sunken text-ink-3 [background-image:repeating-linear-gradient(135deg,transparent_0_6px,rgb(0_0_0/0.04)_6px_12px)]',
@@ -213,6 +213,7 @@ function TableSheet({ table, data, onClose }: { table: TableRow; data: FloorData
                   size="sm"
                   variant="ghost"
                   onClick={() =>
+                    confirm('แยกโต๊ะที่รวมไว้ออกจากกัน?') &&
                     run.mutate(async () => {
                       await post(`/tables/${table.id}/unjoin`, { tableIds: joined.map((j) => j.id) });
                       toast.success('แยกโต๊ะแล้ว');
@@ -312,8 +313,8 @@ function TableEditDialog({ table, zones, onClose }: { table: TableRow | 'new'; z
       footer={
         <>
           {t && (
-            <Button variant="ghost" className="mr-auto text-chili" onClick={() => archive.mutate()} loading={archive.isPending}>
-              เก็บโต๊ะ
+            <Button variant="danger-ghost" className="mr-auto" onClick={() => confirm(`ซ่อนโต๊ะ ${t.name} ออกจากผัง?`) && archive.mutate()} loading={archive.isPending}>
+              ซ่อนโต๊ะ (เลิกใช้)
             </Button>
           )}
           <Button variant="ghost" onClick={onClose}>

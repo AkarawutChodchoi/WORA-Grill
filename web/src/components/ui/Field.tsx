@@ -79,8 +79,8 @@ export function Textarea({ label, hint, error, wrapClassName, className, require
 
 export function Checkbox({ label, className, ...rest }: InputHTMLAttributes<HTMLInputElement> & { label: ReactNode }) {
   return (
-    <label className={clsx('inline-flex cursor-pointer items-center gap-2 text-sm', className)}>
-      <input type="checkbox" className="size-4 accent-basil" {...rest} />
+    <label className={clsx('inline-flex min-h-10 cursor-pointer items-center gap-2 py-1 text-sm pointer-coarse:min-h-11', className)}>
+      <input type="checkbox" className="size-5 shrink-0 accent-brand" {...rest} />
       {label}
     </label>
   );

@@ -5,13 +5,13 @@
  *   with header "x-offline-cache: 1" so the UI can label the data as possibly stale.
  * - Writes are never cached here; the app's outbox (IndexedDB) handles them.
  */
-const VERSION = 'rms-v1';
+const VERSION = 'rms-v2';
 const SHELL = `${VERSION}-shell`;
 const DATA = `${VERSION}-data`;
 const READ_APIS = [/^\/api\/menu(\?|$)/, /^\/api\/tables$/, /^\/api\/orders\/[\w-]+$/, /^\/api\/orders\?scope=active/, /^\/api\/settings\/branch$/, /^\/api\/auth\/me$/, /^\/api\/stations$/];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(SHELL).then((c) => c.addAll(['/', '/manifest.webmanifest', '/icon.svg'])).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(SHELL).then((c) => c.addAll(['/', '/manifest.webmanifest', '/favicon.png', '/icon-192.png', '/brand/logo-white.png', '/brand/mark-white.png', '/brand/mark-red.png'])).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (e) => {
@@ -41,7 +41,8 @@ self.addEventListener('fetch', (e) => {
     );
     return;
   }
-  if (url.pathname.startsWith('/assets/')) {
+  // Hashed build assets and uploaded menu photos (random, never-reused names) are immutable.
+  if (url.pathname.startsWith('/assets/') || url.pathname.startsWith('/uploads/')) {
     e.respondWith(
       caches.match(req).then(
         (hit) =>

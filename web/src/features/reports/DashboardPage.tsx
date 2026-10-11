@@ -55,8 +55,8 @@ export function DashboardPage() {
               </div>
             </section>
             {(d.live.pendingPayments > 0 || d.now.voids.count > 0 || d.now.refunds.count > 0) && (
-              <p className="rounded-control bg-turmeric-50 px-3 py-2 text-sm text-[#7A5806]">
-                {d.live.pendingPayments > 0 && `การชำระรอยืนยัน ${d.live.pendingPayments} รายการ · `}Void วันนี้ {d.now.voids.count} บิล ({formatBaht(d.now.voids.amountSatang)}) · คืนเงิน {d.now.refunds.count} รายการ ({formatBaht(d.now.refunds.amountSatang)})
+              <p className="rounded-control bg-turmeric-50 px-3 py-2 text-sm text-turmeric-700">
+                {d.live.pendingPayments > 0 && `การชำระรอยืนยัน ${d.live.pendingPayments} รายการ · `}ยกเลิกบิลวันนี้ {d.now.voids.count} บิล ({formatBaht(d.now.voids.amountSatang)}) · คืนเงิน {d.now.refunds.count} รายการ ({formatBaht(d.now.refunds.amountSatang)})
               </p>
             )}
             <div className="grid gap-4 lg:grid-cols-2">

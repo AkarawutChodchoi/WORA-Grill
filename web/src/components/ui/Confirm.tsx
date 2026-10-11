@@ -30,7 +30,7 @@ export function ConfirmDialog({ open, title, message, confirmLabel, danger, requ
           <Button variant="ghost" onClick={onClose}>
             ยกเลิก
           </Button>
-          <Button variant={danger ? 'danger' : 'primary'} disabled={invalid} loading={loading} onClick={() => onConfirm(reason.trim())}>
+          <Button variant={danger ? 'danger-solid' : 'primary'} disabled={invalid} loading={loading} onClick={() => onConfirm(reason.trim())}>
             {confirmLabel}
           </Button>
         </>
@@ -38,7 +38,7 @@ export function ConfirmDialog({ open, title, message, confirmLabel, danger, requ
     >
       {message && <div className="mb-3 text-ink-2">{message}</div>}
       {requireReason && (
-        <Textarea label="เหตุผล" required value={reason} onChange={(e) => setReason(e.target.value)} hint="อย่างน้อย 3 ตัวอักษร จะถูกบันทึกใน Audit Log" />
+        <Textarea label="เหตุผล" required value={reason} onChange={(e) => setReason(e.target.value)} hint="อย่างน้อย 3 ตัวอักษร จะถูกบันทึกในประวัติการใช้งาน" />
       )}
     </Dialog>
   );

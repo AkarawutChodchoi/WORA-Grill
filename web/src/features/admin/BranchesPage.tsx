@@ -80,7 +80,7 @@ export function BranchesPage() {
                     variant="ghost"
                     onClick={(e) => {
                       e.stopPropagation();
-                      archive.mutate(r);
+                      if (r.archivedAt || confirm(`ปิดสาขา "${r.name}"? พนักงานจะเข้าสาขานี้ไม่ได้จนกว่าจะเปิดใช้อีกครั้ง`)) archive.mutate(r);
                     }}
                   >
                     {r.archivedAt ? 'เปิดใช้' : 'ปิดสาขา'}

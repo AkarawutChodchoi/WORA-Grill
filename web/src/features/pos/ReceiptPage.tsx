@@ -49,6 +49,7 @@ export function ReceiptPage() {
       </div>
       <article className={`mx-auto bg-white p-4 text-[13px] leading-snug text-black ${full ? 'max-w-2xl' : 'w-[80mm]'} print:w-auto print:p-0`}>
         <header className="mb-2 text-center">
+          <img src="/brand/logo.png" alt="WORA Grill" className="mx-auto mb-1 h-16 w-auto" />
           <h1 className="text-base font-bold">{seller.name}</h1>
           {seller.header && <p>{seller.header}</p>}
           {seller.address && <p>{seller.address}</p>}

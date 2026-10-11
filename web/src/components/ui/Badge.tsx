@@ -5,7 +5,7 @@ export type Tone = 'neutral' | 'success' | 'warning' | 'danger' | 'info';
 const tones: Record<Tone, string> = {
   neutral: 'bg-sunken text-ink-2',
   success: 'bg-basil-50 text-basil-600',
-  warning: 'bg-turmeric-50 text-[#7A5806]',
+  warning: 'bg-turmeric-50 text-turmeric-700',
   danger: 'bg-chili-50 text-chili',
   info: 'bg-sky-50 text-sky',
 };
@@ -19,7 +19,7 @@ const STATUS: Record<string, [string, Tone]> = {
   BILL_REQUESTED: ['เรียกเช็กบิล', 'warning'],
   PAID: ['ชำระแล้ว', 'success'],
   CLOSED: ['ปิดแล้ว', 'neutral'],
-  VOIDED: ['Void', 'danger'],
+  VOIDED: ['ยกเลิกบิลแล้ว', 'danger'],
   PENDING: ['ยังไม่ส่ง', 'neutral'],
   SENT: ['ส่งครัวแล้ว', 'info'],
   PREPARING: ['กำลังทำ', 'warning'],
@@ -53,6 +53,11 @@ const STATUS: Record<string, [string, Tone]> = {
   PENDING_CONFIRMATION: ['รอยืนยัน', 'warning'],
   SHIPPED: ['ส่งแล้ว', 'info'],
 };
+
+/** Thai label for a status code (falls back to the code itself). */
+export function statusLabel(status: string): string {
+  return STATUS[status]?.[0] ?? status;
+}
 
 export function StatusBadge({ status }: { status: string }) {
   const [label, tone] = STATUS[status] ?? [status, 'neutral' as Tone];
