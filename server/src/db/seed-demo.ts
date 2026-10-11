@@ -1,5 +1,5 @@
 import type { DbOrTx } from './client';
-import { menuCategories, menuItemModifierGroups, menuItems, modifierGroups, modifiers, stations } from './schema';
+import { diningTables, menuCategories, menuItemModifierGroups, menuItems, modifierGroups, modifiers, stations, zones } from './schema';
 
 /**
  * Demo master data (menu, tables, ingredients…). Each module adds to this as it is built.
@@ -7,6 +7,18 @@ import { menuCategories, menuItemModifierGroups, menuItems, modifierGroups, modi
  */
 export async function seedDemoData(db: DbOrTx, orgId: string, branchId: string, _ownerId: string): Promise<void> {
   await seedMenu(db, orgId, branchId);
+  await seedTables(db, orgId, branchId);
+}
+
+async function seedTables(db: DbOrTx, orgId: string, branchId: string) {
+  const [inside] = await db.insert(zones).values({ organizationId: orgId, branchId, name: 'ในร้าน', floor: '1', sort: 10 }).returning();
+  const [terrace] = await db.insert(zones).values({ organizationId: orgId, branchId, name: 'ระเบียง', floor: '1', sort: 20 }).returning();
+  const rows: (typeof diningTables.$inferInsert)[] = [];
+  for (let i = 0; i < 8; i++)
+    rows.push({ organizationId: orgId, branchId, zoneId: inside.id, name: `A${i + 1}`, capacity: i < 6 ? 4 : 6, posX: 1 + (i % 4) * 3, posY: 1 + Math.floor(i / 4) * 3, width: 2, height: 2 });
+  for (let i = 0; i < 4; i++)
+    rows.push({ organizationId: orgId, branchId, zoneId: terrace.id, name: `T${i + 1}`, capacity: 2, shape: 'round', posX: 1 + i * 3, posY: 1, width: 2, height: 2 });
+  await db.insert(diningTables).values(rows);
 }
 
 async function seedMenu(db: DbOrTx, orgId: string, branchId: string) {

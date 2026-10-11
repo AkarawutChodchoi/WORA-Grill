@@ -10,10 +10,12 @@ import { PinPage } from './features/auth/PinPage';
 import { SetupPage } from './features/auth/SetupPage';
 import { HomePage } from './features/home/HomePage';
 import { MenuPage } from './features/menu/MenuPage';
+import { TablesPage } from './features/tables/TablesPage';
 import { AppLayout, RequireAuth, RequirePermission } from './layouts/AppLayout';
 import type { Permission } from '@shared/permissions';
 import { ApiError } from './lib/api';
 import { AuthProvider } from './lib/auth';
+import { RealtimeProvider } from './lib/realtime';
 
 export function makeQueryClient() {
   return new QueryClient({
@@ -43,6 +45,7 @@ export function AppRoutes() {
         }
       >
         <Route index element={<HomePage />} />
+        <Route path="tables" element={guard(['table.view'], <TablesPage />)} />
         <Route path="menu" element={guard(['menu.view'], <MenuPage />)} />
         <Route path="admin/users" element={guard(['user.manage'], <UsersPage />)} />
         <Route path="admin/roles" element={guard(['user.manage'], <RolesPage />)} />
@@ -59,9 +62,11 @@ export function App({ client = makeQueryClient() }: { client?: QueryClient }) {
     <QueryClientProvider client={client}>
       <ToastProvider>
         <AuthProvider>
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
+          <RealtimeProvider>
+            <BrowserRouter>
+              <AppRoutes />
+            </BrowserRouter>
+          </RealtimeProvider>
         </AuthProvider>
       </ToastProvider>
     </QueryClientProvider>
