@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { BookOpen, Calculator, Grid3x3, History, LayoutDashboard, MonitorSmartphone, ShieldCheck, Users } from 'lucide-react';
+import { BookOpen, Calculator, Grid3x3, Settings, Wallet, History, LayoutDashboard, MonitorSmartphone, ShieldCheck, Users } from 'lucide-react';
 import type { Permission } from '@shared/permissions';
 
 export interface NavItem {
@@ -31,6 +31,7 @@ export const NAV: NavGroup[] = [
     items: [
       { to: '/pos', label: 'POS / บิล', icon: Calculator, anyOf: ['order.view'] },
       { to: '/tables', label: 'ผังโต๊ะ', icon: Grid3x3, anyOf: ['table.view'] },
+      { to: '/shift', label: 'กะ / ลิ้นชักเงิน', icon: Wallet, anyOf: ['shift.open', 'shift.view_all'] },
     ],
   },
   {
@@ -40,6 +41,7 @@ export const NAV: NavGroup[] = [
   {
     label: 'ระบบ',
     items: [
+      { to: '/admin/settings', label: 'ตั้งค่าร้าน', icon: Settings, anyOf: ['settings.manage'] },
       { to: '/admin/users', label: 'ผู้ใช้', icon: Users, anyOf: ['user.manage'] },
       { to: '/admin/roles', label: 'บทบาท', icon: ShieldCheck, anyOf: ['user.manage'] },
       { to: '/admin/devices', label: 'อุปกรณ์', icon: MonitorSmartphone, anyOf: ['device.manage'] },

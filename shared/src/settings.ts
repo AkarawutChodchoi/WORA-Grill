@@ -23,7 +23,7 @@ export const branchSettingsSchema = z.object({
   /** PromptPay target (phone or tax id) for static QR generation; empty = PromptPay disabled. */
   promptPayId: z.string().max(20).default(''),
   /** Payment methods the branch accepts. Only listed methods are offered in the POS. */
-  enabledPaymentMethods: z.array(z.string()).default(['CASH', 'PROMPTPAY']),
+  enabledPaymentMethods: z.array(z.enum(['CASH', 'PROMPTPAY', 'CARD', 'EWALLET', 'TRANSFER', 'VOUCHER'])).default(['CASH']),
   /** Reservation defaults. */
   reservationSeatingMinutes: z.number().int().min(15).max(600).default(90),
   openTime: z.string().regex(/^\d{2}:\d{2}$/).default('10:00'),

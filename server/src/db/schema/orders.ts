@@ -33,6 +33,8 @@ export const orders = pgTable(
     customerName: text('customer_name'),
     customerPhone: text('customer_phone'),
     externalRef: text('external_ref'),
+    /** Receipt / abbreviated tax invoice number, assigned when fully paid. */
+    receiptNo: text('receipt_no'),
     mergedIntoOrderId: uuid('merged_into_order_id'),
     splitFromOrderId: uuid('split_from_order_id'),
     shiftId: uuid('shift_id'),

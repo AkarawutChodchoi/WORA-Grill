@@ -59,3 +59,11 @@ dialog::backdrop { background: rgb(28 35 38 / 0.45); }
   .no-print { display: none !important; }
   body { background: white; }
 }
+
+/* Printing while a dialog is open prints just the dialog (X/Z reports, tickets). */
+@media print {
+  body:has(dialog[open]) * { visibility: hidden; }
+  dialog[open], dialog[open] * { visibility: visible; }
+  dialog[open] { position: absolute; inset: 0; margin: 0; width: 100%; max-width: none; box-shadow: none; }
+  dialog[open] button { display: none; }
+}

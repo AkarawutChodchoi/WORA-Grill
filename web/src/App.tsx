@@ -13,6 +13,10 @@ import { MenuPage } from './features/menu/MenuPage';
 import { TablesPage } from './features/tables/TablesPage';
 import { OrderScreen } from './features/pos/OrderScreen';
 import { PosHome } from './features/pos/PosHome';
+import { PaymentScreen } from './features/pos/PaymentScreen';
+import { ReceiptPage } from './features/pos/ReceiptPage';
+import { ShiftPage } from './features/shift/ShiftPage';
+import { SettingsPage } from './features/admin/SettingsPage';
 import { AppLayout, RequireAuth, RequirePermission } from './layouts/AppLayout';
 import type { Permission } from '@shared/permissions';
 import { ApiError } from './lib/api';
@@ -48,6 +52,22 @@ export function AppRoutes() {
         }
       />
       <Route
+        path="/pos/orders/:id/pay"
+        element={
+          <RequireAuth>
+            {guard(['payment.take'], <PaymentScreen />)}
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/pos/orders/:id/receipt"
+        element={
+          <RequireAuth>
+            {guard(['order.view', 'payment.take'], <ReceiptPage />)}
+          </RequireAuth>
+        }
+      />
+      <Route
         element={
           <RequireAuth>
             <AppLayout />
@@ -56,6 +76,8 @@ export function AppRoutes() {
       >
         <Route index element={<HomePage />} />
         <Route path="pos" element={guard(['order.view'], <PosHome />)} />
+        <Route path="shift" element={guard(['shift.open', 'shift.view_all'], <ShiftPage />)} />
+        <Route path="admin/settings" element={guard(['settings.manage'], <SettingsPage />)} />
         <Route path="tables" element={guard(['table.view'], <TablesPage />)} />
         <Route path="menu" element={guard(['menu.view'], <MenuPage />)} />
         <Route path="admin/users" element={guard(['user.manage'], <UsersPage />)} />

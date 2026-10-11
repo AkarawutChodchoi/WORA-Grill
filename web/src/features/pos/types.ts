@@ -69,9 +69,12 @@ export interface Order {
   pricing: { vatMode: string; vatBps: number; serviceChargeBps: number; serviceChargeTaxable: boolean };
   note: string | null;
   splitFromOrderId: string | null;
+  receiptNo: string | null;
+  closedBy: string | null;
   mergedIntoOrderId: string | null;
   openedAt: string;
   openedByName: string | null;
+  paidAt: string | null;
   closedAt: string | null;
   voidReason: string | null;
   version: number;

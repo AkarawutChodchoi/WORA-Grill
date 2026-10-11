@@ -11,7 +11,7 @@ Status legend: ✅ implemented & verified (tests/typecheck/build run) · 🟡 pa
 | 05 | Menu, modifiers, pricing | ✅ | Categories/items/modifier groups/combos, th/en/zh names, branch+channel prices, time windows, 86 propagation event, image upload w/ magic-byte check, stations |
 | 06 | Tables & floor plan | ✅ | Zones, tables, drag/keyboard floor-plan editor, derived statuses, open/move/join/unjoin with row locks + partial unique index, WebSocket gateway + polling fallback |
 | 07 | POS orders | ✅ | Tested totals engine (shared/pricing.ts), idempotent client-id lines, draft vs send, hold/fire courses, cancel/void w/ reason+approval, split/merge, barcode entry, POS screen |
-| 08 | Payments, shifts, receipts | ⬜ | |
+| 08 | Payments, shifts, receipts | ✅ | Cash/card/transfer/PromptPay (local EMVCo QR, manual confirm), mixed + split-by-people, no overpay, idempotent payment ids, refunds w/ approval, discount ceiling+override, shifts, pay-in/out, X/Z with variance, receipt + abbreviated/full tax invoice print views, branch settings page |
 | 09 | KDS | ⬜ | |
 | 10 | Recipes & inventory | ⬜ | |
 | 11 | Purchasing | ⬜ | |

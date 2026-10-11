@@ -1,11 +1,16 @@
 import type { DbOrTx } from './client';
-import { diningTables, menuCategories, menuItemModifierGroups, menuItems, modifierGroups, modifiers, stations, zones } from './schema';
+import { eq } from 'drizzle-orm';
+import { branches, diningTables, menuCategories, menuItemModifierGroups, menuItems, modifierGroups, modifiers, stations, zones } from './schema';
 
 /**
  * Demo master data (menu, tables, ingredients…). Each module adds to this as it is built.
  * Everything here is labelled DEMO and only runs on an empty database.
  */
 export async function seedDemoData(db: DbOrTx, orgId: string, branchId: string, _ownerId: string): Promise<void> {
+  await db
+    .update(branches)
+    .set({ address: 'DEMO - 1 Example Road, Bangkok', phone: '02-000-0000', settings: { enabledPaymentMethods: ['CASH', 'CARD', 'TRANSFER'], receiptHeader: 'DEMO restaurant (test data)' } as never })
+    .where(eq(branches.id, branchId));
   await seedMenu(db, orgId, branchId);
   await seedTables(db, orgId, branchId);
 }
