@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans Thai", "Leelawadee UI", "Noto Sans Thai", Tahoma, system-ui, sans-serif;
+  --color-bg: #F5F6F4;
+  --color-surface: #FFFFFF;
+  --color-sunken: #ECEFEC;
+  --color-line: #DCE1DE;
+  --color-line-strong: #C2C9C5;
+  --color-ink: #1C2326;
+  --color-ink-2: #4A5559;
+  --color-ink-3: #77827F;
+  --color-basil: #1E6B47;
+  --color-basil-600: #185A3B;
+  --color-basil-50: #E5F1EA;
+  --color-chili: #C2352B;
+  --color-chili-50: #FBEAE8;
+  --color-turmeric: #C9930E;
+  --color-turmeric-50: #FBF3DC;
+  --color-sky: #2C64A8;
+  --color-sky-50: #E6EEF8;
+  --radius-control: 6px;
+  --radius-panel: 10px;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  :focus-visible { outline: 2px solid var(--color-sky); outline-offset: 2px; }
+  .num { font-variant-numeric: tabular-nums; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+}
+
+/* Thermal-ticket edge used by the POS order panel and receipts */
+.ticket {
+  background: var(--color-surface);
+  position: relative;
+}
+.ticket::after {
+  content: "";
+  position: absolute; left: 0; right: 0; bottom: -8px; height: 8px;
+  background: radial-gradient(circle at 6px -2px, transparent 6px, var(--color-surface) 6.5px) 0 0 / 12px 8px repeat-x;
+}
+
+dialog::backdrop { background: rgb(28 35 38 / 0.45); }
+
+/* KDS dark high-contrast surface */
+.kds { background: #121719; color: #EEF2EF; }
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: white; }
+}
