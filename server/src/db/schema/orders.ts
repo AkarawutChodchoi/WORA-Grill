@@ -107,6 +107,8 @@ export const orderItems = pgTable(
     course: integer('course').notNull().default(1),
     /** Held course: saved but not fired to the kitchen until released (Hold/Fire). */
     held: boolean('held').notNull().default(false),
+    /** Ordered by a guest via QR and waiting for staff approval before going to the kitchen. */
+    awaitingApproval: boolean('awaiting_approval').notNull().default(false),
     status: text('status', { enum: ITEM_STATUS_VALUES }).notNull().default('PENDING'),
     discountSatang: integer('discount_satang').notNull().default(0),
     lineTotalSatang: integer('line_total_satang').notNull(),

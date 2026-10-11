@@ -14,6 +14,8 @@ export interface OrderItem {
   stationCode: string | null;
   course: number;
   held: boolean;
+  awaitingApproval: boolean;
+  source: string;
   status: 'PENDING' | 'SENT' | 'PREPARING' | 'READY' | 'SERVED' | 'CANCELLED';
   discountSatang: number;
   lineTotalSatang: number;

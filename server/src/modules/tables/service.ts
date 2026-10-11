@@ -1,6 +1,7 @@
 import { and, eq, inArray, isNull, sql } from 'drizzle-orm';
 import type { TableStatus } from '@shared/states';
 import type { DbOrTx } from '../../db/client';
+import { createOrder } from '../orders/create';
 import { diningTables, orders } from '../../db/schema';
 import type { EventBus } from '../../lib/events';
 import { conflict, notFound } from '../../lib/errors';
@@ -76,4 +77,30 @@ export async function releaseTable(db: DbOrTx, bus: EventBus | null, tableId: st
 export function assertFree(t: typeof diningTables.$inferSelect) {
   if (t.currentOrderId || t.mergedIntoTableId) throw conflict(`โต๊ะ ${t.name} มีลูกค้าอยู่แล้ว`, 'TABLE_OCCUPIED');
   if (t.status === 'CLEANING') throw conflict(`โต๊ะ ${t.name} ยังรอทำความสะอาด`, 'TABLE_CLEANING');
+}
+
+/** Seat guests: claim a free table and create its dine-in bill (caller provides the transaction). */
+export async function openTable(
+  db: DbOrTx,
+  p: { orgId: string; branchId: string; tableId: string; guestCount: number; orderId?: string; note?: string | null; openedBy: string; source: 'POS' | 'WAITER'; customerId?: string | null },
+) {
+  const t = await loadTableForUpdate(db, p.orgId, p.branchId, p.tableId);
+  assertFree(t);
+  const { order } = await createOrder(db, {
+    id: p.orderId,
+    orgId: p.orgId,
+    branchId: p.branchId,
+    channel: 'DINE_IN',
+    source: p.source,
+    tableId: p.tableId,
+    guestCount: p.guestCount,
+    openedBy: p.openedBy,
+    note: p.note ?? null,
+  });
+  if (p.customerId) await db.update(orders).set({ customerId: p.customerId }).where(eq(orders.id, order.id));
+  await db
+    .update(diningTables)
+    .set({ currentOrderId: order.id, status: 'OCCUPIED', statusChangedAt: new Date(), version: sql`${diningTables.version} + 1` })
+    .where(eq(diningTables.id, p.tableId));
+  return { order, table: t };
 }

@@ -46,6 +46,7 @@ export function invalidateFor(qc: QueryClient, e: RealtimeEvent) {
     case 'call_waiter':
     case 'service_request.updated':
       inv(['service-requests']);
+      inv(['qr-pending']);
       break;
     case 'reservation.updated':
     case 'waitlist.updated':

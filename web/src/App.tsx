@@ -14,6 +14,9 @@ import { InventoryPage } from './features/inventory/InventoryPage';
 import { PurchasingPage } from './features/purchasing/PurchasingPage';
 import { CustomersPage } from './features/crm/CustomersPage';
 import { DashboardPage } from './features/reports/DashboardPage';
+import { GuestMenuPage } from './features/guest/GuestMenuPage';
+import { BookingPage, QueuePage } from './features/guest/QueuePage';
+import { ReservationsPage } from './features/guest/ReservationsPage';
 import { ReportsPage } from './features/reports/ReportsPage';
 import { PromotionsPage } from './features/crm/PromotionsPage';
 import { TablesPage } from './features/tables/TablesPage';
@@ -51,6 +54,9 @@ export function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/setup" element={<SetupPage />} />
       <Route path="/pin" element={<PinPage />} />
+      <Route path="/m/:token" element={<GuestMenuPage />} />
+      <Route path="/q/:token" element={<QueuePage />} />
+      <Route path="/book/:branchId" element={<BookingPage />} />
       <Route
         path="/pos/orders/:id"
         element={
@@ -100,6 +106,7 @@ export function AppRoutes() {
       >
         <Route index element={<HomePage />} />
         <Route path="pos" element={guard(['order.view'], <PosHome />)} />
+        <Route path="reservations" element={guard(['reservation.manage'], <ReservationsPage />)} />
         <Route path="shift" element={guard(['shift.open', 'shift.view_all'], <ShiftPage />)} />
         <Route path="admin/settings" element={guard(['settings.manage'], <SettingsPage />)} />
         <Route path="tables" element={guard(['table.view'], <TablesPage />)} />

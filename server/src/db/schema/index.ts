@@ -7,3 +7,4 @@ export * from './payments';
 export * from './inventory';
 export * from './purchasing';
 export * from './crm';
+export * from './guest';

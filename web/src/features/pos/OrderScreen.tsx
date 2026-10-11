@@ -136,6 +136,41 @@ function ServerLineDialog({ order, item, onClose }: { order: Order; item: OrderI
   );
 }
 
+function QrSection({ order }: { order: Order }) {
+  const toast = useToast();
+  const [qr, setQr] = useState<{ url: string; qrDataUrl: string; expiresAt: string } | null>(null);
+  const issue = useMutation({
+    mutationFn: () => post<{ url: string; qrDataUrl: string; expiresAt: string }>(`/orders/${order.id}/qr`),
+    onSuccess: setQr,
+    onError: (e) => toast.error(errorMessage(e)),
+  });
+  return (
+    <section>
+      <h3 className="mb-2 font-semibold">QR ให้ลูกค้าสั่งเอง</h3>
+      {qr ? (
+        <div className="flex flex-col items-center gap-2 text-center">
+          <img src={qr.qrDataUrl} alt="QR สั่งอาหาร" className="size-56" />
+          <p className="text-sm">
+            {order.tableName ? `โต๊ะ ${order.tableName}` : `บิล #${order.orderNo}`} · หมดอายุ {new Date(qr.expiresAt).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}
+          </p>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={() => window.print()}>
+              พิมพ์ QR
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => window.open(qr.url, '_blank', 'noopener')}>
+              เปิดหน้าลูกค้า (Kiosk)
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <Button variant="outline" loading={issue.isPending} onClick={() => issue.mutate()}>
+          ออก QR ใหม่ (QR เดิมของบิลนี้จะใช้ไม่ได้)
+        </Button>
+      )}
+    </section>
+  );
+}
+
 function MoreDialog({ order, onClose }: { order: Order; onClose: () => void }) {
   const { can } = useAuth();
   const qc = useQueryClient();
@@ -225,6 +260,7 @@ function MoreDialog({ order, onClose }: { order: Order; onClose: () => void }) {
             </Button>
           </section>
         )}
+        {editable && <QrSection order={order} />}
         {editable && order.paidSatang === 0 && (
           <section>
             <Button variant="danger" onClick={() => setVoidOpen(true)}>
@@ -256,6 +292,32 @@ function MoreDialog({ order, onClose }: { order: Order; onClose: () => void }) {
       />
       {voidApproval.dialog}
     </Dialog>
+  );
+}
+
+function QrApprovalBar({ order }: { order: Order }) {
+  const qc = useQueryClient();
+  const toast = useToast();
+  const act = useMutation({
+    mutationFn: (reject: boolean) => post<{ order: Order }>(`/orders/${order.id}/approve-qr`, { reject }),
+    onSuccess: (r, reject) => {
+      qc.setQueryData(['order', order.id], r.order);
+      qc.invalidateQueries({ queryKey: ['qr-pending'] });
+      toast.success(reject ? 'ปฏิเสธรายการจาก QR แล้ว' : 'อนุมัติและส่งครัวแล้ว');
+    },
+    onError: (e) => toast.error(errorMessage(e)),
+  });
+  const n = order.items.filter((i) => i.awaitingApproval && i.status === 'PENDING').length;
+  return (
+    <div className="mb-3 flex flex-wrap items-center gap-2 rounded-control bg-sky-50 px-3 py-2 text-sm">
+      <span>ลูกค้าสั่งผ่าน QR {n} รายการ รออนุมัติ (ดูในบิลด้านขวา)</span>
+      <Button size="sm" className="ml-auto" loading={act.isPending && act.variables === false} onClick={() => act.mutate(false)}>
+        อนุมัติส่งครัว
+      </Button>
+      <Button size="sm" variant="ghost" className="text-chili" onClick={() => act.mutate(true)}>
+        ปฏิเสธ
+      </Button>
+    </div>
   );
 }
 
@@ -476,6 +538,7 @@ export function OrderScreen() {
               </Button>
             ))}
           </div>
+          {o.items.some((i) => i.awaitingApproval && i.status === 'PENDING') && can('order.approve_qr') && <QrApprovalBar order={o} />}
           {!editable && (
             <p className="mb-3 rounded-control bg-turmeric-50 px-3 py-2 text-sm text-[#7A5806]">
               {o.status === 'BILL_REQUESTED' ? 'เรียกเช็กบิลแล้ว — กด "แก้ไขบิล" เพื่อสั่งเพิ่ม' : `บิลนี้สถานะ ${o.status} แก้ไขรายการไม่ได้`}

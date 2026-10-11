@@ -6,8 +6,7 @@ import { diningTables, orderItems, orders, users, zones, zoneWaiters } from '../
 import { audit } from '../../lib/audit';
 import { requireBranch, requirePerm } from '../../lib/auth';
 import { badRequest, conflict, isUniqueViolation, notFound, parse } from '../../lib/errors';
-import { createOrder } from '../orders/create';
-import { assertFree, loadTableForUpdate, releaseTable, setDerivedStatus } from './service';
+import { assertFree, loadTableForUpdate, openTable, releaseTable, setDerivedStatus } from './service';
 
 const tableBody = z.object({
   zoneId: uuid,
@@ -183,23 +182,7 @@ export default async function tableRoutes(app: FastifyInstance) {
           const [prev] = await tx.select().from(orders).where(and(eq(orders.id, body.orderId), eq(orders.branchId, branchId)));
           if (prev) return { order: prev, replay: true }; // idempotent retry
         }
-        const t = await loadTableForUpdate(tx, a.orgId, branchId, id);
-        assertFree(t);
-        const { order } = await createOrder(tx, {
-          id: body.orderId,
-          orgId: a.orgId,
-          branchId,
-          channel: 'DINE_IN',
-          source: a.sessionKind === 'PIN' ? 'WAITER' : 'POS',
-          tableId: id,
-          guestCount: body.guestCount,
-          openedBy: a.userId,
-          note: body.note,
-        });
-        await tx
-          .update(diningTables)
-          .set({ currentOrderId: order.id, status: 'OCCUPIED', statusChangedAt: new Date(), version: sql`${diningTables.version} + 1` })
-          .where(eq(diningTables.id, id));
+        const { order } = await openTable(tx, { orgId: a.orgId, branchId, tableId: id, guestCount: body.guestCount, orderId: body.orderId, note: body.note, openedBy: a.userId, source: a.sessionKind === 'PIN' ? 'WAITER' : 'POS' });
         await audit(tx, a, { action: 'table.open', targetType: 'table', targetId: id, data: { orderId: order.id, orderNo: order.orderNo, guestCount: body.guestCount } }, req.ip);
         return { order, replay: false };
       });

@@ -126,7 +126,8 @@ export async function sendItems(db: DbOrTx, bus: EventBus | null, o: Order, opts
     .select()
     .from(orderItems)
     .where(and(eq(orderItems.orderId, o.id), eq(orderItems.status, 'PENDING'), opts.itemIds?.length ? inArray(orderItems.id, opts.itemIds) : undefined));
-  const toSend = pending.filter((i) => (opts.course ? i.course === opts.course : true) && (!i.held || opts.includeHeld || opts.itemIds?.includes(i.id)));
+  // Lines a guest ordered by QR wait for staff approval (when the branch requires it) before they can be sent.
+  const toSend = pending.filter((i) => !i.awaitingApproval && (opts.course ? i.course === opts.course : true) && (!i.held || opts.includeHeld || opts.itemIds?.includes(i.id)));
   if (toSend.length === 0) return [];
   const now = new Date();
   await db

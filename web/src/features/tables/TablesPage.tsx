@@ -9,6 +9,7 @@ import { errorMessage, get, patch, post, put } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
 import { fmtElapsed, formatBaht } from '../../lib/format';
 import { LiveIndicator, useLivePolling } from '../../lib/realtime';
+import { ServiceRequestsPanel } from './ServiceRequests';
 
 export interface TableRow {
   id: string;
@@ -541,6 +542,7 @@ export function TablesPage() {
           </>
         }
       />
+      <ServiceRequestsPanel />
       <QueryView
         query={{ ...floor, data }}
         isEmpty={(d) => d.zones.length === 0}
