@@ -5,3 +5,4 @@ export * from './tables';
 export * from './orders';
 export * from './payments';
 export * from './inventory';
+export * from './purchasing';

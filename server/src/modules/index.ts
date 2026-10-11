@@ -5,6 +5,7 @@ import inventoryRoutes from './inventory/routes';
 import kdsRoutes from './kds/routes';
 import menuRoutes from './menu/routes';
 import orderRoutes from './orders/routes';
+import purchasingRoutes from './purchasing/routes';
 import paymentRoutes from './payments/routes';
 import settingsRoutes from './settings/routes';
 import realtimeRoutes from './realtime/routes';
@@ -22,6 +23,7 @@ export async function registerModules(app: FastifyInstance) {
   await app.register(paymentRoutes);
   await app.register(kdsRoutes);
   await app.register(inventoryRoutes);
+  await app.register(purchasingRoutes);
   await app.register(settingsRoutes);
   await app.register(realtimeRoutes);
 }
