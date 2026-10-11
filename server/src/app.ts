@@ -6,6 +6,7 @@ import multipart from '@fastify/multipart';
 import fastifyStatic from '@fastify/static';
 import websocket from '@fastify/websocket';
 import Fastify, { type FastifyInstance } from 'fastify';
+import { sql } from 'drizzle-orm';
 import { ZodError } from 'zod';
 import type { Config } from './config';
 import type { DB } from './db/client';
@@ -46,6 +47,19 @@ export async function buildApp(deps: Deps, opts: { logger?: boolean } = {}): Pro
   app.decorate('deps', deps);
   app.decorateRequest('auth', null);
 
+  // Accept an empty JSON body as {} (many clients send Content-Type without a body on action POSTs).
+  app.removeContentTypeParser('application/json');
+  app.addContentTypeParser('application/json', { parseAs: 'string' }, (_req, body, done) => {
+    const text = typeof body === 'string' ? body : body.toString('utf8');
+    if (!text.trim()) return done(null, {});
+    try {
+      done(null, JSON.parse(text));
+    } catch {
+      const err = new AppError(400, 'BAD_REQUEST', 'รูปแบบ JSON ไม่ถูกต้อง');
+      done(err, undefined);
+    }
+  });
+
   await app.register(cookie);
   await app.register(helmet, {
     contentSecurityPolicy: {
@@ -59,8 +73,12 @@ export async function buildApp(deps: Deps, opts: { logger?: boolean } = {}): Pro
         connectSrc: ["'self'", 'ws:', 'wss:'],
         objectSrc: ["'none'"],
         frameAncestors: ["'none'"],
+        // Only force HTTPS sub-resources when the site is actually served over HTTPS
+        // (many restaurants run the server on a LAN over plain HTTP).
+        upgradeInsecureRequests: deps.config.COOKIE_SECURE === 'true' ? [] : null,
       },
     },
+    hsts: deps.config.COOKIE_SECURE === 'true' ? { maxAge: 31536000, includeSubDomains: true } : false,
     crossOriginEmbedderPolicy: false,
   });
   await app.register(multipart, { limits: { fileSize: 2 * 1024 * 1024, files: 1 } });
@@ -95,7 +113,15 @@ export async function buildApp(deps: Deps, opts: { logger?: boolean } = {}): Pro
     return reply.status(500).send({ error: { code: 'INTERNAL', message: 'เกิดข้อผิดพลาดในระบบ กรุณาลองใหม่' } });
   });
 
-  app.get('/api/health', async () => ({ ok: true, time: new Date().toISOString() }));
+  /** Liveness + database readiness for load balancers / uptime monitors (no sensitive data). */
+  app.get('/api/health', async (_req, reply) => {
+    try {
+      await deps.db.execute(sql`select 1`);
+      return { ok: true, db: 'up', time: new Date().toISOString() };
+    } catch {
+      return reply.status(503).send({ ok: false, db: 'down' });
+    }
+  });
 
   await app.register(registerModules, { prefix: '/api' });
 

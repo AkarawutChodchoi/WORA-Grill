@@ -225,6 +225,7 @@ export default async function integrationRoutes(app: FastifyInstance) {
 
   // ---------- Inbound webhooks (raw body needed for signature verification) ----------
   await app.register(async (hooks) => {
+    hooks.removeContentTypeParser('application/json');
     hooks.addContentTypeParser('application/json', { parseAs: 'buffer' }, (_req, body, done) => done(null, body));
 
     hooks.post('/webhooks/payments/opn', async (req, reply) => {

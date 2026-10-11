@@ -22,7 +22,9 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check": "npm run typecheck && npm run lint && npm run test && npm run build"
+    "check": "npm run typecheck && npm run lint && npm run test && npm run build",
+    "db:backup": "tsx --env-file-if-exists=.env server/src/db/backup-cli.ts backup",
+    "db:restore": "tsx --env-file-if-exists=.env server/src/db/backup-cli.ts restore"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.8",
