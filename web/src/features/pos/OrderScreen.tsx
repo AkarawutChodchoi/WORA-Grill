@@ -441,6 +441,18 @@ export function OrderScreen() {
         </div>
         <LiveIndicator />
         <span className="hidden text-sm text-ink-2 md:inline">{me?.user.name}</span>
+        {o.items.some((i) => ['SENT', 'PREPARING'].includes(i.status)) && (
+          <Link to={`/kitchen-ticket/${o.id}`} className="hidden sm:block">
+            <Button variant="ghost" size="sm">
+              พิมพ์ใบครัว
+            </Button>
+          </Link>
+        )}
+        <Link to={`/pos/orders/${o.id}/receipt`} className="hidden sm:block">
+          <Button variant="ghost" size="sm">
+            พิมพ์ใบแจ้งยอด
+          </Button>
+        </Link>
         <Button variant="ghost" size="sm" aria-label="ตัวเลือกบิล" icon={<MoreHorizontal className="size-5" />} onClick={() => setMore(true)} />
       </header>
       <div className="flex min-h-0 flex-1">

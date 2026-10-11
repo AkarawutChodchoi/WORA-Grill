@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import authRoutes from './auth/routes';
 import deviceRoutes from './devices/routes';
+import kdsRoutes from './kds/routes';
 import menuRoutes from './menu/routes';
 import orderRoutes from './orders/routes';
 import paymentRoutes from './payments/routes';
@@ -18,6 +19,7 @@ export async function registerModules(app: FastifyInstance) {
   await app.register(tableRoutes);
   await app.register(orderRoutes);
   await app.register(paymentRoutes);
+  await app.register(kdsRoutes);
   await app.register(settingsRoutes);
   await app.register(realtimeRoutes);
 }

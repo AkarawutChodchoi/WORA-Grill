@@ -12,7 +12,7 @@ Status legend: ✅ implemented & verified (tests/typecheck/build run) · 🟡 pa
 | 06 | Tables & floor plan | ✅ | Zones, tables, drag/keyboard floor-plan editor, derived statuses, open/move/join/unjoin with row locks + partial unique index, WebSocket gateway + polling fallback |
 | 07 | POS orders | ✅ | Tested totals engine (shared/pricing.ts), idempotent client-id lines, draft vs send, hold/fire courses, cancel/void w/ reason+approval, split/merge, barcode entry, POS screen |
 | 08 | Payments, shifts, receipts | ✅ | Cash/card/transfer/PromptPay (local EMVCo QR, manual confirm), mixed + split-by-people, no overpay, idempotent payment ids, refunds w/ approval, discount ceiling+override, shifts, pay-in/out, X/Z with variance, receipt + abbreviated/full tax invoice print views, branch settings page |
-| 09 | KDS | ⬜ | |
+| 09 | KDS | ✅ | Station routing by category/item, WS + polling, aging colours from settings, all-day count, expo/served, undo step, device→station lock, 86 dialog, recall, beep on new ticket, printable per-station kitchen slips, ready-to-serve toasts |
 | 10 | Recipes & inventory | ⬜ | |
 | 11 | Purchasing | ⬜ | |
 | 12 | CRM, loyalty, promotions | ⬜ | |

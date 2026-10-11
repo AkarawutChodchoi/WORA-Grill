@@ -16,6 +16,8 @@ import { PosHome } from './features/pos/PosHome';
 import { PaymentScreen } from './features/pos/PaymentScreen';
 import { ReceiptPage } from './features/pos/ReceiptPage';
 import { ShiftPage } from './features/shift/ShiftPage';
+import { KdsPage } from './features/kds/KdsPage';
+import { KitchenTicketPage } from './features/kds/KitchenTicketPage';
 import { SettingsPage } from './features/admin/SettingsPage';
 import { AppLayout, RequireAuth, RequirePermission } from './layouts/AppLayout';
 import type { Permission } from '@shared/permissions';
@@ -56,6 +58,22 @@ export function AppRoutes() {
         element={
           <RequireAuth>
             {guard(['payment.take'], <PaymentScreen />)}
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/kds"
+        element={
+          <RequireAuth>
+            {guard(['kitchen.view'], <KdsPage />)}
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/kitchen-ticket/:id"
+        element={
+          <RequireAuth>
+            {guard(['kitchen.view', 'order.send'], <KitchenTicketPage />)}
           </RequireAuth>
         }
       />

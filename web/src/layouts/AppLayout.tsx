@@ -7,6 +7,7 @@ import { ROLE_LABELS, type SystemRole } from '@shared/permissions';
 import { Button, EmptyState, Spinner, useToast } from '../components/ui';
 import { errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
+import { useRealtimeEvent } from '../lib/realtime';
 import { visibleNav } from '../nav';
 
 export function FullPageSpinner() {
@@ -135,6 +136,22 @@ function SideNav({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
+/** Floor staff get a toast when food is ready to serve (SPEC §3.5 แจ้งเตือนเมื่ออาหารพร้อมเสิร์ฟ). */
+function FloorNotifier() {
+  const { can } = useAuth();
+  const toast = useToast();
+  useRealtimeEvent((e) => {
+    if (!can('table.operate')) return;
+    if (e.type === 'order_item.status_changed' && e.payload.status === 'READY') {
+      toast.info(`${e.payload.tableName ? `โต๊ะ ${e.payload.tableName}` : `บิล #${e.payload.orderNo}`}: ${e.payload.name} ×${e.payload.qty} พร้อมเสิร์ฟ`);
+    }
+    if (e.type === 'call_waiter') {
+      toast.info(`โต๊ะ ${e.payload.tableName}: ${e.payload.label ?? 'เรียกพนักงาน'}`);
+    }
+  });
+  return null;
+}
+
 /** Back-office shell: left rail on desktop, drawer on mobile/tablet. */
 export function AppLayout() {
   const [open, setOpen] = useState(false);
@@ -142,6 +159,7 @@ export function AppLayout() {
   useEffect(() => setOpen(false), [loc.pathname]);
   return (
     <div className="flex min-h-dvh">
+      <FloorNotifier />
       <aside className="no-print sticky top-0 hidden h-dvh w-60 shrink-0 overflow-y-auto border-r border-line bg-surface lg:block">
         <SideNav />
       </aside>
