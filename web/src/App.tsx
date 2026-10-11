@@ -12,6 +12,8 @@ import { HomePage } from './features/home/HomePage';
 import { MenuPage } from './features/menu/MenuPage';
 import { InventoryPage } from './features/inventory/InventoryPage';
 import { PurchasingPage } from './features/purchasing/PurchasingPage';
+import { CustomersPage } from './features/crm/CustomersPage';
+import { PromotionsPage } from './features/crm/PromotionsPage';
 import { TablesPage } from './features/tables/TablesPage';
 import { OrderScreen } from './features/pos/OrderScreen';
 import { PosHome } from './features/pos/PosHome';
@@ -101,6 +103,8 @@ export function AppRoutes() {
         <Route path="tables" element={guard(['table.view'], <TablesPage />)} />
         <Route path="inventory" element={guard(['inventory.view', 'stock.receive', 'stock.count', 'stock.waste'], <InventoryPage />)} />
         <Route path="purchasing" element={guard(['purchase.view', 'purchase.create', 'stock.receive'], <PurchasingPage />)} />
+        <Route path="customers" element={guard(['customer.view'], <CustomersPage />)} />
+        <Route path="promotions" element={guard(['promotion.manage'], <PromotionsPage />)} />
         <Route path="menu" element={guard(['menu.view'], <MenuPage />)} />
         <Route path="admin/users" element={guard(['user.manage'], <UsersPage />)} />
         <Route path="admin/roles" element={guard(['user.manage'], <RolesPage />)} />

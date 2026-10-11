@@ -57,6 +57,13 @@
       "when": 1791736677267,
       "tag": "0007_purchasing",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791737172855,
+      "tag": "0008_crm",
+      "breakpoints": true
     }
   ]
 }

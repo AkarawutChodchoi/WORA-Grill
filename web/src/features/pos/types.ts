@@ -81,7 +81,7 @@ export interface Order {
   items: OrderItem[];
   discounts: OrderDiscount[];
   payments?: Payment[];
-  customer?: { id: string; name: string; phone: string | null; tier: string | null; pointsBalance: number } | null;
+  customer?: { id: string; name: string; phone: string | null; tier: string | null; pointsBalance: number; allergies?: string | null } | null;
 }
 
 /** A line tapped in the POS but not yet saved to the server. */

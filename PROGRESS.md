@@ -15,7 +15,7 @@ Status legend: ✅ implemented & verified (tests/typecheck/build run) · 🟡 pa
 | 09 | KDS | ✅ | Station routing by category/item, WS + polling, aging colours from settings, all-day count, expo/served, undo step, device→station lock, 86 dialog, recall, beep on new ticket, printable per-station kitchen slips, ready-to-serve toasts |
 | 10 | Recipes & inventory | ✅ | Ledger + cached balances w/ reconcile, explicit unit conversions, weighted-avg cost, FEFO lots, recipes for items/modifiers/sub-recipes, idempotent deduction on send + reversal on cancel, receive/issue/waste/adjust/transfer/produce, counts with variance, low-stock + expiry alerts, food cost %. See docs/10-inventory.md |
 | 11 | Purchasing | ✅ | Suppliers + item prices, price comparison per base unit, PR(SUBMITTED)→PO(APPROVED)→ORDERED, GR posting in one tx (partial, rejected w/ reason, over-receipt blocked, idempotent GR id), returns w/ credit, simple AP with due dates, replenishment suggestions (14-day usage + lead time) |
-| 12 | CRM, loyalty, promotions | ⬜ | |
+| 12 | CRM, loyalty, promotions | ✅ | Customers w/ consent timestamps, masked lists, PDPA export/anonymise, points ledger (earn on paid, redeem as payment, reverse on refund, FIFO expiry, idempotent keys), tiers, promotion engine (percent/amount/item/BOGO, time/day/branch/channel/member/tier, limits, stacking) re-checked before payment, coupons (single/multi-use), birthday coupons. Gift cards/stored value + LINE/SMS delivery intentionally not enabled |
 | 13 | Reports & dashboard | ⬜ | |
 | 14 | Reservations, QR ordering | ⬜ | |
 | 15 | Staff & multi-branch | ⬜ | |

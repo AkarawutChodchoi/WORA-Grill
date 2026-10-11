@@ -13,6 +13,7 @@ import { authorizeSensitive, requireAnyPerm, requireBranch, requirePerm } from '
 import { badRequest, conflict, isUniqueViolation, notFound, parse, unprocessable } from '../../lib/errors';
 import { businessDate } from '../../lib/time';
 import { branchSettings } from '../menu/service';
+import { orderHooks, runOrderHook } from '../orders/hooks';
 import { getOrderDetail, lockOrder, recalcOrder } from '../orders/service';
 import { assertMethodEnabled, buildShiftReport, nextDocNo, openShiftFor, paidAmount, settleOrder } from './service';
 
@@ -82,6 +83,7 @@ export default async function paymentRoutes(app: FastifyInstance) {
       const o = await lockOrder(tx, a.orgId, branchId, d.orderId);
       if (!['OPEN', 'BILL_REQUESTED'].includes(o.status) || o.paidSatang > 0) throw conflict('แก้ไขส่วนลดไม่ได้แล้ว');
       await tx.update(orderDiscounts).set({ removedAt: new Date(), removedBy: a.userId }).where(eq(orderDiscounts.id, id));
+      for (const h of orderHooks.discountRemoved) await h({ db: tx, actor: a, bus }, id);
       await recalcOrder(tx, d.orderId);
       await audit(tx, a, { action: 'bill.discount_removed', targetType: 'order', targetId: d.orderId, data: { discountId: id } }, req.ip);
     });
@@ -104,6 +106,22 @@ export default async function paymentRoutes(app: FastifyInstance) {
       }),
       req.body,
     );
+    // Re-validate the bill (promotions etc.) in a separate, committed step: if anything changed the
+    // cashier must see the new total before taking money.
+    const [prior] = await db.select({ id: payments.id }).from(payments).where(eq(payments.id, body.id));
+    if (!prior) {
+      const changes = await db.transaction(async (tx) => {
+        const o = await lockOrder(tx, a.orgId, branchId, id);
+        if (!['OPEN', 'BILL_REQUESTED'].includes(o.status)) return [];
+        const out: string[] = [];
+        for (const h of orderHooks.beforePayment) out.push(...(await h({ db: tx, actor: a, bus }, o)));
+        return out;
+      });
+      if (changes.length) {
+        emit(a.orgId, branchId, id);
+        throw conflict(`ยอดบิลเปลี่ยน: ${changes.join(', ')} — ตรวจยอดใหม่ก่อนรับเงิน`, 'PROMOTIONS_CHANGED');
+      }
+    }
     const result = await db.transaction(async (tx) => {
       // Idempotent retry: same payment id returns the existing record.
       const [dup] = await tx.select().from(payments).where(eq(payments.id, body.id));
@@ -214,6 +232,7 @@ export default async function paymentRoutes(app: FastifyInstance) {
       if (p.method === 'CASH' && !shift) throw unprocessable('คืนเงินสดต้องเปิดกะก่อน', 'NO_OPEN_SHIFT');
       await tx.insert(refunds).values({ organizationId: a.orgId, branchId, paymentId: id, orderId: o.id, shiftId: shift?.id ?? null, method: p.method, amountSatang: body.amountSatang, reason: body.reason, createdBy: a.userId, approvedBy: approver });
       await tx.update(payments).set({ refundedSatang: p.refundedSatang + body.amountSatang }).where(eq(payments.id, id));
+      for (const h of orderHooks.paymentRefunded) await h({ db: tx, actor: a, bus }, p, body.amountSatang);
       const { confirmed } = await paidAmount(tx, o.id);
       // Fully refunded paid bill goes back to OPEN so it can be corrected or voided (state machine PAID → OPEN).
       const reopen = o.status === 'PAID' && confirmed === 0;
@@ -221,6 +240,7 @@ export default async function paymentRoutes(app: FastifyInstance) {
         .update(orders)
         .set({ paidSatang: confirmed, ...(reopen ? { status: 'OPEN' as const, paidAt: null } : {}), version: sql`${orders.version} + 1` })
         .where(eq(orders.id, o.id));
+      if (reopen) await runOrderHook(orderHooks.orderReopened, { db: tx, actor: a, bus }, { ...o, status: 'OPEN' });
       await audit(
         tx,
         a,

@@ -15,6 +15,8 @@ export interface HookCtx {
 
 type ItemsHook = (ctx: HookCtx, order: Order, items: OrderItem[]) => Promise<void>;
 type OrderHook = (ctx: HookCtx, order: Order) => Promise<void>;
+type DiscountHook = (ctx: HookCtx, discountId: string) => Promise<void>;
+type RefundHook = (ctx: HookCtx, payment: { id: string; orderId: string; method: string }, amountSatang: number) => Promise<void>;
 
 export const orderHooks = {
   itemsSent: [] as ItemsHook[],
@@ -22,6 +24,13 @@ export const orderHooks = {
   orderPaid: [] as OrderHook[],
   orderVoided: [] as OrderHook[],
   orderReopened: [] as OrderHook[],
+  /**
+   * Runs in its own committed transaction before money is taken (e.g. re-check promotions).
+   * Returns human-readable changes; any change aborts the payment so the cashier can re-check the total.
+   */
+  beforePayment: [] as ((ctx: HookCtx, order: Order) => Promise<string[]>)[],
+  discountRemoved: [] as DiscountHook[],
+  paymentRefunded: [] as RefundHook[],
 };
 
 export async function runItemsHook(list: ItemsHook[], ctx: HookCtx, order: Order, items: OrderItem[]) {

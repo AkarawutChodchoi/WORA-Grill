@@ -11,6 +11,7 @@ import { useAuth } from '../../lib/auth';
 import { formatBaht, fmtTime } from '../../lib/format';
 import { METHOD_LABEL, useBranchSettings } from '../../lib/settings';
 import { useOrder } from './OrderScreen';
+import { MemberPromoPanel } from './MemberPromoPanel';
 import { TotalsBlock } from './Ticket';
 import type { Order, Payment } from './types';
 
@@ -210,7 +211,10 @@ export function PaymentScreen() {
       setReference('');
       if (o.status === 'PAID') toast.success('ชำระเงินครบแล้ว');
     },
-    onError: (e) => toast.error(errorMessage(e)),
+    onError: (e) => {
+      toast.error(errorMessage(e));
+      qc.invalidateQueries({ queryKey: ['order', id] });
+    },
   });
   const act = useMutation({
     mutationFn: (fn: () => Promise<Order>) => fn(),
@@ -358,6 +362,7 @@ export function PaymentScreen() {
               </Panel>
             )
           )}
+          {payable && <MemberPromoPanel order={o} />}
           <Panel title="รายการชำระ">
             {payments.length === 0 ? (
               <p className="text-ink-3">ยังไม่มีการชำระ</p>
