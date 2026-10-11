@@ -1,6 +1,7 @@
 # ระบบจัดการร้านอาหาร — Restaurant Management System
 
-Full restaurant operations system built from `สเปกระบบจัดการร้านอาหารแบบละเอียด.md`:
+Full restaurant operations system built from `สเปกระบบจัดการร้านอาหารแบบละเอียด.md`
+(the specification and the 17 implementation prompts live in `../Prompt/`):
 POS (dine-in / takeaway / delivery), floor plan & tables, kitchen display (KDS), menu with modifiers and
 branch/channel pricing, payments (cash, card/EDC, transfer, PromptPay), shifts & cash drawer with X/Z
 reports, receipts & tax invoices, recipes & inventory ledger, purchasing, CRM/loyalty/promotions,
