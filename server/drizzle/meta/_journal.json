@@ -43,6 +43,13 @@
       "when": 1791735438511,
       "tag": "0005_payments_shifts",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791736301725,
+      "tag": "0006_inventory",
+      "breakpoints": true
     }
   ]
 }

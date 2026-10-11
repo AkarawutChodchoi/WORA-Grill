@@ -49,7 +49,7 @@ export async function settleOrder(db: DbOrTx, bus: EventBus | null, actor: Pick<
     .where(eq(orders.id, orderId))
     .returning();
   if (o.tableId) await releaseTable(db, bus, o.tableId, 'CLEANING');
-  await runOrderHook(orderHooks.orderPaid, { db, actor }, paid);
+  await runOrderHook(orderHooks.orderPaid, { db, actor, bus }, paid);
   bus?.publish({ type: 'payment.confirmed', organizationId: o.organizationId, branchId: o.branchId, payload: { orderId, status: 'PAID' } });
   return paid;
 }

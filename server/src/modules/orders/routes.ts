@@ -172,7 +172,7 @@ export default async function orderRoutes(app: FastifyInstance) {
       if (!body.send) return [];
       if (!a.permissions.has('order.send')) return [];
       const s = await sendItems(tx, bus, o, { itemIds: body.items.filter((i) => !i.held).map((i) => i.id) });
-      await runItemsHook(orderHooks.itemsSent, { db: tx, actor: a }, o, s);
+      await runItemsHook(orderHooks.itemsSent, { db: tx, actor: a, bus }, o, s);
       return s;
     });
     if (sent.length) await db.transaction((tx) => refreshTableForOrder(tx, bus, id));
@@ -228,7 +228,7 @@ export default async function orderRoutes(app: FastifyInstance) {
       await tx.update(orderItems).set({ status: 'CANCELLED', cancelledAt: new Date(), cancelledReason: reason, cancelledBy: a.userId }).where(eq(orderItems.id, id));
       await tx.update(orderDiscounts).set({ removedAt: new Date(), removedBy: a.userId }).where(eq(orderDiscounts.orderItemId, id));
       await recalcOrder(tx, o.id);
-      if (cur.status !== 'PENDING') await runItemsHook(orderHooks.itemsCancelled, { db: tx, actor: a }, o, [cur]);
+      if (cur.status !== 'PENDING') await runItemsHook(orderHooks.itemsCancelled, { db: tx, actor: a, bus }, o, [cur]);
       await audit(
         tx,
         a,
@@ -253,7 +253,7 @@ export default async function orderRoutes(app: FastifyInstance) {
       const o = await lockOrder(tx, a.orgId, branchId, id);
       if (!['OPEN', 'BILL_REQUESTED'].includes(o.status)) throw conflict('บิลปิดแล้ว');
       const s = await sendItems(tx, bus, o, body);
-      await runItemsHook(orderHooks.itemsSent, { db: tx, actor: a }, o, s);
+      await runItemsHook(orderHooks.itemsSent, { db: tx, actor: a, bus }, o, s);
       if (s.length) {
         await audit(tx, a, { action: body.includeHeld || body.course ? 'order.fire' : 'order.send', targetType: 'order', targetId: id, data: { items: s.map((i) => ({ id: i.id, name: i.nameSnapshot, qty: i.qty })) } }, req.ip);
         await refreshTableForOrder(tx, bus, id);
@@ -319,8 +319,8 @@ export default async function orderRoutes(app: FastifyInstance) {
         .set({ status: 'VOIDED', voidedAt: new Date(), voidedBy: a.userId, voidReason: body.reason, version: sql`${orders.version} + 1` })
         .where(eq(orders.id, id));
       const after = await recalcOrder(tx, id);
-      await runItemsHook(orderHooks.itemsCancelled, { db: tx, actor: a }, after, sentBefore);
-      await runOrderHook(orderHooks.orderVoided, { db: tx, actor: a }, after);
+      await runItemsHook(orderHooks.itemsCancelled, { db: tx, actor: a, bus }, after, sentBefore);
+      await runOrderHook(orderHooks.orderVoided, { db: tx, actor: a, bus }, after);
       if (o.tableId) await releaseTable(tx, bus, o.tableId, sentBefore.length ? 'CLEANING' : 'AVAILABLE');
       await audit(tx, a, { action: 'order.void', targetType: 'order', targetId: id, reason: body.reason, approverUserId: approver, data: { orderNo: o.orderNo, totalBefore: o.grandTotalSatang, items: live.length } }, req.ip);
       for (const i of sentBefore) bus.publish({ type: 'order_item.status_changed', organizationId: a.orgId, branchId, payload: { orderId: id, itemId: i.id, status: 'CANCELLED' } });

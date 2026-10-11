@@ -13,7 +13,7 @@ Status legend: ✅ implemented & verified (tests/typecheck/build run) · 🟡 pa
 | 07 | POS orders | ✅ | Tested totals engine (shared/pricing.ts), idempotent client-id lines, draft vs send, hold/fire courses, cancel/void w/ reason+approval, split/merge, barcode entry, POS screen |
 | 08 | Payments, shifts, receipts | ✅ | Cash/card/transfer/PromptPay (local EMVCo QR, manual confirm), mixed + split-by-people, no overpay, idempotent payment ids, refunds w/ approval, discount ceiling+override, shifts, pay-in/out, X/Z with variance, receipt + abbreviated/full tax invoice print views, branch settings page |
 | 09 | KDS | ✅ | Station routing by category/item, WS + polling, aging colours from settings, all-day count, expo/served, undo step, device→station lock, 86 dialog, recall, beep on new ticket, printable per-station kitchen slips, ready-to-serve toasts |
-| 10 | Recipes & inventory | ⬜ | |
+| 10 | Recipes & inventory | ✅ | Ledger + cached balances w/ reconcile, explicit unit conversions, weighted-avg cost, FEFO lots, recipes for items/modifiers/sub-recipes, idempotent deduction on send + reversal on cancel, receive/issue/waste/adjust/transfer/produce, counts with variance, low-stock + expiry alerts, food cost %. See docs/10-inventory.md |
 | 11 | Purchasing | ⬜ | |
 | 12 | CRM, loyalty, promotions | ⬜ | |
 | 13 | Reports & dashboard | ⬜ | |

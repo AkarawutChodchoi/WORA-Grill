@@ -1,5 +1,6 @@
 import type { DbOrTx } from '../../db/client';
 import type { AuthContext } from '../../lib/auth';
+import type { EventBus } from '../../lib/events';
 import type { Order, OrderItem } from './service';
 
 /**
@@ -9,6 +10,7 @@ import type { Order, OrderItem } from './service';
 export interface HookCtx {
   db: DbOrTx;
   actor: Pick<AuthContext, 'orgId' | 'branchId' | 'userId'>;
+  bus?: EventBus | null;
 }
 
 type ItemsHook = (ctx: HookCtx, order: Order, items: OrderItem[]) => Promise<void>;

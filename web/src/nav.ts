@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { BookOpen, Calculator, ChefHat, Grid3x3, Settings, Wallet, History, LayoutDashboard, MonitorSmartphone, ShieldCheck, Users } from 'lucide-react';
+import { Boxes, BookOpen, Calculator, ChefHat, Grid3x3, Settings, Wallet, History, LayoutDashboard, MonitorSmartphone, ShieldCheck, Users } from 'lucide-react';
 import type { Permission } from '@shared/permissions';
 
 export interface NavItem {
@@ -37,7 +37,10 @@ export const NAV: NavGroup[] = [
   },
   {
     label: 'หลังร้าน',
-    items: [{ to: '/menu', label: 'เมนู', icon: BookOpen, anyOf: ['menu.view'] }],
+    items: [
+      { to: '/menu', label: 'เมนู', icon: BookOpen, anyOf: ['menu.view'] },
+      { to: '/inventory', label: 'สต็อก', icon: Boxes, anyOf: ['inventory.view', 'stock.receive', 'stock.count', 'stock.waste'] },
+    ],
   },
   {
     label: 'ระบบ',
