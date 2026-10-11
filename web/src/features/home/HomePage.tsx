@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 import { PageHeader } from '../../components/ui';
 import { useAuth } from '../../lib/auth';
 import { visibleNav } from '../../nav';
+import { ClockWidget } from '../staff/StaffPage';
 
 /** Landing page: shortcuts to every module this user may use. */
 export function HomePage() {
@@ -12,6 +13,7 @@ export function HomePage() {
   return (
     <>
       <PageHeader title={`สวัสดี ${me?.user.name ?? ''}`} description={me?.branch ? `สาขา ${me.branch.name}` : 'ยังไม่ได้เลือกสาขา'} />
+      <ClockWidget />
       {items.length === 0 ? (
         <p className="text-ink-2">บัญชีของคุณยังไม่มีสิทธิ์ใช้งานโมดูลใด ติดต่อผู้จัดการร้าน</p>
       ) : (

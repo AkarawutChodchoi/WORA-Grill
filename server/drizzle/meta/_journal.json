@@ -71,6 +71,13 @@
       "when": 1791737891675,
       "tag": "0009_guest",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791738360371,
+      "tag": "0010_staff_multibranch",
+      "breakpoints": true
     }
   ]
 }

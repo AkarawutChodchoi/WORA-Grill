@@ -8,6 +8,7 @@ import { useAuth } from '../../lib/auth';
 import { fmtDate, fmtDateTime, formatBaht, todayISO } from '../../lib/format';
 import { toSatang } from '@shared/money';
 import type { AdminMenu } from '../menu/types';
+import { TransfersTab } from './TransfersTab';
 
 export interface Ingredient {
   id: string;
@@ -635,7 +636,7 @@ function AlertsTab() {
   );
 }
 
-type Tab = 'ingredients' | 'ops' | 'recipes' | 'counts' | 'movements' | 'alerts';
+type Tab = 'ingredients' | 'ops' | 'recipes' | 'counts' | 'movements' | 'alerts' | 'transfers';
 
 export function InventoryPage() {
   const { can } = useAuth();
@@ -646,6 +647,7 @@ export function InventoryPage() {
     ...(can('inventory.view') ? [{ value: 'recipes' as Tab, label: 'สูตรอาหาร' }] : []),
     ...(can('stock.count') ? [{ value: 'counts' as Tab, label: 'นับสต็อก' }] : []),
     { value: 'movements', label: 'ความเคลื่อนไหว' },
+    ...(can('stock.issue') || can('stock.receive') ? [{ value: 'transfers' as Tab, label: 'โอนระหว่างสาขา' }] : []),
     { value: 'alerts', label: 'แจ้งเตือน' },
   ];
   return (
@@ -658,6 +660,7 @@ export function InventoryPage() {
       {tab === 'counts' && <CountsTab />}
       {tab === 'movements' && <MovementsTab />}
       {tab === 'alerts' && <AlertsTab />}
+      {tab === 'transfers' && <TransfersTab />}
     </>
   );
 }

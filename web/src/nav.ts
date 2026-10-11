@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { BarChart3, CalendarClock, Boxes, Gauge, Gift, Truck, UserRound, BookOpen, Calculator, ChefHat, Grid3x3, Settings, Wallet, History, LayoutDashboard, MonitorSmartphone, ShieldCheck, Users } from 'lucide-react';
+import { BarChart3, Building2, CalendarClock, IdCard, Boxes, Gauge, Gift, Truck, UserRound, BookOpen, Calculator, ChefHat, Grid3x3, Settings, Wallet, History, LayoutDashboard, MonitorSmartphone, ShieldCheck, Users } from 'lucide-react';
 import type { Permission } from '@shared/permissions';
 
 export interface NavItem {
@@ -51,11 +51,13 @@ export const NAV: NavGroup[] = [
       { to: '/reports', label: 'รายงาน', icon: BarChart3, anyOf: ['report.view_sales', 'report.view_profit', 'report.view_staff'] },
       { to: '/customers', label: 'ลูกค้า', icon: UserRound, anyOf: ['customer.view'] },
       { to: '/promotions', label: 'โปรโมชัน/สมาชิก', icon: Gift, anyOf: ['promotion.manage'] },
+      { to: '/staff', label: 'พนักงาน', icon: IdCard, anyOf: ['staff.manage', 'attendance.manage', 'attendance.self'] },
     ],
   },
   {
     label: 'ระบบ',
     items: [
+      { to: '/admin/branches', label: 'สาขา', icon: Building2, anyOf: ['org.manage'] },
       { to: '/admin/settings', label: 'ตั้งค่าร้าน', icon: Settings, anyOf: ['settings.manage'] },
       { to: '/admin/users', label: 'ผู้ใช้', icon: Users, anyOf: ['user.manage'] },
       { to: '/admin/roles', label: 'บทบาท', icon: ShieldCheck, anyOf: ['user.manage'] },

@@ -4,6 +4,8 @@ import crmRoutes from './crm/routes';
 import deviceRoutes from './devices/routes';
 import guestRoutes from './guest/routes';
 import publicRoutes from './guest/public';
+import transferRoutes from './inventory/transfers';
+import staffRoutes from './staff/routes';
 import inventoryRoutes from './inventory/routes';
 import kdsRoutes from './kds/routes';
 import menuRoutes from './menu/routes';
@@ -32,6 +34,8 @@ export async function registerModules(app: FastifyInstance) {
   await app.register(reportRoutes);
   await app.register(guestRoutes);
   await app.register(publicRoutes);
+  await app.register(staffRoutes);
+  await app.register(transferRoutes);
   await app.register(settingsRoutes);
   await app.register(realtimeRoutes);
 }

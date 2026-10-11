@@ -17,6 +17,8 @@ import { DashboardPage } from './features/reports/DashboardPage';
 import { GuestMenuPage } from './features/guest/GuestMenuPage';
 import { BookingPage, QueuePage } from './features/guest/QueuePage';
 import { ReservationsPage } from './features/guest/ReservationsPage';
+import { StaffPage } from './features/staff/StaffPage';
+import { BranchesPage } from './features/admin/BranchesPage';
 import { ReportsPage } from './features/reports/ReportsPage';
 import { PromotionsPage } from './features/crm/PromotionsPage';
 import { TablesPage } from './features/tables/TablesPage';
@@ -108,6 +110,8 @@ export function AppRoutes() {
         <Route path="pos" element={guard(['order.view'], <PosHome />)} />
         <Route path="reservations" element={guard(['reservation.manage'], <ReservationsPage />)} />
         <Route path="shift" element={guard(['shift.open', 'shift.view_all'], <ShiftPage />)} />
+        <Route path="staff" element={guard(['staff.manage', 'attendance.manage', 'attendance.self'], <StaffPage />)} />
+        <Route path="admin/branches" element={guard(['org.manage'], <BranchesPage />)} />
         <Route path="admin/settings" element={guard(['settings.manage'], <SettingsPage />)} />
         <Route path="tables" element={guard(['table.view'], <TablesPage />)} />
         <Route path="inventory" element={guard(['inventory.view', 'stock.receive', 'stock.count', 'stock.waste'], <InventoryPage />)} />
