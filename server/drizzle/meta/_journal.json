@@ -78,6 +78,13 @@
       "when": 1791738360371,
       "tag": "0010_staff_multibranch",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1791744158779,
+      "tag": "0011_integrations",
+      "breakpoints": true
     }
   ]
 }

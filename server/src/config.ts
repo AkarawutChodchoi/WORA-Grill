@@ -16,6 +16,19 @@ const envSchema = z.object({
   LOG_LEVEL: z.string().default('info'),
   /** Trust X-Forwarded-For (only when running behind a reverse proxy you control). */
   TRUST_PROXY: z.enum(['true', 'false']).default('false'),
+  // ---- Optional integrations (each stays disabled until configured) ----
+  /** Opn Payments (Omise) secret key for PromptPay charges. */
+  OPN_SECRET_KEY: z.string().optional(),
+  /** Base64 webhook signing secret from the Opn dashboard. */
+  OPN_WEBHOOK_SECRET: z.string().optional(),
+  OPN_API_BASE: z.string().default('https://api.omise.co'),
+  /** Shared HMAC secret used by a delivery-platform middleware posting normalised orders. */
+  DELIVERY_WEBHOOK_SECRET: z.string().optional(),
+  /** LINE Messaging API channel access token and the user/group id that receives alerts. */
+  LINE_CHANNEL_ACCESS_TOKEN: z.string().optional(),
+  LINE_NOTIFY_TO: z.string().optional(),
+  /** Send kitchen tickets to configured network printers automatically. */
+  AUTO_KITCHEN_PRINT: z.enum(['true', 'false']).default('true'),
 });
 
 export type Config = z.infer<typeof envSchema>;

@@ -5,6 +5,7 @@ import { get } from './api';
 export interface BranchInfo {
   branch: { id: string; code: string; name: string; address: string | null; phone: string | null; taxId: string | null; timezone: string };
   settings: BranchSettings;
+  gatewayEnabled: boolean;
 }
 
 export function useBranchSettings() {

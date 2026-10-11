@@ -103,9 +103,12 @@ export default async function paymentRoutes(app: FastifyInstance) {
         amountSatang: satang.min(1),
         tenderedSatang: satang.optional(),
         reference: z.string().trim().max(60).optional(),
+        /** Set when the POS recorded this cash payment while offline and is syncing it now. */
+        offlineRecordedAt: z.string().datetime({ offset: true }).optional(),
       }),
       req.body,
     );
+    if (body.offlineRecordedAt && body.method !== 'CASH') throw badRequest('รับชำระแบบออฟไลน์ได้เฉพาะเงินสด');
     // Re-validate the bill (promotions etc.) in a separate, committed step: if anything changed the
     // cashier must see the new total before taking money.
     const [prior] = await db.select({ id: payments.id }).from(payments).where(eq(payments.id, body.id));
@@ -165,6 +168,7 @@ export default async function paymentRoutes(app: FastifyInstance) {
           createdBy: a.userId,
           confirmedBy: immediate ? a.userId : null,
           confirmedAt: immediate ? new Date() : null,
+          offlineRecordedAt: body.offlineRecordedAt ? new Date(body.offlineRecordedAt) : null,
         })
         .returning();
       await audit(tx, a, { action: 'payment.create', targetType: 'payment', targetId: p.id, data: { orderId: id, method: p.method, amount: p.amountSatang, status: p.status } }, req.ip);

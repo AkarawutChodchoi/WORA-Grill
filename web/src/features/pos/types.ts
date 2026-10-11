@@ -97,4 +97,6 @@ export interface DraftLine {
   note?: string;
   course?: number;
   held?: boolean;
+  /** Saved in the offline outbox, not yet confirmed by the server. */
+  queued?: boolean;
 }

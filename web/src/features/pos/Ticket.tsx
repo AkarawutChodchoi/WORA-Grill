@@ -68,7 +68,8 @@ export function DraftTicketLine({ line, onClick }: { line: DraftLine; onClick: (
           {line.note && <span className="block text-sm text-[#7A5806]">“{line.note}”</span>}
           <span className="flex items-center gap-1 text-xs text-sky">
             <Clock className="size-3" />
-            ยังไม่บันทึก{line.held ? ' · พักไว้' : ''}
+            {line.queued ? 'บันทึกในเครื่อง รอซิงก์' : 'ยังไม่บันทึก'}
+            {line.held ? ' · พักไว้' : ''}
           </span>
         </span>
         <span className="num shrink-0">{formatBaht(line.unitPriceSatang * line.qty)}</span>

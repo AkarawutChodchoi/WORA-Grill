@@ -11,6 +11,16 @@ export class ApiError extends Error {
 
 type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
+/** Thrown when a write was saved to the offline outbox instead of reaching the server. */
+export class OfflineQueuedError extends Error {
+  constructor(public entryId: string) {
+    super('ออฟไลน์อยู่ — บันทึกไว้ในเครื่องแล้ว จะส่งให้เซิร์ฟเวอร์อัตโนมัติเมื่อกลับมาออนไลน์');
+  }
+}
+
+/** Set by lib/offline.tsx so the API layer can queue writes without importing UI code. */
+export const offlineHooks: { queue: ((path: string, body: unknown) => Promise<string | null>) | null; onOnline: (() => void) | null } = { queue: null, onOnline: null };
+
 export async function api<T = unknown>(method: Method, path: string, body?: unknown, init?: RequestInit): Promise<T> {
   let res: Response;
   try {
@@ -25,8 +35,13 @@ export async function api<T = unknown>(method: Method, path: string, body?: unkn
       ...init,
     });
   } catch {
+    if (method === 'POST' && offlineHooks.queue && !(body instanceof FormData)) {
+      const entryId = await offlineHooks.queue(path, body);
+      if (entryId) throw new OfflineQueuedError(entryId);
+    }
     throw new ApiError(0, 'NETWORK', 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ตรวจสอบอินเทอร์เน็ตแล้วลองอีกครั้ง');
   }
+  offlineHooks.onOnline?.();
   if (res.status === 204) return undefined as T;
   const text = await res.text();
   const data = text ? safeJson(text) : undefined;

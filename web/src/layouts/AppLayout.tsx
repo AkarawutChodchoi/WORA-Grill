@@ -8,6 +8,8 @@ import { Button, EmptyState, Spinner, useToast } from '../components/ui';
 import { errorMessage } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { useRealtimeEvent } from '../lib/realtime';
+import { OfflineIndicator } from '../lib/offline';
+import { NotificationBell } from '../components/NotificationBell';
 import { visibleNav } from '../nav';
 
 export function FullPageSpinner() {
@@ -178,7 +180,9 @@ export function AppLayout() {
         <header className="no-print sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-line bg-surface/95 px-3 backdrop-blur sm:px-5">
           <Button variant="ghost" size="sm" className="lg:hidden" onClick={() => setOpen(true)} aria-label="เปิดเมนู" icon={<Menu className="size-5" />} />
           <BranchSelect compact />
-          <div className="ml-auto">
+          <OfflineIndicator />
+          <div className="ml-auto flex items-center gap-2">
+            <NotificationBell />
             <UserMenu />
           </div>
         </header>

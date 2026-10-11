@@ -13,11 +13,14 @@ import { loadAuth, SESSION_COOKIE } from './lib/auth';
 import { AppError } from './lib/errors';
 import { EventBus } from './lib/events';
 import { registerModules } from './modules';
+import type { Integrations } from './modules/integrations/routes';
 
 export interface Deps {
   db: DB;
   bus: EventBus;
   config: Config;
+  /** Optional overrides for external integrations (tests inject fakes). */
+  integrations?: Partial<Integrations>;
 }
 
 declare module 'fastify' {
@@ -51,7 +54,8 @@ export async function buildApp(deps: Deps, opts: { logger?: boolean } = {}): Pro
         scriptSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
         fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-        imgSrc: ["'self'", 'data:', 'blob:'],
+        // Gateway PromptPay QR images are served by the provider.
+        imgSrc: ["'self'", 'data:', 'blob:', 'https://*.omise.co'],
         connectSrc: ["'self'", 'ws:', 'wss:'],
         objectSrc: ["'none'"],
         frameAncestors: ["'none'"],

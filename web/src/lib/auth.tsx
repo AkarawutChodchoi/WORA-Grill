@@ -61,6 +61,8 @@ export function AuthProvider({ children, initial }: { children: ReactNode; initi
       refresh,
       logout: async () => {
         await post('/auth/logout').catch(() => undefined);
+        // Do not leave the previous user's cached orders/menu on a shared device.
+        if (typeof caches !== 'undefined') await caches.delete('rms-v1-data').catch(() => undefined);
         qc.clear();
         qc.setQueryData(['me'], null);
       },

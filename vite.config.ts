@@ -20,7 +20,7 @@ export default defineConfig({
   build: { outDir: '../dist/web', emptyOutDir: true },
   test: {
     root: '.',
-    include: ['shared/**/*.test.ts', 'server/**/*.test.ts', 'web/**/*.test.tsx'],
+    include: ['shared/**/*.test.ts', 'server/**/*.test.ts', 'web/**/*.test.ts', 'web/**/*.test.tsx'],
     environment: 'node',
     setupFiles: ['./web/src/test-setup.ts'],
     testTimeout: 30000,

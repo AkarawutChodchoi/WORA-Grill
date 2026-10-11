@@ -35,6 +35,7 @@ import type { Permission } from '@shared/permissions';
 import { ApiError } from './lib/api';
 import { AuthProvider } from './lib/auth';
 import { RealtimeProvider } from './lib/realtime';
+import { OfflineProvider } from './lib/offline';
 
 export function makeQueryClient() {
   return new QueryClient({
@@ -137,9 +138,11 @@ export function App({ client = makeQueryClient() }: { client?: QueryClient }) {
       <ToastProvider>
         <AuthProvider>
           <RealtimeProvider>
-            <BrowserRouter>
-              <AppRoutes />
-            </BrowserRouter>
+            <OfflineProvider>
+              <BrowserRouter>
+                <AppRoutes />
+              </BrowserRouter>
+            </OfflineProvider>
           </RealtimeProvider>
         </AuthProvider>
       </ToastProvider>

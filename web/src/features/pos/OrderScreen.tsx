@@ -6,7 +6,8 @@ import { Link, useNavigate, useParams } from 'react-router';
 import { MENU_TAGS } from '@shared/menu';
 import { useApproval } from '../../components/ApprovalDialog';
 import { Badge, Button, ConfirmDialog, Dialog, EmptyState, ErrorState, Input, LoadingBlock, Select, Textarea, useToast } from '../../components/ui';
-import { errorMessage, get, patch, post } from '../../lib/api';
+import { errorMessage, get, OfflineQueuedError, patch, post } from '../../lib/api';
+import { OfflineIndicator } from '../../lib/offline';
 import { useAuth } from '../../lib/auth';
 import { fmtElapsed, formatBaht } from '../../lib/format';
 import { LiveIndicator, useLivePolling } from '../../lib/realtime';
@@ -348,10 +349,11 @@ export function OrderScreen() {
 
   const save = useMutation({
     mutationFn: async (send: boolean) => {
-      if (drafts.length) {
+      const unsent = drafts.filter((d) => !d.queued);
+      if (unsent.length) {
         return post<Order>(`/orders/${id}/items`, {
           send,
-          items: drafts.map((d) => ({ id: d.id, menuItemId: d.menuItemId, qty: d.qty, modifiers: d.modifiers.map((m) => ({ modifierId: m.modifierId, qty: m.qty })), note: d.note, course: d.course, held: d.held })),
+          items: unsent.map((d) => ({ id: d.id, menuItemId: d.menuItemId, qty: d.qty, modifiers: d.modifiers.map((m) => ({ modifierId: m.modifierId, qty: m.qty })), note: d.note, course: d.course, held: d.held })),
         });
       }
       return (await post<{ order: Order }>(`/orders/${id}/send`, {})).order;
@@ -362,7 +364,13 @@ export function OrderScreen() {
       qc.invalidateQueries({ queryKey: ['tables'] });
       toast.success(send ? 'ส่งเข้าครัวแล้ว' : 'บันทึกรายการแล้ว');
     },
-    onError: (e) => toast.error(errorMessage(e)),
+    onError: (e) => {
+      if (e instanceof OfflineQueuedError) {
+        // Lines stay visible (marked as queued) until the server confirms them after sync.
+        setDrafts((d) => d.map((x) => ({ ...x, queued: true })));
+        toast.info(e.message);
+      } else toast.error(errorMessage(e));
+    },
   });
   const billAction = useMutation({
     mutationFn: (path: string) => post<Order>(`/orders/${id}/${path}`),
@@ -372,6 +380,13 @@ export function OrderScreen() {
     },
     onError: (e) => toast.error(errorMessage(e)),
   });
+
+  // Queued (offline) drafts disappear once the synced order contains them.
+  useEffect(() => {
+    if (!order.data) return;
+    const ids = new Set(order.data.items.map((i) => i.id));
+    setDrafts((d) => (d.some((x) => ids.has(x.id)) ? d.filter((x) => !ids.has(x.id)) : d));
+  }, [order.data]);
 
   const draftTotal = drafts.reduce((a, d) => a + d.unitPriceSatang * d.qty, 0);
   const groups = useMemo(() => groupByCourse(order.data?.items ?? []), [order.data]);
@@ -502,6 +517,7 @@ export function OrderScreen() {
           />
         </div>
         <LiveIndicator />
+        <OfflineIndicator />
         <span className="hidden text-sm text-ink-2 md:inline">{me?.user.name}</span>
         {o.items.some((i) => ['SENT', 'PREPARING'].includes(i.status)) && (
           <Link to={`/kitchen-ticket/${o.id}`} className="hidden sm:block">

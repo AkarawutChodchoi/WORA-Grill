@@ -6,7 +6,8 @@ import { Link, useNavigate, useParams } from 'react-router';
 import { allocate, toSatang } from '@shared/money';
 import { useApproval } from '../../components/ApprovalDialog';
 import { Badge, Button, Dialog, ErrorState, Input, LoadingBlock, MoneyInput, Panel, Select, StatusBadge, Textarea, useToast } from '../../components/ui';
-import { del, errorMessage, get, post } from '../../lib/api';
+import { del, errorMessage, get, OfflineQueuedError, post } from '../../lib/api';
+import { useOffline } from '../../lib/offline';
 import { useAuth } from '../../lib/auth';
 import { formatBaht, fmtTime } from '../../lib/format';
 import { METHOD_LABEL, useBranchSettings } from '../../lib/settings';
@@ -189,6 +190,7 @@ export function PaymentScreen() {
   const { can } = useAuth();
   const order = useOrder(id);
   const settings = useBranchSettings();
+  const { online } = useOffline();
   const shift = useQuery({ queryKey: ['shift-current'], queryFn: () => get<{ shift: { id: string } | null }>('/shifts/current') });
   const [method, setMethod] = useState('CASH');
   const [amount, setAmount] = useState('');
@@ -212,6 +214,12 @@ export function PaymentScreen() {
       if (o.status === 'PAID') toast.success('ชำระเงินครบแล้ว');
     },
     onError: (e) => {
+      if (e instanceof OfflineQueuedError) {
+        toast.info('รับเงินสดแบบออฟไลน์ — บันทึกในเครื่องแล้ว ยังไม่ยืนยันกับเซิร์ฟเวอร์ (ระบบจะซิงก์อัตโนมัติ)');
+        setAmount('');
+        setTendered('');
+        return;
+      }
       toast.error(errorMessage(e));
       qc.invalidateQueries({ queryKey: ['order', id] });
     },
@@ -232,7 +240,8 @@ export function PaymentScreen() {
   const pending = payments.filter((p) => p.status === 'PENDING_CONFIRMATION').reduce((a, p) => a + p.amountSatang, 0);
   const due = Math.max(0, o.grandTotalSatang - o.paidSatang - pending);
   const share = split > 1 ? allocate(due, Array(split).fill(1))[0] : due;
-  const methods = settings.data?.settings.enabledPaymentMethods ?? ['CASH'];
+  // Offline: only cash can be taken (and it stays "unconfirmed" until synced).
+  const methods = online ? (settings.data?.settings.enabledPaymentMethods ?? ['CASH']) : ['CASH'];
   const amt = amount ? parseBaht(amount) : share;
   const tend = tendered ? parseBaht(tendered) : null;
   const change = method === 'CASH' && tend != null && amt != null ? tend - amt : 0;
@@ -258,7 +267,10 @@ export function PaymentScreen() {
       </header>
       <div className="grid gap-4 lg:grid-cols-[1fr_420px]">
         <div className="flex flex-col gap-4">
-          {payable && noShift && (
+          {!online && (
+            <p className="rounded-control bg-chili-50 px-3 py-2 text-sm text-chili">ออฟไลน์ — รับได้เฉพาะเงินสด ระบบจะบันทึกในเครื่องและยืนยันกับเซิร์ฟเวอร์เมื่อกลับมาออนไลน์</p>
+          )}
+          {payable && noShift && online && (
             <p className="rounded-control bg-turmeric-50 px-3 py-2 text-[#7A5806]">
               ยังไม่ได้เปิดกะ — <Link to="/shift" className="underline">เปิดกะก่อนรับเงิน</Link>
             </p>
@@ -314,6 +326,25 @@ export function PaymentScreen() {
                   {change < 0 ? `ขาดอีก ${formatBaht(-change)}` : `เงินทอน ${formatBaht(change)}`}
                 </p>
               )}
+              {method === 'PROMPTPAY' && settings.data?.gatewayEnabled && online && (
+                <Button
+                  className="mt-3 mr-2"
+                  icon={<QrCode className="size-4" />}
+                  disabled={!amt}
+                  onClick={async () => {
+                    try {
+                      const r = await post<{ qrImageUrl: string | null }>(`/orders/${o.id}/payments/gateway`, { paymentId: crypto.randomUUID(), amountSatang: amt });
+                      qc.invalidateQueries({ queryKey: ['order', id] });
+                      if (r.qrImageUrl) setQr({ dataUrl: r.qrImageUrl, amount: amt! });
+                      toast.info('สร้าง QR ผ่าน Payment Gateway แล้ว — ระบบจะยืนยันอัตโนมัติเมื่อธนาคารแจ้งยอดเข้า');
+                    } catch (e) {
+                      toast.error(errorMessage(e));
+                    }
+                  }}
+                >
+                  QR ยืนยันอัตโนมัติ
+                </Button>
+              )}
               {method === 'PROMPTPAY' && (
                 <Button
                   variant="outline"
@@ -350,6 +381,18 @@ export function PaymentScreen() {
                   <div className="flex flex-wrap justify-center gap-2">
                     <Button icon={<Printer className="size-4" />} onClick={() => nav(`/pos/orders/${o.id}/receipt`)}>
                       พิมพ์ใบเสร็จ
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() =>
+                        act.mutate(async () => {
+                          await post(`/orders/${o.id}/print`, { kind: 'receipt', openDrawer: payments.some((p) => p.method === 'CASH' && p.status === 'CONFIRMED') });
+                          toast.success('ส่งไปเครื่องพิมพ์แล้ว');
+                          return o;
+                        })
+                      }
+                    >
+                      พิมพ์ที่เครื่องพิมพ์ใบเสร็จ
                     </Button>
                     <Button variant="outline" onClick={() => setTaxOpen(true)}>
                       ขอใบกำกับภาษีเต็มรูป

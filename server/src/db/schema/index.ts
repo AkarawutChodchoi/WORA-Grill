@@ -9,3 +9,4 @@ export * from './purchasing';
 export * from './crm';
 export * from './guest';
 export * from './staff';
+export * from './integrations';

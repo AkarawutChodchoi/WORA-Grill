@@ -4,6 +4,7 @@ import path from 'node:path';
 import type { FastifyInstance } from 'fastify';
 import type { SystemRole } from '@shared/permissions';
 import { buildApp } from '../src/app';
+import type { Integrations } from '../src/modules/integrations/routes';
 import { loadConfig } from '../src/config';
 import { openDatabase, type DB } from '../src/db/client';
 import { userRoles, users } from '../src/db/schema';
@@ -88,13 +89,13 @@ export interface TestEnv {
 }
 
 /** Fresh in-memory Postgres + app + one org/branch with one user per system role. */
-export async function createTestEnv(opts: { demo?: boolean } = {}): Promise<TestEnv> {
+export async function createTestEnv(opts: { demo?: boolean; env?: Record<string, string>; integrations?: Partial<Integrations> } = {}): Promise<TestEnv> {
   const database = await openDatabase({ memory: true });
   await database.migrate();
   const db = database.db;
-  const config = loadConfig({ NODE_ENV: 'test', UPLOAD_DIR: mkdtempSync(path.join(tmpdir(), 'rms-up-')) } as NodeJS.ProcessEnv);
+  const config = loadConfig({ NODE_ENV: 'test', UPLOAD_DIR: mkdtempSync(path.join(tmpdir(), 'rms-up-')), ...opts.env } as NodeJS.ProcessEnv);
   const bus = new EventBus();
-  const app = await buildApp({ db, bus, config });
+  const app = await buildApp({ db, bus, config, integrations: opts.integrations });
   const boot = await bootstrapOrganization(db, {
     orgName: 'Test Org',
     branchName: 'สาขาทดสอบ',

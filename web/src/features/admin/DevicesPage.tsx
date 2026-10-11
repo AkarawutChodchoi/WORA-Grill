@@ -4,9 +4,11 @@ import { useState } from 'react';
 import { Badge, Button, ConfirmDialog, DataTable, EmptyState, Input, PageHeader, Panel, QueryView, Select, useToast } from '../../components/ui';
 import { del, errorMessage, get, post } from '../../lib/api';
 import { fmtDateTime } from '../../lib/format';
+import { DeviceActions, IntegrationStatus, PrinterSetup } from './DeviceSetup';
 
 interface Device {
   id: string;
+  stationId: string | null;
   name: string;
   kind: string;
   lastSeenAt: string | null;
@@ -84,6 +86,7 @@ export function DevicesPage() {
           </form>
         )}
       </Panel>
+      <PrinterSetup />
       <QueryView query={list} isEmpty={(d) => d.devices.length === 0} empty={<EmptyState icon={<MonitorSmartphone className="size-8" />} title="ยังไม่มีอุปกรณ์ในสาขานี้" />}>
         {(d) => (
           <DataTable
@@ -100,15 +103,19 @@ export function DevicesPage() {
                 align: 'right',
                 cell: (r) =>
                   !r.revokedAt && (
-                    <Button size="sm" variant="ghost" className="text-chili" onClick={() => setRevoke(r)}>
-                      ยกเลิก
-                    </Button>
+                    <div className="flex justify-end gap-1">
+                      <DeviceActions d={r} />
+                      <Button size="sm" variant="ghost" className="text-chili" onClick={() => setRevoke(r)}>
+                        ยกเลิก
+                      </Button>
+                    </div>
                   ),
               },
             ]}
           />
         )}
       </QueryView>
+      <IntegrationStatus />
       <ConfirmDialog
         open={!!revoke}
         title={`ยกเลิก "${revoke?.name}"?`}

@@ -15,7 +15,12 @@ export default async function settingsRoutes(app: FastifyInstance) {
     const a = requireAuth(req);
     const branchId = requireBranch(a);
     const [b] = await db.select().from(branches).where(eq(branches.id, branchId));
-    return { branch: { id: b.id, code: b.code, name: b.name, address: b.address, phone: b.phone, taxId: b.taxId, timezone: b.timezone }, settings: resolveBranchSettings(b.settings) };
+    return {
+      branch: { id: b.id, code: b.code, name: b.name, address: b.address, phone: b.phone, taxId: b.taxId, timezone: b.timezone },
+      settings: resolveBranchSettings(b.settings),
+      /** Whether PromptPay can be auto-confirmed through the payment gateway (secret not exposed). */
+      gatewayEnabled: !!app.deps.config.OPN_SECRET_KEY,
+    };
   });
 
   app.put('/settings/branch', async (req) => {
