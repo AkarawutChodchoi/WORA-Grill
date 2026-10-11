@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { Boxes, Gift, Truck, UserRound, BookOpen, Calculator, ChefHat, Grid3x3, Settings, Wallet, History, LayoutDashboard, MonitorSmartphone, ShieldCheck, Users } from 'lucide-react';
+import { BarChart3, Boxes, Gauge, Gift, Truck, UserRound, BookOpen, Calculator, ChefHat, Grid3x3, Settings, Wallet, History, LayoutDashboard, MonitorSmartphone, ShieldCheck, Users } from 'lucide-react';
 import type { Permission } from '@shared/permissions';
 
 export interface NavItem {
@@ -46,6 +46,8 @@ export const NAV: NavGroup[] = [
   {
     label: 'บริหาร',
     items: [
+      { to: '/dashboard', label: 'แดชบอร์ด', icon: Gauge, anyOf: ['report.view_sales'] },
+      { to: '/reports', label: 'รายงาน', icon: BarChart3, anyOf: ['report.view_sales', 'report.view_profit', 'report.view_staff'] },
       { to: '/customers', label: 'ลูกค้า', icon: UserRound, anyOf: ['customer.view'] },
       { to: '/promotions', label: 'โปรโมชัน/สมาชิก', icon: Gift, anyOf: ['promotion.manage'] },
     ],

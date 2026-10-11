@@ -16,7 +16,7 @@ Status legend: ✅ implemented & verified (tests/typecheck/build run) · 🟡 pa
 | 10 | Recipes & inventory | ✅ | Ledger + cached balances w/ reconcile, explicit unit conversions, weighted-avg cost, FEFO lots, recipes for items/modifiers/sub-recipes, idempotent deduction on send + reversal on cancel, receive/issue/waste/adjust/transfer/produce, counts with variance, low-stock + expiry alerts, food cost %. See docs/10-inventory.md |
 | 11 | Purchasing | ✅ | Suppliers + item prices, price comparison per base unit, PR(SUBMITTED)→PO(APPROVED)→ORDERED, GR posting in one tx (partial, rejected w/ reason, over-receipt blocked, idempotent GR id), returns w/ credit, simple AP with due dates, replenishment suggestions (14-day usage + lead time) |
 | 12 | CRM, loyalty, promotions | ✅ | Customers w/ consent timestamps, masked lists, PDPA export/anonymise, points ledger (earn on paid, redeem as payment, reverse on refund, FIFO expiry, idempotent keys), tiers, promotion engine (percent/amount/item/BOGO, time/day/branch/channel/member/tier, limits, stacking) re-checked before payment, coupons (single/multi-use), birthday coupons. Gift cards/stored value + LINE/SMS delivery intentionally not enabled |
-| 13 | Reports & dashboard | ⬜ | |
+| 13 | Reports & dashboard | ✅ | Sales (day/hour/channel/payment), items + menu engineering + margins, food cost/waste/variance, staff controls, cash variance, tax summary, table turnover, member mix, drill-down to bills, live dashboard vs same time last week, CSV (injection-safe) + print/PDF; reconciliation tests. See docs/13-reports.md |
 | 14 | Reservations, QR ordering | ⬜ | |
 | 15 | Staff & multi-branch | ⬜ | |
 | 16 | Integrations, offline, devices | ⬜ | |

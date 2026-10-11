@@ -13,6 +13,8 @@ import { MenuPage } from './features/menu/MenuPage';
 import { InventoryPage } from './features/inventory/InventoryPage';
 import { PurchasingPage } from './features/purchasing/PurchasingPage';
 import { CustomersPage } from './features/crm/CustomersPage';
+import { DashboardPage } from './features/reports/DashboardPage';
+import { ReportsPage } from './features/reports/ReportsPage';
 import { PromotionsPage } from './features/crm/PromotionsPage';
 import { TablesPage } from './features/tables/TablesPage';
 import { OrderScreen } from './features/pos/OrderScreen';
@@ -103,6 +105,8 @@ export function AppRoutes() {
         <Route path="tables" element={guard(['table.view'], <TablesPage />)} />
         <Route path="inventory" element={guard(['inventory.view', 'stock.receive', 'stock.count', 'stock.waste'], <InventoryPage />)} />
         <Route path="purchasing" element={guard(['purchase.view', 'purchase.create', 'stock.receive'], <PurchasingPage />)} />
+        <Route path="dashboard" element={guard(['report.view_sales'], <DashboardPage />)} />
+        <Route path="reports" element={guard(['report.view_sales', 'report.view_profit', 'report.view_staff'], <ReportsPage />)} />
         <Route path="customers" element={guard(['customer.view'], <CustomersPage />)} />
         <Route path="promotions" element={guard(['promotion.manage'], <PromotionsPage />)} />
         <Route path="menu" element={guard(['menu.view'], <MenuPage />)} />
