@@ -3,7 +3,7 @@ import type { FastifyInstance } from 'fastify';
 import QRCode from 'qrcode';
 import { z } from 'zod';
 import { dateString, nonEmpty, satang, uuid } from '@shared/validation';
-import { diningTables, orderItems, orders, reservations, serviceRequests, waitlistEntries } from '../../db/schema';
+import { customers, diningTables, orderItems, orders, reservations, serviceRequests, waitlistEntries } from '../../db/schema';
 import { audit } from '../../lib/audit';
 import { requireAnyPerm, requireBranch, requirePerm } from '../../lib/auth';
 import { randomToken } from '../../lib/crypto';
@@ -83,6 +83,10 @@ export default async function guestRoutes(app: FastifyInstance) {
     const reservedAt = new Date(body.reservedAt);
     if (reservedAt.getTime() < Date.now() - 15 * 60_000) throw badRequest('เวลาจองต้องไม่อยู่ในอดีต');
     const duration = body.durationMinutes ?? s.reservationSeatingMinutes;
+    if (body.customerId) {
+      const [c] = await db.select({ id: customers.id }).from(customers).where(and(eq(customers.id, body.customerId), eq(customers.organizationId, a.orgId)));
+      if (!c) throw badRequest('ลูกค้าไม่ถูกต้อง');
+    }
     const r = await db.transaction(async (tx) => {
       // Serialise bookings of one branch so two staff cannot double-book the same slot.
       await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${'res:' + branchId}))`);
@@ -103,6 +107,10 @@ export default async function guestRoutes(app: FastifyInstance) {
     const branchId = requireBranch(a);
     const { id } = parse(z.object({ id: uuid }), req.params);
     const body = parse(reservationBody.partial(), req.body);
+    if (body.customerId) {
+      const [c] = await db.select({ id: customers.id }).from(customers).where(and(eq(customers.id, body.customerId), eq(customers.organizationId, a.orgId)));
+      if (!c) throw badRequest('ลูกค้าไม่ถูกต้อง');
+    }
     const r = await db.transaction(async (tx) => {
       await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${'res:' + branchId}))`);
       const [cur] = await tx.select().from(reservations).where(and(eq(reservations.id, id), eq(reservations.branchId, branchId)));

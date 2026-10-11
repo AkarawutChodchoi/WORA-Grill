@@ -57,6 +57,7 @@ export default async function transferRoutes(app: FastifyInstance) {
       req.body,
     );
     if (body.otherBranchId === branchId) throw badRequest('เลือกสาขาอื่น');
+    if (new Set(body.lines.map((l) => l.ingredientId)).size !== body.lines.length) throw badRequest('มีวัตถุดิบซ้ำในใบโอน รวมเป็นบรรทัดเดียว');
     const [other] = await db.select().from(branches).where(and(eq(branches.id, body.otherBranchId), eq(branches.organizationId, a.orgId), isNull(branches.archivedAt)));
     if (!other) throw notFound('สาขาปลายทาง');
     if (body.mode === 'SHIP' && !a.permissions.has('stock.issue')) throw badRequest('ต้องมีสิทธิ์เบิก/โอนของ');

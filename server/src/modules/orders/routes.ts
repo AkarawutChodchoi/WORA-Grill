@@ -10,6 +10,7 @@ import { badRequest, conflict, parse } from '../../lib/errors';
 import { loadBranchMenu, resolveLine } from '../menu/service';
 import { refreshTableForOrder, releaseTable } from '../tables/service';
 import { createOrder } from './create';
+import { assertNoMoney } from '../payments/service';
 import { orderHooks, runItemsHook, runOrderHook } from './hooks';
 import { assertCancellable, assertEditable, assertOrderTransition, getOrderDetail, lockOrder, nextSeq, recalcOrder, sendItems } from './service';
 
@@ -306,7 +307,7 @@ export default async function orderRoutes(app: FastifyInstance) {
     await db.transaction(async (tx) => {
       const o = await lockOrder(tx, a.orgId, branchId, id);
       assertOrderTransition(o, 'VOIDED');
-      if (o.paidSatang > 0) throw conflict('บิลนี้มีการชำระเงินแล้ว ต้องคืนเงินก่อน Void', 'HAS_PAYMENTS');
+      await assertNoMoney(tx, o.id);
       const approver = await authorizeSensitive(tx, a, 'order.void', body.approval);
       const live = await tx.select().from(orderItems).where(and(eq(orderItems.orderId, id), sql`${orderItems.status} <> 'CANCELLED'`));
       const sentBefore = live.filter((i) => i.status !== 'PENDING');
@@ -343,7 +344,8 @@ export default async function orderRoutes(app: FastifyInstance) {
       const target = await lockOrder(tx, a.orgId, branchId, id);
       const source = await lockOrder(tx, a.orgId, branchId, fromOrderId);
       for (const o of [target, source]) if (!['OPEN', 'BILL_REQUESTED'].includes(o.status)) throw conflict(`บิล #${o.orderNo} ปิดแล้ว`);
-      if (source.paidSatang > 0 || target.paidSatang > 0) throw conflict('รวมบิลที่มีการชำระเงินบางส่วนไม่ได้', 'HAS_PAYMENTS');
+      await assertNoMoney(tx, source.id);
+      await assertNoMoney(tx, target.id);
       let seq = await nextSeq(tx, id);
       const moving = await tx.select({ id: orderItems.id }).from(orderItems).where(eq(orderItems.orderId, fromOrderId));
       for (const m of moving) await tx.update(orderItems).set({ orderId: id, seq: seq++ }).where(eq(orderItems.id, m.id));
@@ -375,7 +377,15 @@ export default async function orderRoutes(app: FastifyInstance) {
     const newId = await db.transaction(async (tx) => {
       const o = await lockOrder(tx, a.orgId, branchId, id);
       if (!['OPEN', 'BILL_REQUESTED'].includes(o.status)) throw conflict('บิลปิดแล้ว');
-      if (o.paidSatang > 0) throw conflict('แยกบิลที่มีการชำระบางส่วนไม่ได้ ใช้การชำระแบบแบ่งยอดแทน', 'HAS_PAYMENTS');
+      await assertNoMoney(tx, o.id, 'แยกบิลที่มีการชำระหรือรอยืนยันการชำระไม่ได้ ใช้การชำระแบบแบ่งยอดแทน');
+      // A client-supplied id may only replay this same split, never point at another existing bill.
+      if (body.newOrderId) {
+        const [existing] = await tx.select({ id: orders.id, splitFromOrderId: orders.splitFromOrderId }).from(orders).where(eq(orders.id, body.newOrderId));
+        if (existing) {
+          if (existing.splitFromOrderId === id) return existing.id;
+          throw conflict('รหัสบิลใหม่ถูกใช้แล้ว', 'ID_IN_USE');
+        }
+      }
       const items = await tx.select().from(orderItems).where(and(eq(orderItems.orderId, id), inArray(orderItems.id, body.lines.map((l) => l.itemId))));
       if (items.length !== body.lines.length) throw badRequest('รายการไม่ถูกต้อง');
       const all = await tx.select().from(orderItems).where(and(eq(orderItems.orderId, id), sql`${orderItems.status} <> 'CANCELLED'`));

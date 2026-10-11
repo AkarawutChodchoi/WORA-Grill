@@ -14,8 +14,11 @@ const envSchema = z.object({
   /** Public URL used when generating QR-menu links, e.g. https://pos.example.com */
   PUBLIC_BASE_URL: z.string().default('http://localhost:5173'),
   LOG_LEVEL: z.string().default('info'),
-  /** Trust X-Forwarded-For (only when running behind a reverse proxy you control). */
-  TRUST_PROXY: z.enum(['true', 'false']).default('false'),
+  /**
+   * Behind a reverse proxy you control: number of proxy hops to trust in X-Forwarded-For
+   * ("true" = 1 hop). Never trust every hop, or clients could spoof their IP and bypass rate limits.
+   */
+  TRUST_PROXY: z.string().regex(/^(true|false|\d{1,2})$/).default('false'),
   // ---- Optional integrations (each stays disabled until configured) ----
   /** Opn Payments (Omise) secret key for PromptPay charges. */
   OPN_SECRET_KEY: z.string().optional(),

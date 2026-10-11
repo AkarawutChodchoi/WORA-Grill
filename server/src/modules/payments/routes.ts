@@ -15,7 +15,7 @@ import { businessDate } from '../../lib/time';
 import { branchSettings } from '../menu/service';
 import { orderHooks, runOrderHook } from '../orders/hooks';
 import { getOrderDetail, lockOrder, recalcOrder } from '../orders/service';
-import { assertMethodEnabled, buildShiftReport, nextDocNo, openShiftFor, paidAmount, settleOrder } from './service';
+import { assertMethodEnabled, assertNoMoney, buildShiftReport, nextDocNo, openShiftFor, paidAmount, settleOrder } from './service';
 
 /** Methods confirmed by the cashier at the till (cash in hand, EDC slip, voucher). Others need explicit confirmation. */
 const IMMEDIATE = new Set(['CASH', 'CARD', 'EWALLET', 'VOUCHER']);
@@ -45,7 +45,7 @@ export default async function paymentRoutes(app: FastifyInstance) {
     await db.transaction(async (tx) => {
       const o = await lockOrder(tx, a.orgId, branchId, id);
       if (!['OPEN', 'BILL_REQUESTED'].includes(o.status)) throw conflict('บิลปิดแล้ว');
-      if (o.paidSatang > 0) throw conflict('มีการชำระบางส่วนแล้ว ให้ส่วนลดเพิ่มไม่ได้', 'HAS_PAYMENTS');
+      await assertNoMoney(tx, o.id, 'มีการชำระหรือรอยืนยันการชำระแล้ว ให้ส่วนลดเพิ่มไม่ได้');
       let base = o.subtotalSatang - o.discountSatang;
       if (body.scope === 'ITEM') {
         const [it] = await tx.select().from(orderItems).where(and(eq(orderItems.id, body.orderItemId!), eq(orderItems.orderId, id)));
@@ -81,7 +81,8 @@ export default async function paymentRoutes(app: FastifyInstance) {
     if (!d) throw notFound('ส่วนลด');
     await db.transaction(async (tx) => {
       const o = await lockOrder(tx, a.orgId, branchId, d.orderId);
-      if (!['OPEN', 'BILL_REQUESTED'].includes(o.status) || o.paidSatang > 0) throw conflict('แก้ไขส่วนลดไม่ได้แล้ว');
+      if (!['OPEN', 'BILL_REQUESTED'].includes(o.status)) throw conflict('แก้ไขส่วนลดไม่ได้แล้ว');
+      await assertNoMoney(tx, o.id, 'มีการชำระหรือรอยืนยันการชำระแล้ว แก้ไขส่วนลดไม่ได้');
       await tx.update(orderDiscounts).set({ removedAt: new Date(), removedBy: a.userId }).where(eq(orderDiscounts.id, id));
       for (const h of orderHooks.discountRemoved) await h({ db: tx, actor: a, bus }, id);
       await recalcOrder(tx, d.orderId);

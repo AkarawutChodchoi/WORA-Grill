@@ -9,7 +9,7 @@ import { audit } from '../../lib/audit';
 import { requireAnyPerm, requireBranch, requirePerm, resolvePermissions } from '../../lib/auth';
 import { badRequest, conflict, forbidden, isUniqueViolation, notFound, parse, unprocessable } from '../../lib/errors';
 import { getOrderDetail, lockOrder } from '../orders/service';
-import { openShiftFor, paidAmount, settleOrder } from '../payments/service';
+import { assertNoMoney, openShiftFor, paidAmount, settleOrder } from '../payments/service';
 import { applyPromotion, expirePoints, maskPhone, orgSettings, postPoints, promotionsApplicable, registerCrmHooks } from './service';
 
 registerCrmHooks();
@@ -237,7 +237,7 @@ export default async function crmRoutes(app: FastifyInstance) {
     const r = await db.transaction(async (tx) => {
       const o = await lockOrder(tx, a.orgId, branchId, id);
       if (!['OPEN', 'BILL_REQUESTED'].includes(o.status)) throw conflict('บิลปิดแล้ว');
-      if (o.paidSatang > 0) throw conflict('มีการชำระบางส่วนแล้ว ใช้โปรโมชันเพิ่มไม่ได้', 'HAS_PAYMENTS');
+      await assertNoMoney(tx, o.id, 'มีการชำระหรือรอยืนยันการชำระแล้ว ใช้โปรโมชันเพิ่มไม่ได้');
       const res = await applyPromotion(tx, o, a.userId, body);
       await audit(tx, a, { action: 'promotion.apply', targetType: 'order', targetId: id, data: { promotionId: res.promotion.id, code: body.code, amount: res.amountSatang } }, req.ip);
       return res;
@@ -327,6 +327,10 @@ export default async function crmRoutes(app: FastifyInstance) {
     const [p] = await db.select().from(promotions).where(and(eq(promotions.id, id), eq(promotions.organizationId, a.orgId)));
     if (!p) throw notFound('โปรโมชัน');
     if (body.code && body.count > 1) throw badRequest('ระบุรหัสเองได้ครั้งละ 1 คูปอง');
+    if (body.customerId) {
+      const [c] = await db.select({ id: customers.id }).from(customers).where(and(eq(customers.id, body.customerId), eq(customers.organizationId, a.orgId)));
+      if (!c) throw badRequest('ลูกค้าไม่ถูกต้อง');
+    }
     const codes = body.code ? [body.code] : Array.from({ length: body.count }, () => `${body.prefix}${randomBytes(5).toString('hex').toUpperCase()}`);
     try {
       const rows = await db

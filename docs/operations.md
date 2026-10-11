@@ -72,8 +72,16 @@ Customer PII lives in the database backups: encrypt them at rest and restrict ac
   absolute expiry, revoked on logout/password change/deactivation; WebSocket re-validates sessions.
 - CSRF: SameSite=Strict + mandatory `X-Requested-With` header on every non-GET API call (webhooks excepted,
   they use HMAC signatures).
-- Passwords/PINs: scrypt; login & PIN lockout after 5 failures; per-IP rate limits on auth, public QR,
-  booking and queue endpoints.
+- Passwords/PINs: scrypt; login, PIN sign-in **and manager-approval PINs** lock for 15 min after 5 failures
+  (failed approvals are audited); per-IP rate limits on auth, public QR, booking and queue endpoints.
+  `TRUST_PROXY` is a hop count — never trust every X-Forwarded-For hop.
+- Revoking a terminal immediately ends the PIN sessions opened on it.
+- Money safety: void/merge/split/discount/promotions are refused while any payment is confirmed **or pending**;
+  gateway charges reserve the amount under a row lock; payment ids, goods-receipt ids, return ids and
+  manual stock receipts are idempotent; supplier returns are capped by received minus already returned.
+- Webhooks: a failed event is re-processed when the provider retries (only PROCESSED/IGNORED are treated
+  as duplicates); money that arrives on a closed bill is recorded and raises a refund notification.
+- Loyalty: refunds claw back earned points proportionally (balance may go negative).
 - Authorisation on every route (permissions + organisation/branch scoping); privilege-escalation guard on
   role grants; manager-PIN approvals for void/cancel/discount override/refund/drawer/stock adjust.
 - Input validation with zod; integer money; uploads checked by magic bytes and size; CSV formula-injection
@@ -96,6 +104,14 @@ Customer PII lives in the database backups: encrypt them at rest and restrict ac
 | e-Tax Invoice / accounting export (FlowAccount, PEAK, Express) | Provider credentials and certification — not built |
 | Payroll, OT, social security, withholding tax, tips | Business rules and compliance review — intentionally out of scope |
 | Email reports | SMTP provider — not built (CSV/PDF export instead) |
+
+## Independent review (Prompt 17)
+
+An independent read-only security review of the server found 13 issues (2 high, 5 medium, 6 low); all were
+fixed and each has a regression test in `server/test/review-fixes.test.ts`. No cross-tenant IDOR, SQL
+injection, XSS or upload issues were found. Latent multi-organisation gaps (delivery branch lookup by code,
+customer ids on reservations/coupons) were also closed although the product currently runs one
+organisation per deployment.
 
 ## Known gaps / follow-ups
 

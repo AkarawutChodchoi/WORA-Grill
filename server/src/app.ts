@@ -10,7 +10,7 @@ import { sql } from 'drizzle-orm';
 import { ZodError } from 'zod';
 import type { Config } from './config';
 import type { DB } from './db/client';
-import { loadAuth, SESSION_COOKIE } from './lib/auth';
+import { loadAuth, SESSION_COOKIE, setApprovalFailureRecorder } from './lib/auth';
 import { AppError } from './lib/errors';
 import { EventBus } from './lib/events';
 import { registerModules } from './modules';
@@ -41,10 +41,12 @@ export async function buildApp(deps: Deps, opts: { logger?: boolean } = {}): Pro
           redact: { paths: ['req.headers.cookie', 'req.headers.authorization', 'res.headers["set-cookie"]'], remove: true },
         }
       : false,
-    trustProxy: deps.config.TRUST_PROXY === 'true',
+    // Fastify accepts a hop count at runtime (typed as boolean/string in its definitions).
+    trustProxy: (deps.config.TRUST_PROXY === 'true' ? 1 : deps.config.TRUST_PROXY === 'false' ? false : Number(deps.config.TRUST_PROXY)) as unknown as boolean,
     bodyLimit: 1024 * 1024,
   });
   app.decorate('deps', deps);
+  setApprovalFailureRecorder(deps.db, (err) => app.log.error({ err }, 'failed to record approval failure'));
   app.decorateRequest('auth', null);
 
   // Accept an empty JSON body as {} (many clients send Content-Type without a body on action POSTs).

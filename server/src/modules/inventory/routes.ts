@@ -247,6 +247,8 @@ export default async function inventoryRoutes(app: FastifyInstance) {
     const a = requirePerm(req, 'stock.receive');
     const body = parse(
       opBody.extend({
+        /** Client id makes retries idempotent. */
+        id: uuid.optional(),
         lines: z
           .array(lineSchema.extend({ unitCostSatang: z.number().int().min(0).max(100_000_000), lotNo: z.string().max(40).optional(), expiryDate: dateString.optional() }))
           .min(1)
@@ -255,14 +257,14 @@ export default async function inventoryRoutes(app: FastifyInstance) {
       req.body,
     );
     const wh = await warehouseFor(db, a, body.warehouseId);
-    const ref = crypto.randomUUID();
+    const ref = body.id ?? crypto.randomUUID();
     await db.transaction(async (tx) => {
-      for (const l of body.lines) {
+      for (const [i, l] of body.lines.entries()) {
         await ownIngredient(tx, a.orgId, l.ingredientId);
         const base = await toBase(tx, l.ingredientId, l.qty, l.unit);
         // Cost is entered per purchase unit; convert to satang per base unit.
         const perBase = D(l.unitCostSatang).mul(l.qty).div(base);
-        await postMovement(tx, { orgId: a.orgId, branchId: a.branchId!, warehouseId: wh, ingredientId: l.ingredientId, type: 'PURCHASE', qty: base, unitCost: perBase, refType: 'receive', refId: ref, reason: body.note, createdBy: a.userId, lot: { lotNo: l.lotNo, expiryDate: l.expiryDate } });
+        await postMovement(tx, { orgId: a.orgId, branchId: a.branchId!, warehouseId: wh, ingredientId: l.ingredientId, type: 'PURCHASE', qty: base, unitCost: perBase, refType: 'receive', refId: ref, reason: body.note, idempotencyKey: body.id ? `RCV:${ref}:${i}` : undefined, createdBy: a.userId, lot: { lotNo: l.lotNo, expiryDate: l.expiryDate } });
       }
       await audit(tx, a, { action: 'stock.receive', targetType: 'stock_receive', targetId: ref, data: body }, req.ip);
     });

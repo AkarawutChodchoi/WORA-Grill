@@ -313,6 +313,8 @@ export default async function purchasingRoutes(app: FastifyInstance) {
       }),
       req.body,
     );
+    const lineKeys = body.lines.map((l) => l.poLineId ?? `ing:${l.ingredientId}`);
+    if (new Set(lineKeys).size !== lineKeys.length) throw badRequest('มีรายการซ้ำในใบรับของ รวมเป็นบรรทัดเดียว');
     const [existing] = await db.select().from(goodsReceipts).where(eq(goodsReceipts.id, body.id));
     if (existing) {
       if (existing.branchId !== branchId) throw conflict('รหัสใบรับของชนกัน');
@@ -451,6 +453,7 @@ export default async function purchasingRoutes(app: FastifyInstance) {
       z.object({ id: uuid, supplierId: uuid, grId: uuid.optional(), reason: reasonSchema, lines: z.array(z.object({ ingredientId: uuid, qty: positive, unit: z.string().min(1).max(20) })).min(1).max(100) }),
       req.body,
     );
+    if (new Set(body.lines.map((l) => l.ingredientId)).size !== body.lines.length) throw badRequest('มีวัตถุดิบซ้ำในใบคืน รวมเป็นบรรทัดเดียว');
     const [dup] = await db.select().from(supplierReturns).where(eq(supplierReturns.id, body.id));
     if (dup) return { ...dup, replay: true };
     await ownSupplier(db, a.orgId, body.supplierId);
@@ -469,7 +472,15 @@ export default async function purchasingRoutes(app: FastifyInstance) {
         const base = await toBase(tx, l.ingredientId, l.qty, l.unit);
         const grl = grLinesFor.find((g) => g.ingredientId === l.ingredientId);
         if (body.grId && !grl) throw badRequest('วัตถุดิบนี้ไม่อยู่ในใบรับของ');
-        if (grl && base.gt(grl.acceptedQtyBase)) throw unprocessable('คืนเกินจำนวนที่รับเข้า', 'OVER_RETURN');
+        if (grl) {
+          // Cap by what was received on this GR minus everything already returned against it.
+          const [{ prior }] = await tx
+            .select({ prior: sql<string>`coalesce(sum(${supplierReturnLines.qtyBase}), 0)` })
+            .from(supplierReturnLines)
+            .innerJoin(supplierReturns, eq(supplierReturns.id, supplierReturnLines.returnId))
+            .where(and(eq(supplierReturns.grId, body.grId!), eq(supplierReturnLines.ingredientId, l.ingredientId)));
+          if (base.plus(prior).gt(grl.acceptedQtyBase)) throw unprocessable('คืนเกินจำนวนที่รับเข้า (รวมที่คืนไปแล้ว)', 'OVER_RETURN');
+        }
         // Credit at the GR price when known, otherwise at current average cost.
         const posted = await postMovement(tx, { orgId: a.orgId, branchId, warehouseId: wh, ingredientId: l.ingredientId, type: 'RETURN', qty: base.neg(), refType: 'supplier_return', refId: body.id, reason: body.reason, idempotencyKey: `RT:${body.id}:${l.ingredientId}`, createdBy: a.userId });
         const lineCredit = grl ? D(grl.lineTotalSatang).div(grl.acceptedQtyBase).mul(base).toDecimalPlaces(0).toNumber() : posted!.unitCost.mul(base).toDecimalPlaces(0).toNumber();

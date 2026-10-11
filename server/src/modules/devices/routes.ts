@@ -1,8 +1,8 @@
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, isNull } from 'drizzle-orm';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { uuid } from '@shared/validation';
-import { devices, stations } from '../../db/schema';
+import { devices, sessions, stations } from '../../db/schema';
 import { audit } from '../../lib/audit';
 import { requireBranch, requirePerm } from '../../lib/auth';
 import { badRequest, notFound, parse } from '../../lib/errors';
@@ -30,6 +30,7 @@ export default async function deviceRoutes(app: FastifyInstance) {
       .where(and(eq(devices.id, id), eq(devices.organizationId, a.orgId), eq(devices.branchId, requireBranch(a))))
       .returning({ id: devices.id });
     if (!d) throw notFound('อุปกรณ์');
+    await db.update(sessions).set({ revokedAt: new Date() }).where(and(eq(sessions.deviceId, id), isNull(sessions.revokedAt)));
     await audit(db, a, { action: 'device.revoke', targetType: 'device', targetId: id }, req.ip);
     return { ok: true };
   });

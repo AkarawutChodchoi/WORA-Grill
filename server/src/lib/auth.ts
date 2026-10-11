@@ -2,7 +2,7 @@ import { and, eq, gt, inArray, isNull, or } from 'drizzle-orm';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { APPROVABLE_PERMISSIONS, type Permission } from '@shared/permissions';
 import type { DbOrTx } from '../db/client';
-import { branches, rolePermissions, roles, sessions, userRoles, users } from '../db/schema';
+import { auditLogs, branches, devices, rolePermissions, roles, sessions, userRoles, users } from '../db/schema';
 import { sha256, verifySecret } from './crypto';
 import { badRequest, forbidden, tooMany, unauthorized } from './errors';
 import { RateLimiter } from './rate-limit';
@@ -75,6 +75,10 @@ export async function loadAuth(db: DbOrTx, token: string | undefined): Promise<A
     .where(and(eq(sessions.tokenHash, sha256(token)), isNull(sessions.revokedAt), gt(sessions.expiresAt, now)))
     .limit(1);
   if (!row || !row.u.isActive) return null;
+  if (row.s.deviceId) {
+    const [d] = await db.select({ revokedAt: devices.revokedAt }).from(devices).where(eq(devices.id, row.s.deviceId));
+    if (!d || d.revokedAt) return null; // PIN sessions end when their terminal is revoked
+  }
   if (now.getTime() - row.s.lastSeenAt.getTime() > SLIDE_MS) {
     await db.update(sessions).set({ lastSeenAt: now }).where(eq(sessions.id, row.s.id));
   }
@@ -122,6 +126,32 @@ export interface Approval {
 
 const approvalLimiter = new RateLimiter(5, 5 * 60 * 1000);
 
+export interface ApprovalFailure {
+  approverId: string;
+  orgId: string;
+  branchId: string | null;
+  actorId: string;
+  permission: string;
+}
+
+/** Writes failed approval attempts with the root DB handle after the current transaction ends (set by buildApp). */
+let approvalFailureRecorder: (f: ApprovalFailure) => void = () => undefined;
+export function setApprovalFailureRecorder(db: DbOrTx, onError: (e: unknown) => void) {
+  approvalFailureRecorder = (f) => {
+    setTimeout(() => {
+      void (async () => {
+        const [u] = await db.select({ failed: users.failedLoginCount }).from(users).where(eq(users.id, f.approverId));
+        const n = (u?.failed ?? 0) + 1;
+        await db
+          .update(users)
+          .set({ failedLoginCount: n, lockedUntil: n >= 5 ? new Date(Date.now() + 15 * 60_000) : null })
+          .where(eq(users.id, f.approverId));
+        await db.insert(auditLogs).values({ organizationId: f.orgId, branchId: f.branchId, actorUserId: f.actorId, approverUserId: f.approverId, action: 'approval.pin_failed', data: { permission: f.permission, attempts: n } });
+      })().catch(onError);
+    }, 0);
+  };
+}
+
 /**
  * Authorise a sensitive action (SPEC §2: void / discount / open drawer need a manager PIN).
  * The actor passes if they hold `perm`; otherwise a manager in the same branch may approve it with
@@ -133,12 +163,19 @@ export async function authorizeSensitive(db: DbOrTx, a: AuthContext, perm: Permi
   const key = `${a.orgId}:${approval.userId}`;
   if (!approvalLimiter.take(key)) throw tooMany('ใส่ PIN ผิดหลายครั้ง กรุณารอ 5 นาที');
   const [approver] = await db
-    .select({ id: users.id, pinHash: users.pinHash, isActive: users.isActive, orgId: users.organizationId })
+    .select({ id: users.id, pinHash: users.pinHash, isActive: users.isActive, orgId: users.organizationId, failed: users.failedLoginCount, lockedUntil: users.lockedUntil })
     .from(users)
     .where(eq(users.id, approval.userId))
     .limit(1);
+  if (approver?.lockedUntil && approver.lockedUntil > new Date()) throw tooMany('PIN ผู้อนุมัติถูกล็อกชั่วคราวจากการใส่ผิดหลายครั้ง');
   const ok = await verifySecret(approval.pin, approver?.pinHash);
-  if (!approver || !ok || !approver.isActive || approver.orgId !== a.orgId) throw forbidden('PIN ผู้อนุมัติไม่ถูกต้อง');
+  if (!approver || !ok || !approver.isActive || approver.orgId !== a.orgId) {
+    // Persistent lockout (shared with PIN sign-in). Recorded outside the caller's transaction, which is
+    // about to roll back because of this very failure.
+    if (approver && approver.orgId === a.orgId) approvalFailureRecorder({ approverId: approver.id, orgId: a.orgId, branchId: a.branchId, actorId: a.userId, permission: perm });
+    throw forbidden('PIN ผู้อนุมัติไม่ถูกต้อง');
+  }
+  if (approver.failed) await db.update(users).set({ failedLoginCount: 0, lockedUntil: null }).where(eq(users.id, approver.id));
   const { permissions } = await resolvePermissions(db, approver.id, a.branchId);
   if (!permissions.has(perm)) throw forbidden('ผู้อนุมัติไม่มีสิทธิ์สำหรับรายการนี้');
   approvalLimiter.reset(key);

@@ -14,7 +14,13 @@ export default async function realtimeRoutes(app: FastifyInstance) {
     const origin = req.headers.origin;
     const host = req.headers.host;
     // Reject cross-site WebSocket hijacking attempts.
-    if (origin && host && new URL(origin).host !== host && !process.env.WS_ALLOWED_ORIGINS?.split(',').includes(origin)) {
+    let originHost: string | null;
+    try {
+      originHost = origin ? new URL(origin).host : null;
+    } catch {
+      originHost = 'invalid';
+    }
+    if (origin && host && originHost !== host && !process.env.WS_ALLOWED_ORIGINS?.split(',').includes(origin)) {
       socket.close(4403, 'origin');
       return;
     }

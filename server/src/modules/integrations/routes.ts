@@ -210,18 +210,41 @@ export default async function integrationRoutes(app: FastifyInstance) {
     const body = parse(z.object({ paymentId: uuid, amountSatang: satang.min(2000) }), req.body);
     const [dup] = await db.select().from(payments).where(eq(payments.id, body.paymentId));
     if (dup) return { paymentId: dup.id, providerRef: dup.providerRef, qrImageUrl: null, status: dup.status };
-    const o = await getOrderDetail(db, a.orgId, branchId, id);
-    if (!['OPEN', 'BILL_REQUESTED'].includes(o.status)) throw conflict('บิลนี้ชำระครบหรือปิดแล้ว');
-    const shift = await openShiftFor(db, branchId, a.userId);
-    if (!shift) throw unprocessable('กรุณาเปิดกะก่อนรับชำระเงิน', 'NO_OPEN_SHIFT');
-    const { confirmed, pending } = await paidAmount(db, id);
-    if (body.amountSatang > o.grandTotalSatang - confirmed - pending) throw unprocessable('ยอดเกินกว่าที่ต้องชำระ', 'OVERPAYMENT');
-    // Charge first (outside the DB transaction: network call), then record it as pending.
-    const charge = await integrations.gateway.createPromptPayCharge(body.amountSatang, { paymentId: body.paymentId, orderId: id });
-    await db.insert(payments).values({ id: body.paymentId, organizationId: a.orgId, branchId, orderId: id, shiftId: shift.id, method: 'PROMPTPAY', status: 'PENDING_CONFIRMATION', amountSatang: body.amountSatang, provider: integrations.gateway.name, providerRef: charge.id, createdBy: a.userId });
+    // Reserve the amount first (row-locked, so two terminals cannot both create a payable QR),
+    // then call the provider outside the transaction and attach its charge id.
+    await db.transaction(async (tx) => {
+      const o = await lockOrder(tx, a.orgId, branchId, id);
+      if (!['OPEN', 'BILL_REQUESTED'].includes(o.status)) throw conflict('บิลนี้ชำระครบหรือปิดแล้ว');
+      const shift = await openShiftFor(tx, branchId, a.userId);
+      if (!shift) throw unprocessable('กรุณาเปิดกะก่อนรับชำระเงิน', 'NO_OPEN_SHIFT');
+      const { confirmed, pending } = await paidAmount(tx, id);
+      if (body.amountSatang > o.grandTotalSatang - confirmed - pending) throw unprocessable('ยอดเกินกว่าที่ต้องชำระ', 'OVERPAYMENT');
+      await tx.insert(payments).values({ id: body.paymentId, organizationId: a.orgId, branchId, orderId: id, shiftId: shift.id, method: 'PROMPTPAY', status: 'PENDING_CONFIRMATION', amountSatang: body.amountSatang, provider: integrations.gateway.name, createdBy: a.userId });
+    });
+    let charge;
+    try {
+      charge = await integrations.gateway.createPromptPayCharge(body.amountSatang, { paymentId: body.paymentId, orderId: id });
+    } catch (e) {
+      await db.update(payments).set({ status: 'VOIDED', voidedAt: new Date() }).where(eq(payments.id, body.paymentId));
+      throw new AppError(502, 'GATEWAY_ERROR', `สร้าง QR ไม่สำเร็จ: ${(e as Error).message}`);
+    }
+    await db.update(payments).set({ providerRef: charge.id }).where(eq(payments.id, body.paymentId));
     await audit(db, a, { action: 'payment.gateway_charge', targetType: 'payment', targetId: body.paymentId, data: { orderId: id, amount: body.amountSatang, providerRef: charge.id } }, req.ip);
     return { paymentId: body.paymentId, providerRef: charge.id, qrImageUrl: charge.qrImageUrl, status: 'PENDING_CONFIRMATION' };
   });
+
+  /**
+   * Record an inbound event once. Returns [] when it was already handled (PROCESSED/IGNORED); a FAILED or
+   * half-processed event is handed back for reprocessing so provider retries can still succeed.
+   */
+  const claimEvent = async (provider: string, eventId: string, eventType: string, summary: Record<string, unknown>) => {
+    const ins = await db.insert(webhookEvents).values({ provider, eventId, eventType, summary }).onConflictDoNothing().returning();
+    if (ins.length) return ins;
+    const [prev] = await db.select().from(webhookEvents).where(and(eq(webhookEvents.provider, provider), eq(webhookEvents.eventId, eventId)));
+    if (!prev || prev.status === 'PROCESSED' || prev.status === 'IGNORED') return [];
+    await db.update(webhookEvents).set({ status: 'RECEIVED', error: null }).where(eq(webhookEvents.id, prev.id));
+    return [prev];
+  };
 
   // ---------- Inbound webhooks (raw body needed for signature verification) ----------
   await app.register(async (hooks) => {
@@ -239,7 +262,7 @@ export default async function integrationRoutes(app: FastifyInstance) {
       }
       const eventId = String(evt?.id ?? '');
       if (!eventId) throw badRequest('missing event id');
-      const inserted = await db.insert(webhookEvents).values({ provider: 'opn', eventId, eventType: String(evt.key ?? ''), summary: { chargeId: evt?.data?.id, status: evt?.data?.status } }).onConflictDoNothing().returning();
+      const inserted = await claimEvent('opn', eventId, String(evt.key ?? ''), { chargeId: evt?.data?.id, status: evt?.data?.status });
       if (!inserted.length) return { ok: true, duplicate: true };
       const chargeId = String(evt?.data?.id ?? '');
       if (evt.key !== 'charge.complete' || !chargeId) {
@@ -253,7 +276,10 @@ export default async function integrationRoutes(app: FastifyInstance) {
         if (!p) throw new Error('unknown charge');
         if (charge.status === 'successful' && charge.amountSatang === p.amountSatang && p.status === 'PENDING_CONFIRMATION') {
           await db.transaction(async (tx) => {
-            await lockOrder(tx, p.organizationId, p.branchId, p.orderId);
+            const o = await lockOrder(tx, p.organizationId, p.branchId, p.orderId);
+            if (!['OPEN', 'BILL_REQUESTED'].includes(o.status))
+              // Money really arrived: record it, and ask staff to refund instead of silently losing it.
+              await notify(tx, null, { orgId: p.organizationId, branchId: p.branchId, kind: 'payment_on_closed_bill', title: `ได้รับเงิน PromptPay บนบิล #${o.orderNo} ที่ปิดแล้ว`, body: 'ตรวจสอบและคืนเงินลูกค้า', link: `/pos/orders/${o.id}/pay`, requiredPermission: 'payment.refund' });
             await tx.update(payments).set({ status: 'CONFIRMED', confirmedAt: new Date(), reference: chargeId }).where(eq(payments.id, p.id));
             await audit(tx, SYSTEM(p.organizationId, p.branchId), { action: 'payment.gateway_confirmed', targetType: 'payment', targetId: p.id, data: { chargeId, amount: p.amountSatang } });
             await settleOrder(tx, bus, SYSTEM(p.organizationId, p.branchId), p.orderId, p.shiftId);
@@ -294,10 +320,16 @@ export default async function integrationRoutes(app: FastifyInstance) {
         }),
         JSON.parse(raw.toString('utf8')),
       );
-      const inserted = await db.insert(webhookEvents).values({ provider: `delivery:${provider}`, eventId: body.eventId, eventType: 'order.created', summary: { externalOrderId: body.externalOrderId, items: body.items.length } }).onConflictDoNothing().returning();
+      const inserted = await claimEvent(`delivery:${provider}`, body.eventId, 'order.created', { externalOrderId: body.externalOrderId, items: body.items.length });
       if (!inserted.length) return { ok: true, duplicate: true };
-      const [b] = await db.select().from(branches).where(eq(branches.code, body.branchCode));
-      if (!b) throw notFound('สาขา');
+      const fail = async (e: unknown) => {
+        await db.update(webhookEvents).set({ status: 'FAILED', error: String((e as Error).message).slice(0, 300), processedAt: new Date() }).where(eq(webhookEvents.id, inserted[0].id));
+        throw e;
+      };
+      const bs = await db.select().from(branches).where(eq(branches.code, body.branchCode));
+      // Branch codes are unique per organisation: refuse ambiguous codes instead of guessing a tenant.
+      if (bs.length !== 1) return fail(bs.length ? conflict('รหัสสาขาซ้ำหลายองค์กร') : notFound('สาขา'));
+      const [b] = bs;
       const [existing] = await db.select({ id: orders.id }).from(orders).where(and(eq(orders.branchId, b.id), eq(orders.externalRef, `${provider}:${body.externalOrderId}`)));
       if (existing) return { ok: true, duplicate: true, orderId: existing.id };
       const orderId = await db.transaction(async (tx) => {
@@ -317,7 +349,7 @@ export default async function integrationRoutes(app: FastifyInstance) {
         await runItemsHook(orderHooks.itemsSent, { db: tx, actor: SYSTEM(b.organizationId, b.id), bus }, o2, sent);
         await audit(tx, SYSTEM(b.organizationId, b.id), { action: 'delivery.order_received', targetType: 'order', targetId: order.id, data: { provider, externalOrderId: body.externalOrderId } });
         return order.id;
-      });
+      }).catch(fail);
       await db.update(webhookEvents).set({ status: 'PROCESSED', processedAt: new Date() }).where(eq(webhookEvents.id, inserted[0].id));
       bus.publish({ type: 'order.created', organizationId: b.organizationId, branchId: b.id, payload: { orderId } });
       return { ok: true, orderId };

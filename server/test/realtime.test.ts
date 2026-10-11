@@ -27,6 +27,13 @@ describe('realtime gateway', () => {
     expect(code).toBe(4401);
   });
 
+  it('rejects cross-site WebSocket connections even with a valid cookie', async () => {
+    const c = await env.as('WAITER');
+    const ws = await (env.app as any).injectWS('/api/ws', { headers: { cookie: c.cookie, origin: 'https://evil.example', host: 'pos.example' } });
+    const code = await new Promise<number>((r) => ws.on('close', (x: number) => r(x)));
+    expect(code).toBe(4403);
+  });
+
   it('forwards only events for the session organisation and branch', async () => {
     const c = await env.as('WAITER');
     let box!: ReturnType<typeof collect>;

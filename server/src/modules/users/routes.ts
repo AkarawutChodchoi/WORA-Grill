@@ -185,6 +185,10 @@ export default async function userRoutes(app: FastifyInstance) {
     if (id === a.userId && body.isActive === false) throw badRequest('ปิดใช้งานบัญชีของตัวเองไม่ได้');
     const targetRoles = (await resolvePermissions(db, id, null)).roles;
     if (targetRoles.includes('OWNER') && !a.roles.includes('OWNER')) throw forbidden('เฉพาะเจ้าของเท่านั้นที่แก้ไขบัญชีเจ้าของได้');
+    // Changing credentials/status of someone is only allowed if the actor holds every permission they have
+    // (otherwise resetting their password would be a privilege escalation).
+    const current = await db.select({ roleId: userRoles.roleId, branchId: userRoles.branchId }).from(userRoles).where(eq(userRoles.userId, id));
+    if (id !== a.userId) await assertCanGrant(db, a, scope, current);
     const set: Partial<typeof users.$inferInsert> = {};
     if (body.name !== undefined) set.name = body.name;
     if (body.email !== undefined) set.email = body.email;

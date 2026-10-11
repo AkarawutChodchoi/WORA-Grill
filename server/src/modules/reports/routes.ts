@@ -19,6 +19,12 @@ const rangeQuery = z.object({
 });
 
 /** Branches in scope where the user holds `perm` (reports can span branches for owners/area managers). */
+/** True only if the user holds `perm` in every branch of the range (e.g. cost columns across branches). */
+async function holdsInAll(db: any, a: AuthContext, branchIds: string[], perm: Permission) {
+  for (const b of branchIds) if (!(await resolvePermissions(db, a.userId, b)).permissions.has(perm)) return false;
+  return true;
+}
+
 async function scopedRange(db: any, req: FastifyRequest, perm: Permission): Promise<{ a: AuthContext; range: Range }> {
   const a = requireAuth(req);
   const q = parse(rangeQuery, req.query);
@@ -50,7 +56,7 @@ export default async function reportRoutes(app: FastifyInstance) {
 
   app.get('/reports/items', async (req) => {
     const { a, range } = await scopedRange(db, req, 'report.view_sales');
-    const withCost = a.permissions.has('report.view_profit');
+    const withCost = await holdsInAll(db, a, range.branchIds, 'report.view_profit');
     return { range, withCost, ...(await itemPerformance(db, range, withCost)) };
   });
 
@@ -151,7 +157,7 @@ export default async function reportRoutes(app: FastifyInstance) {
       const r = await salesSummary(db, range);
       csv = toCsv(['วันที่', 'จำนวนบิล', 'ลูกค้า', 'ยอดสุทธิก่อนภาษี/ค่าบริการ', 'ยอดรวม'], r.daily.map((d) => [d.date, d.orders, d.guests, b(d.netSatang), b(d.totalSatang)]));
     } else if (report === 'items') {
-      const withCost = a.permissions.has('report.view_profit');
+      const withCost = await holdsInAll(db, a, range.branchIds, 'report.view_profit');
       const r = await itemPerformance(db, range, withCost);
       csv = toCsv(
         ['เมนู', 'จำนวน', 'ยอดขาย', 'สัดส่วน %', ...(withCost ? ['ต้นทุน', 'กำไรขั้นต้น', 'Food cost %', 'Menu engineering'] : [])],

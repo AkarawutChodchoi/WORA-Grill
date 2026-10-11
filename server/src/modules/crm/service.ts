@@ -3,7 +3,7 @@ import { localParts } from '@shared/menu';
 import { evaluatePromotion, pointsToEarn, tierFor, type PromoContext, type PromotionRule } from '@shared/promotions';
 import { resolveOrgSettings } from '@shared/settings';
 import type { DbOrTx } from '../../db/client';
-import { branches, coupons, customers, loyaltyTransactions, menuItems, orderDiscounts, orderItems, organizations, payments, promotionRedemptions, promotions } from '../../db/schema';
+import { branches, coupons, customers, loyaltyTransactions, menuItems, orderDiscounts, orderItems, orders, organizations, payments, promotionRedemptions, promotions } from '../../db/schema';
 import { LOYALTY_TYPES } from '../../db/schema/crm';
 import { conflict, notFound, unprocessable } from '../../lib/errors';
 import { orderHooks } from '../orders/hooks';
@@ -17,7 +17,7 @@ export async function orgSettings(db: DbOrTx, orgId: string) {
 /** Append a points transaction and update the cached balance under a row lock. Idempotent by key. */
 export async function postPoints(
   db: DbOrTx,
-  p: { orgId: string; customerId: string; type: (typeof LOYALTY_TYPES)[number]; points: number; orderId?: string | null; paymentId?: string | null; reason?: string; idempotencyKey?: string; expiresAt?: Date | null; createdBy?: string | null },
+  p: { orgId: string; customerId: string; type: (typeof LOYALTY_TYPES)[number]; points: number; orderId?: string | null; paymentId?: string | null; reason?: string; idempotencyKey?: string; expiresAt?: Date | null; createdBy?: string | null; allowNegative?: boolean },
 ) {
   if (p.points === 0) return null;
   if (p.idempotencyKey) {
@@ -27,7 +27,7 @@ export async function postPoints(
   const [c] = await db.select().from(customers).where(and(eq(customers.id, p.customerId), eq(customers.organizationId, p.orgId))).for('update');
   if (!c) throw notFound('ลูกค้า');
   const next = c.pointsBalance + p.points;
-  if (next < 0) throw unprocessable(`แต้มไม่พอ (คงเหลือ ${c.pointsBalance})`, 'INSUFFICIENT_POINTS');
+  if (next < 0 && !p.allowNegative) throw unprocessable(`แต้มไม่พอ (คงเหลือ ${c.pointsBalance})`, 'INSUFFICIENT_POINTS');
   const [t] = await db
     .insert(loyaltyTransactions)
     .values({ organizationId: p.orgId, customerId: p.customerId, type: p.type, points: p.points, orderId: p.orderId ?? null, paymentId: p.paymentId ?? null, reason: p.reason, idempotencyKey: p.idempotencyKey, expiresAt: p.expiresAt ?? null, createdBy: p.createdBy ?? null })
@@ -223,18 +223,19 @@ export function registerCrmHooks() {
     await postPoints(ctx.db, { orgId: order.organizationId, customerId: c.id, type: 'EARN', points, orderId: order.id, reason: `บิล #${order.orderNo}`, idempotencyKey: `EARN:${order.id}:${order.paidAt?.getTime() ?? 0}`, expiresAt, createdBy: ctx.actor.userId });
   });
 
-  // A fully refunded bill loses the points it earned.
-  orderHooks.orderReopened.push(async (ctx, order) => {
-    const earns = await ctx.db.select().from(loyaltyTransactions).where(and(eq(loyaltyTransactions.orderId, order.id), eq(loyaltyTransactions.type, 'EARN')));
-    for (const e of earns) {
-      const [c] = await ctx.db.select({ bal: customers.pointsBalance }).from(customers).where(eq(customers.id, e.customerId));
-      await postPoints(ctx.db, { orgId: order.organizationId, customerId: e.customerId, type: 'REVERSE', points: -Math.min(e.points, c.bal), orderId: order.id, reason: 'คืนเงินทั้งบิล', idempotencyKey: `REV_EARN:${e.id}` });
-    }
-  });
+  // A fully refunded bill loses the rest of the points it earned, even if the balance goes negative,
+  // so points cannot be spent first and the bill refunded afterwards.
+  orderHooks.orderReopened.push(async (ctx, order) => reverseEarned(ctx.db, order.id, Number.MAX_SAFE_INTEGER, 'คืนเงินทั้งบิล', ctx.actor.userId));
 
   // Refunding a points payment gives the points back.
   orderHooks.paymentRefunded.push(async (ctx, payment, amount) => {
-    if (payment.method !== 'POINTS') return;
+    if (payment.method !== 'POINTS') {
+      // Partial money refund: take back points in proportion to the refunded amount.
+      const [o] = await ctx.db.select({ total: orders.grandTotalSatang }).from(orders).where(eq(orders.id, payment.orderId));
+      const earned = await earnedRemaining(ctx.db, payment.orderId);
+      if (earned.points > 0 && o?.total) await reverseEarned(ctx.db, payment.orderId, Math.ceil((earned.earned * amount) / o.total), 'คืนเงินบางส่วน', ctx.actor.userId);
+      return;
+    }
     const [red] = await ctx.db.select().from(loyaltyTransactions).where(and(eq(loyaltyTransactions.paymentId, payment.id), eq(loyaltyTransactions.type, 'REDEEM')));
     if (!red) return;
     const s = await orgSettings(ctx.db, red.organizationId);
@@ -251,6 +252,21 @@ export function registerCrmHooks() {
       .where(eq(customers.id, o.customerId));
     return { customer: c ? { ...c, phone: maskPhone(c.phone) } : null };
   });
+}
+
+/** Points earned on a bill and how many of them are not yet reversed. */
+async function earnedRemaining(db: DbOrTx, orderId: string) {
+  const rows = await db.select().from(loyaltyTransactions).where(eq(loyaltyTransactions.orderId, orderId));
+  const earned = rows.filter((r) => r.type === 'EARN').reduce((a, r) => a + r.points, 0);
+  const reversed = -rows.filter((r) => r.type === 'REVERSE' && r.points < 0).reduce((a, r) => a + r.points, 0);
+  return { earned, points: Math.max(0, earned - reversed), customerId: rows.find((r) => r.type === 'EARN')?.customerId ?? null, orgId: rows[0]?.organizationId };
+}
+
+async function reverseEarned(db: DbOrTx, orderId: string, maxPoints: number, reason: string, by: string | null) {
+  const r = await earnedRemaining(db, orderId);
+  const pts = Math.min(r.points, maxPoints);
+  if (!pts || !r.customerId || !r.orgId) return;
+  await postPoints(db, { orgId: r.orgId, customerId: r.customerId, type: 'REVERSE', points: -pts, orderId, reason, createdBy: by, allowNegative: true });
 }
 
 export function maskPhone(p: string | null) {

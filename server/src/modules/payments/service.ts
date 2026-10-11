@@ -3,7 +3,7 @@ import type { DbOrTx } from '../../db/client';
 import { branches, cashMovements, docCounters, orders, payments, refunds, shifts } from '../../db/schema';
 import type { AuthContext } from '../../lib/auth';
 import type { EventBus } from '../../lib/events';
-import { badRequest } from '../../lib/errors';
+import { badRequest, conflict } from '../../lib/errors';
 import { orderHooks, runOrderHook } from '../orders/hooks';
 import { orderDetailExtensions, type Order } from '../orders/service';
 import { releaseTable } from '../tables/service';
@@ -52,6 +52,15 @@ export async function settleOrder(db: DbOrTx, bus: EventBus | null, actor: Pick<
   await runOrderHook(orderHooks.orderPaid, { db, actor, bus }, paid);
   bus?.publish({ type: 'payment.confirmed', organizationId: o.organizationId, branchId: o.branchId, payload: { orderId, status: 'PAID' } });
   return paid;
+}
+
+/**
+ * Bill-changing actions (void, merge, split, discounts, promotions) are refused while any money is
+ * confirmed OR pending on the bill — a pending PromptPay/transfer may still arrive.
+ */
+export async function assertNoMoney(db: DbOrTx, orderId: string, message = 'บิลนี้มีการชำระเงินหรือรอยืนยันการชำระอยู่ ต้องคืนเงิน/ยกเลิกการชำระก่อน') {
+  const { confirmed, pending } = await paidAmount(db, orderId);
+  if (confirmed > 0 || pending > 0) throw conflict(message, 'HAS_PAYMENTS');
 }
 
 export function assertMethodEnabled(enabled: string[], method: string) {
