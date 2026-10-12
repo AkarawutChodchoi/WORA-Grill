@@ -65,7 +65,7 @@ function RoleDialog({ role, perms, onClose }: { role: Role | 'new'; perms: { cod
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {groups.map(([g, list]) => (
           <fieldset key={g} className="rounded-control border border-line p-3">
-            <legend className="px-1 text-sm font-medium text-ink-2">{g}</legend>
+            <legend className="px-1 text-sm font-medium text-ink-2">{PERM_GROUP[g] ?? g}</legend>
             <div className="flex flex-col gap-1.5">
               {list.map((p) => (
                 <Checkbox
@@ -88,6 +88,34 @@ function RoleDialog({ role, perms, onClose }: { role: Role | 'new'; perms: { cod
     </Dialog>
   );
 }
+
+/** Thai headings for permission groups (the prefix of each permission code). */
+const PERM_GROUP: Record<string, string> = {
+  attendance: 'ลงเวลาทำงาน',
+  audit: 'ประวัติการใช้งาน',
+  bill: 'บิลและส่วนลด',
+  cash: 'ลิ้นชักเงิน',
+  customer: 'ลูกค้า',
+  device: 'อุปกรณ์',
+  inventory: 'สต็อก (ดู)',
+  kitchen: 'ครัว',
+  loyalty: 'แต้มสมาชิก',
+  menu: 'เมนู',
+  order: 'บิล/ออเดอร์',
+  org: 'ร้านและสาขา',
+  payment: 'การชำระเงิน',
+  promotion: 'โปรโมชัน',
+  purchase: 'จัดซื้อ',
+  report: 'รายงาน',
+  reservation: 'การจอง',
+  settings: 'ตั้งค่า',
+  shift: 'กะ',
+  staff: 'พนักงาน',
+  stock: 'สต็อก (รับ/เบิก/ปรับ)',
+  supplier: 'ซัพพลายเออร์',
+  table: 'โต๊ะ',
+  user: 'ผู้ใช้',
+};
 
 export function RolesPage() {
   const roles = useQuery({ queryKey: ['roles'], queryFn: () => get<{ roles: Role[] }>('/roles') });

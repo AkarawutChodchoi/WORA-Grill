@@ -4,6 +4,7 @@ import { useState } from 'react';
 import type { OrgSettings } from '@shared/settings';
 import { Badge, Button, Dialog, Input, Panel, useToast } from '../../components/ui';
 import { errorMessage, get, post } from '../../lib/api';
+import { useTierName } from '../../lib/tiers';
 import { useAuth } from '../../lib/auth';
 import { formatBaht } from '../../lib/format';
 import { CustomerForm } from '../crm/CustomersPage';
@@ -11,6 +12,7 @@ import type { Order } from './types';
 
 /** Attach a member, apply promotions/coupons and redeem points — all validated by the server. */
 export function MemberPromoPanel({ order }: { order: Order }) {
+  const tierName = useTierName();
   const { can } = useAuth();
   const qc = useQueryClient();
   const toast = useToast();
@@ -64,7 +66,7 @@ export function MemberPromoPanel({ order }: { order: Order }) {
         <div className="mb-3 flex items-start justify-between gap-2 rounded-control bg-basil-50 p-3">
           <div>
             <p className="flex items-center gap-2 font-medium">
-              <UserRound className="size-4" /> {c.name} {c.tier && <Badge tone="info">{c.tier}</Badge>}
+              <UserRound className="size-4" /> {c.name} {c.tier && <Badge tone="info">{tierName(c.tier)}</Badge>}
             </p>
             <p className="text-sm text-ink-2">
               {c.phone} · แต้ม {c.pointsBalance.toLocaleString()}
@@ -82,7 +84,9 @@ export function MemberPromoPanel({ order }: { order: Order }) {
             <Button variant="outline" loading={lookup.isPending} disabled={phone.replace(/\D/g, '').length < 9} onClick={() => lookup.mutate()}>
               ค้นหา
             </Button>
-            {can('customer.manage') && <Button variant="ghost" aria-label="สมัครสมาชิก" icon={<UserPlus className="size-4" />} onClick={() => setCreating(true)} />}
+            {can('customer.manage') && <Button variant="outline" icon={<UserPlus className="size-4" />} onClick={() => setCreating(true)}>
+                สมัคร
+              </Button>}
           </div>
         )
       )}

@@ -30,6 +30,16 @@
   --color-turmeric-700: #7A5806;
   --color-sky: #2A5EA0;
   --color-sky-50: #E8EFF8;
+  /* Kitchen display (dark, high contrast) */
+  --color-kds-card: #1F1F1F;
+  --color-kds-raised: #2B2B2B;
+  --color-kds-line: #333333;
+  --color-kds-hover: #3D3D3D;
+  --color-kds-muted: #C2C2C2;
+  --color-kds-dim: #A3A3A3;
+  --color-kds-note-bg: #3A3420;
+  --color-kds-note: #FFE08A;
+  --color-kds-alert: #FF8A80;
   --radius-control: 8px;
   --radius-panel: 12px;
 }
@@ -46,6 +56,10 @@
   :focus-visible { outline: 2px solid var(--color-ink); outline-offset: 2px; }
   .kds :focus-visible, .on-dark :focus-visible { outline-color: #FFFFFF; }
   .num { font-variant-numeric: tabular-nums; }
+  /* Touch devices: ≥16px form text so iOS Safari never auto-zooms when a field is focused. */
+  @media (pointer: coarse) {
+    input, select, textarea { font-size: max(16px, 1em); }
+  }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
   }

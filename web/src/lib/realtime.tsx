@@ -136,12 +136,13 @@ export function useLivePolling(): number {
   return connected ? 60_000 : 10_000;
 }
 
-export function LiveIndicator() {
+/** Live-update status. `compact` hides the word on phones (crowded headers); elsewhere it is always spelled out. */
+export function LiveIndicator({ compact }: { compact?: boolean } = {}) {
   const { connected } = useRealtime();
   return (
     <span className="inline-flex items-center gap-1.5 text-xs text-ink-3" title={connected ? 'อัปเดตแบบเรียลไทม์' : 'ขาดการเชื่อมต่อเรียลไทม์ — รีเฟรชทุก 10 วินาที'}>
       <span className={`size-2 rounded-full ${connected ? 'bg-basil' : 'bg-turmeric'}`} />
-      <span className={connected ? 'hidden sm:inline' : undefined}>{connected ? 'สด' : 'ออฟไลน์เรียลไทม์'}</span>
+      <span className={connected && compact ? 'hidden sm:inline' : undefined}>{connected ? 'อัปเดตสด' : 'ไม่ได้เชื่อมต่อสด (รีเฟรชทุก 10 วิ)'}</span>
     </span>
   );
 }

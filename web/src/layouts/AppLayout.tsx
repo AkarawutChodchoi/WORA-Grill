@@ -157,7 +157,28 @@ function FloorNotifier() {
 }
 
 /** Back-office shell: left rail on desktop, drawer on mobile/tablet. */
+/**
+ * Screens load on demand; once staff are signed in, fetch the service screens in the background so the
+ * service worker caches them and POS/tables/KDS still open if the connection drops mid-service.
+ */
+function usePrefetchServiceScreens() {
+  useEffect(() => {
+    const t = setTimeout(() => {
+      void Promise.all([
+        import('../features/pos/PosHome'),
+        import('../features/pos/OrderScreen'),
+        import('../features/pos/PaymentScreen'),
+        import('../features/pos/ReceiptPage'),
+        import('../features/tables/TablesPage'),
+        import('../features/kds/KdsPage'),
+      ]).catch(() => undefined);
+    }, 2000);
+    return () => clearTimeout(t);
+  }, []);
+}
+
 export function AppLayout() {
+  usePrefetchServiceScreens();
   const [open, setOpen] = useState(false);
   const loc = useLocation();
   useEffect(() => setOpen(false), [loc.pathname]);

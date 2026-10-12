@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { toSatang } from '@shared/money';
 import { Badge, Button, Checkbox, DataTable, Dialog, EmptyState, ErrorState, Input, LoadingBlock, MoneyInput, PageHeader, Panel, QueryView, Select, Tabs, Textarea, useToast } from '../../components/ui';
 import { errorMessage, get, post, put } from '../../lib/api';
+import { useTabParam } from '../../lib/useTabParam';
 import { useAuth } from '../../lib/auth';
 import { fmtDate, fmtDateTime, formatBaht, todayISO } from '../../lib/format';
 import { fmtQty, useIngredients, type Ingredient } from '../inventory/InventoryPage';
@@ -128,7 +129,7 @@ function SupplierDialog({ s, ingredients, onClose }: { s: Supplier | 'new'; ingr
       <div className="flex flex-col gap-2">
         {items.map((it, idx) => (
           <div key={idx} className="flex flex-wrap items-end gap-2">
-            <Select aria-label="วัตถุดิบ" wrapClassName="min-w-44 flex-1" value={it.ingredientId} onChange={(e) => setItems(items.map((y, j) => (j === idx ? { ...y, ingredientId: e.target.value, unit: byId.get(e.target.value)?.units.find((u) => u.isPurchase)?.unit ?? byId.get(e.target.value)?.baseUnit ?? '' } : y)))}>
+            <Select label="วัตถุดิบ" wrapClassName="min-w-44 flex-1" value={it.ingredientId} onChange={(e) => setItems(items.map((y, j) => (j === idx ? { ...y, ingredientId: e.target.value, unit: byId.get(e.target.value)?.units.find((u) => u.isPurchase)?.unit ?? byId.get(e.target.value)?.baseUnit ?? '' } : y)))}>
               <option value="">เลือก</option>
               {ingredients.map((i) => (
                 <option key={i.id} value={i.id}>
@@ -136,13 +137,13 @@ function SupplierDialog({ s, ingredients, onClose }: { s: Supplier | 'new'; ingr
                 </option>
               ))}
             </Select>
-            <Select aria-label="หน่วย" wrapClassName="w-24" value={it.unit} onChange={(e) => setItems(items.map((y, j) => (j === idx ? { ...y, unit: e.target.value } : y)))}>
+            <Select label="หน่วย" wrapClassName="w-24" value={it.unit} onChange={(e) => setItems(items.map((y, j) => (j === idx ? { ...y, unit: e.target.value } : y)))}>
               {unitsOf(byId.get(it.ingredientId)).map((u) => (
                 <option key={u}>{u}</option>
               ))}
             </Select>
-            <MoneyInput aria-label="ราคา" wrapClassName="w-28" value={it.price} onChange={(e) => setItems(items.map((y, j) => (j === idx ? { ...y, price: e.target.value } : y)))} />
-            <Input aria-label="Lead time (วัน)" type="number" min={0} wrapClassName="w-20" value={it.leadTimeDays} onChange={(e) => setItems(items.map((y, j) => (j === idx ? { ...y, leadTimeDays: Number(e.target.value) } : y)))} />
+            <MoneyInput label="ราคา" wrapClassName="w-28" value={it.price} onChange={(e) => setItems(items.map((y, j) => (j === idx ? { ...y, price: e.target.value } : y)))} />
+            <Input label="ระยะเวลาส่งของ (วัน)" type="number" min={0} wrapClassName="w-20" value={it.leadTimeDays} onChange={(e) => setItems(items.map((y, j) => (j === idx ? { ...y, leadTimeDays: Number(e.target.value) } : y)))} />
             <Checkbox className="pb-2" label="เจ้าหลัก" checked={it.isPreferred} onChange={(e) => setItems(items.map((y, j) => (j === idx ? { ...y, isPreferred: e.target.checked } : y)))} />
             <Button variant="ghost" aria-label="ลบ" icon={<Trash2 className="size-4" />} onClick={() => setItems(items.filter((_, j) => j !== idx))} />
           </div>
@@ -215,7 +216,7 @@ function PoEditor({ initial, suppliers, ingredients, onClose }: { initial?: PoDe
         {lines.map((l, idx) => (
           <div key={idx} className="flex flex-wrap items-end gap-2">
             <Select
-              aria-label="วัตถุดิบ"
+              label="วัตถุดิบ"
               wrapClassName="min-w-48 flex-1"
               value={l.ingredientId}
               onChange={(e) => {
@@ -231,13 +232,13 @@ function PoEditor({ initial, suppliers, ingredients, onClose }: { initial?: PoDe
                 </option>
               ))}
             </Select>
-            <Input aria-label="จำนวน" inputMode="decimal" wrapClassName="w-24" value={l.qty} onChange={(e) => setLines(lines.map((y, j) => (j === idx ? { ...y, qty: e.target.value } : y)))} />
-            <Select aria-label="หน่วย" wrapClassName="w-24" value={l.unit} onChange={(e) => setLines(lines.map((y, j) => (j === idx ? { ...y, unit: e.target.value } : y)))}>
+            <Input label="จำนวน" inputMode="decimal" wrapClassName="w-24" value={l.qty} onChange={(e) => setLines(lines.map((y, j) => (j === idx ? { ...y, qty: e.target.value } : y)))} />
+            <Select label="หน่วย" wrapClassName="w-24" value={l.unit} onChange={(e) => setLines(lines.map((y, j) => (j === idx ? { ...y, unit: e.target.value } : y)))}>
               {unitsOf(byId.get(l.ingredientId)).map((u) => (
                 <option key={u}>{u}</option>
               ))}
             </Select>
-            <MoneyInput aria-label="ราคาต่อหน่วย" wrapClassName="w-28" value={l.price} onChange={(e) => setLines(lines.map((y, j) => (j === idx ? { ...y, price: e.target.value } : y)))} />
+            <MoneyInput label="ราคาต่อหน่วย" wrapClassName="w-28" value={l.price} onChange={(e) => setLines(lines.map((y, j) => (j === idx ? { ...y, price: e.target.value } : y)))} />
             <Button variant="ghost" aria-label="ลบ" icon={<Trash2 className="size-4" />} onClick={() => setLines(lines.filter((_, j) => j !== idx))} />
           </div>
         ))}
@@ -637,7 +638,7 @@ function ReturnsTab() {
       <div className="flex flex-col gap-2">
         {lines.map((l, idx) => (
           <div key={idx} className="flex flex-wrap items-end gap-2">
-            <Select aria-label="วัตถุดิบ" wrapClassName="min-w-48 flex-1" value={l.ingredientId} onChange={(e) => setLines(lines.map((y, j) => (j === idx ? { ...y, ingredientId: e.target.value, unit: byId.get(e.target.value)?.baseUnit ?? '' } : y)))}>
+            <Select label="วัตถุดิบ" wrapClassName="min-w-48 flex-1" value={l.ingredientId} onChange={(e) => setLines(lines.map((y, j) => (j === idx ? { ...y, ingredientId: e.target.value, unit: byId.get(e.target.value)?.baseUnit ?? '' } : y)))}>
               <option value="">เลือก</option>
               {ings.data?.ingredients.map((i) => (
                 <option key={i.id} value={i.id}>
@@ -645,8 +646,8 @@ function ReturnsTab() {
                 </option>
               ))}
             </Select>
-            <Input aria-label="จำนวน" inputMode="decimal" wrapClassName="w-24" value={l.qty} onChange={(e) => setLines(lines.map((y, j) => (j === idx ? { ...y, qty: e.target.value } : y)))} />
-            <Select aria-label="หน่วย" wrapClassName="w-24" value={l.unit} onChange={(e) => setLines(lines.map((y, j) => (j === idx ? { ...y, unit: e.target.value } : y)))}>
+            <Input label="จำนวน" inputMode="decimal" wrapClassName="w-24" value={l.qty} onChange={(e) => setLines(lines.map((y, j) => (j === idx ? { ...y, qty: e.target.value } : y)))} />
+            <Select label="หน่วย" wrapClassName="w-24" value={l.unit} onChange={(e) => setLines(lines.map((y, j) => (j === idx ? { ...y, unit: e.target.value } : y)))}>
               {unitsOf(byId.get(l.ingredientId)).map((u) => (
                 <option key={u}>{u}</option>
               ))}
@@ -669,7 +670,7 @@ type Tab = 'orders' | 'suggestions' | 'suppliers' | 'returns' | 'payables';
 
 export function PurchasingPage() {
   const { can } = useAuth();
-  const [tab, setTab] = useState<Tab>('orders');
+  const [tab, setTab] = useTabParam<Tab>('orders');
   return (
     <>
       <PageHeader title="จัดซื้อ" crumbs={[{ label: 'หลังร้าน' }]} description="ใบขอซื้อ → อนุมัติเป็นใบสั่งซื้อ → รับของ (ตัวเดียวที่เพิ่มสต็อกและอัปเดตต้นทุน) → ตั้งหนี้/จ่ายเงิน" />

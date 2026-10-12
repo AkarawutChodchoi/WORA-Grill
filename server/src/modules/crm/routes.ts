@@ -6,7 +6,7 @@ import { orgSettingsSchema } from '@shared/settings';
 import { dateString, nonEmpty, reasonSchema, satang, uuid } from '@shared/validation';
 import { coupons, customers, loyaltyTransactions, orderItems, orders, organizations, payments, promotionRedemptions, promotions } from '../../db/schema';
 import { audit } from '../../lib/audit';
-import { requireAnyPerm, requireBranch, requirePerm, resolvePermissions } from '../../lib/auth';
+import { requireAnyPerm, requireAuth, requireBranch, requirePerm, resolvePermissions } from '../../lib/auth';
 import { badRequest, conflict, forbidden, isUniqueViolation, notFound, parse, unprocessable } from '../../lib/errors';
 import { getOrderDetail, lockOrder } from '../orders/service';
 import { assertNoMoney, openShiftFor, paidAmount, settleOrder } from '../payments/service';
@@ -352,6 +352,13 @@ export default async function crmRoutes(app: FastifyInstance) {
   });
 
   // ---------- Loyalty programme settings & jobs ----------
+  /** Tier code → display name, for showing member levels anywhere (POS, customer list). */
+  app.get('/loyalty/tiers', async (req) => {
+    const a = requireAuth(req);
+    const s = await orgSettings(db, a.orgId);
+    return { tiers: s.loyalty.tiers.map((t) => ({ code: t.code, name: t.name })) };
+  });
+
   app.get('/settings/org', async (req) => {
     const a = requireAnyPerm(req, 'settings.manage', 'promotion.manage', 'org.manage');
     const [o] = await db.select().from(organizations).where(eq(organizations.id, a.orgId));

@@ -36,7 +36,9 @@ export function ReceiptPage() {
   const { seller, order: o, isTaxInvoice, taxInvoice, cashier } = q.data;
   const full = params.get('doc') === 'tax' && taxInvoice;
   const items = o.items.filter((i) => i.status !== 'CANCELLED');
-  const title = full ? 'ใบกำกับภาษีเต็มรูป / ใบเสร็จรับเงิน' : isTaxInvoice ? 'ใบเสร็จรับเงิน/ใบกำกับภาษีอย่างย่อ' : 'ใบเสร็จรับเงิน';
+  const unpaid = !['PAID', 'CLOSED', 'VOIDED'].includes(o.status);
+  // An unpaid bill is a statement, never titled as a receipt.
+  const title = unpaid ? 'ใบแจ้งยอด' : full ? 'ใบกำกับภาษีเต็มรูป / ใบเสร็จรับเงิน' : isTaxInvoice ? 'ใบเสร็จรับเงิน/ใบกำกับภาษีอย่างย่อ' : 'ใบเสร็จรับเงิน';
   return (
     <div className="min-h-dvh bg-sunken py-6 print:bg-white print:py-0">
       <div className="no-print mx-auto mb-4 flex max-w-md justify-between gap-2 px-3">
@@ -106,7 +108,7 @@ export function ReceiptPage() {
         </div>
         {seller.footer && <p className="mt-3 text-center">{seller.footer}</p>}
         {o.status === 'VOIDED' && <p className="mt-2 text-center font-bold">*** VOID ***</p>}
-        {!['PAID', 'CLOSED'].includes(o.status) && o.status !== 'VOIDED' && <p className="mt-2 text-center font-bold">*** ใบแจ้งยอด (ยังไม่ชำระ) ***</p>}
+        {unpaid && <p className="mt-2 text-center font-bold">*** ใบแจ้งยอด (ยังไม่ชำระ) ***</p>}
       </article>
     </div>
   );

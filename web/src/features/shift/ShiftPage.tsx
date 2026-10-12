@@ -3,7 +3,7 @@ import { Printer } from 'lucide-react';
 import { useState } from 'react';
 import { toSatang } from '@shared/money';
 import { useApproval } from '../../components/ApprovalDialog';
-import { Badge, Button, DataTable, Dialog, EmptyState, Input, MoneyInput, PageHeader, Panel, QueryView, Select, Stat, Textarea, useToast } from '../../components/ui';
+import { Badge, Button, DataTable, Dialog, EmptyState, ErrorState, Input, LoadingBlock, MoneyInput, PageHeader, Panel, QueryView, Select, Stat, Textarea, useToast } from '../../components/ui';
 import { errorMessage, get, post } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
 import { fmtDateTime, formatBaht } from '../../lib/format';
@@ -35,7 +35,7 @@ export function ShiftReportView({ report, kind }: { report: ShiftReport; kind: '
   const R = ({ l, v, neg }: { l: string; v: number; neg?: boolean }) => (
     <div className="flex justify-between">
       <span>{l}</span>
-      <span className="num">{neg ? '-' : ''}{formatBaht(v)}</span>
+      <span className="num">{neg && v !== 0 ? '-' : ''}{formatBaht(v)}</span>
     </div>
   );
   return (
@@ -126,7 +126,7 @@ function CashDialog({ shiftId, onClose }: { shiftId: string; onClose: () => void
           <Button variant="ghost" onClick={onClose}>
             ยกเลิก
           </Button>
-          <Button loading={save.isPending} disabled={reason.trim().length < 3 || (type !== 'NO_SALE' && !amount)} onClick={() => approval.request((a) => save.mutate(a))}>
+          <Button loading={save.isPending} disabled={reason.trim().length < 3 || (type !== 'NO_SALE' && !amount)} onClick={() => approval.request((a) => save.mutateAsync(a))}>
             บันทึก
           </Button>
         </>
@@ -257,7 +257,7 @@ export function ShiftPage() {
               </form>
             </Panel>
           ) : (
-            <div className="grid gap-4 lg:grid-cols-[1fr_380px]">
+            <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_380px]">
               <div className="flex flex-col gap-4">
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                   <Stat label="ยอดขายกะนี้" value={formatBaht(d.report!.orders.totalSatang)} hint={`${d.report!.orders.count} บิล`} />
@@ -310,18 +310,26 @@ export function ShiftPage() {
           />
         )}
       </QueryView>
-      {viewing && viewReport.data && (
+      {viewing && (
         <Dialog
           open
           onClose={() => setViewing(null)}
-          title={viewReport.data.kind === 'X' ? 'สรุประหว่างกะ (X)' : 'สรุปปิดกะ (Z)'}
+          title={!viewReport.data ? 'สรุปกะ' : viewReport.data.kind === 'X' ? 'สรุประหว่างกะ (X)' : 'สรุปปิดกะ (Z)'}
           footer={
-            <Button icon={<Printer className="size-4" />} onClick={() => window.print()}>
-              พิมพ์
-            </Button>
+            viewReport.data && (
+              <Button icon={<Printer className="size-4" />} onClick={() => window.print()}>
+                พิมพ์
+              </Button>
+            )
           }
         >
-          <ShiftReportView report={viewReport.data.report} kind={viewReport.data.kind} />
+          {viewReport.data ? (
+            <ShiftReportView report={viewReport.data.report} kind={viewReport.data.kind} />
+          ) : viewReport.error ? (
+            <ErrorState error={viewReport.error} onRetry={() => viewReport.refetch()} />
+          ) : (
+            <LoadingBlock />
+          )}
         </Dialog>
       )}
     </>

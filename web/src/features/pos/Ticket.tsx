@@ -5,7 +5,7 @@ import { StatusBadge } from '../../components/ui';
 import { formatBaht } from '../../lib/format';
 import type { DraftLine, Order, OrderItem } from './types';
 
-const COURSE = ['', 'ของทานเล่น', 'จานหลัก', 'ของหวาน', 'รอบ 4', 'รอบ 5'];
+const COURSE = ['', 'เสิร์ฟก่อน (ทานเล่น/เครื่องดื่ม)', 'จานหลัก', 'ของหวาน', 'รอบ 4', 'รอบ 5'];
 
 function Mods({ mods }: { mods: { name: string; qty?: number; priceDeltaSatang: number }[] }) {
   if (mods.length === 0) return null;

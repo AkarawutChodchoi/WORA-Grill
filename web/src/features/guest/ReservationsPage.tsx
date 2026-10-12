@@ -223,7 +223,7 @@ export function ReservationsPage() {
           </>
         }
       />
-      <div className="grid gap-4 lg:grid-cols-[1fr_380px]">
+      <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_380px]">
         <Panel title="การจอง" actions={<Input aria-label="วันที่" type="date" value={date} onChange={(e) => setDate(e.target.value)} />}>
           <QueryView query={res} isEmpty={(d) => d.reservations.length === 0} empty={<EmptyState title="ไม่มีการจองวันนี้" />}>
             {(d) => (

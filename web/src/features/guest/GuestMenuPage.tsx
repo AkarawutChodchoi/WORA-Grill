@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { clsx } from 'clsx';
 import { AlertTriangle, Bell, GlassWater, Minus, Plus, Receipt, ShoppingBasket, Snowflake, X } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { unitPriceWithModifiers, validateModifiers } from '@shared/menu';
 import { formatBaht } from '@shared/money';
-import { Button, Dialog, ErrorState, LoadingBlock, useToast } from '../../components/ui';
-import { errorMessage, get, post } from '../../lib/api';
+import { Button, Dialog, LoadingBlock, useToast } from '../../components/ui';
+import { ApiError, errorMessage, get, post } from '../../lib/api';
 import type { MenuItem } from '../menu/types';
 import { ALLERGEN_I18N, localName, t, type Lang } from './i18n';
 
@@ -53,7 +53,26 @@ function GuestItemDialog({ item, lang, onClose, onAdd }: { item: MenuItem; lang:
     });
   };
   return (
-    <Dialog open onClose={onClose} title={localName(lang, item)} size="md">
+    <Dialog
+      open
+      onClose={onClose}
+      title={localName(lang, item)}
+      size="md"
+      footer={
+        <div className="flex w-full items-center gap-2">
+          <Button variant="outline" size="lg" aria-label="ลด / less" icon={<Minus className="size-5" />} onClick={() => setQty(Math.max(1, qty - 1))} />
+          <span className="num w-8 text-center text-xl font-semibold" aria-live="polite">
+            {qty}
+          </span>
+          <Button variant="outline" size="lg" aria-label="เพิ่ม / more" icon={<Plus className="size-5" />} onClick={() => setQty(Math.min(20, qty + 1))} />
+          <Button size="lg" className="min-w-0 flex-1 px-3" disabled={!v.ok} onClick={() => onAdd({ item, qty, mods, note })}>
+            <span className="truncate">
+              {L.add} · {formatBaht(unit * qty)}
+            </span>
+          </Button>
+        </div>
+      }
+    >
       {item.imageUrl && <img src={item.imageUrl} alt="" className="mb-3 h-48 w-full rounded-control object-cover" />}
       {(lang === 'en' ? item.descriptionEn : lang === 'zh' ? item.descriptionZh : null) || item.description ? (
         <p className="mb-3 text-sm text-ink-2">{(lang === 'en' ? item.descriptionEn : lang === 'zh' ? item.descriptionZh : null) || item.description}</p>
@@ -71,9 +90,9 @@ function GuestItemDialog({ item, lang, onClose, onAdd }: { item: MenuItem; lang:
           </legend>
           <div className="flex flex-wrap gap-2">
             {g.modifiers.map((m) => (
-              <button key={m.id} type="button" aria-pressed={!!mods[m.id]} onClick={() => toggle(g.id, m.id)} className={clsx('min-h-11 rounded-full border px-4', mods[m.id] ? 'border-basil bg-brand text-white' : 'border-line-strong')}>
+              <button key={m.id} type="button" aria-pressed={!!mods[m.id]} onClick={() => toggle(g.id, m.id)} className={clsx('min-h-11 rounded-full border px-4', mods[m.id] ? 'border-brand bg-brand text-white' : 'border-line-strong')}>
                 {localName(lang, m)}
-                {m.priceDeltaSatang !== 0 && ` +${formatBaht(m.priceDeltaSatang)}`}
+                {m.priceDeltaSatang !== 0 && ` ${m.priceDeltaSatang > 0 ? '+' : ''}${formatBaht(m.priceDeltaSatang)}`}
               </button>
             ))}
           </div>
@@ -81,17 +100,13 @@ function GuestItemDialog({ item, lang, onClose, onAdd }: { item: MenuItem; lang:
       ))}
       <label className="mb-3 block">
         <span className="text-sm text-ink-2">{L.note}</span>
-        <input value={note} maxLength={150} onChange={(e) => setNote(e.target.value)} className="mt-1 h-11 w-full rounded-control border border-line-strong px-3" />
+        <input value={note} maxLength={150} onChange={(e) => setNote(e.target.value)} className="mt-1 h-11 w-full rounded-control border border-line-strong px-3 text-base" />
       </label>
-      {!v.ok && <p className="mb-2 text-sm text-chili">{v.errors.join(' · ')}</p>}
-      <div className="flex items-center gap-3">
-        <Button variant="outline" size="lg" aria-label="ลด / less" icon={<Minus className="size-5" />} onClick={() => setQty(Math.max(1, qty - 1))} />
-        <span className="num w-8 text-center text-xl font-semibold">{qty}</span>
-        <Button variant="outline" size="lg" aria-label="เพิ่ม / more" icon={<Plus className="size-5" />} onClick={() => setQty(Math.min(20, qty + 1))} />
-        <Button size="lg" className="flex-1" disabled={!v.ok} onClick={() => onAdd({ item, qty, mods, note })}>
-          {L.add} · {formatBaht(unit * qty)}
-        </Button>
-      </div>
+      {!v.ok && (
+        <p className="mb-2 text-sm text-chili" role="alert">
+          {v.errors.join(' · ')}
+        </p>
+      )}
     </Dialog>
   );
 }
@@ -177,17 +192,39 @@ export function GuestMenuPage() {
     onError: (e) => toast.error(errorMessage(e)),
   });
 
-  const cartTotal = useMemo(
-    () =>
-      cart.reduce((a, c) => {
-        const v = validateModifiers(c.item.modifierGroups, Object.entries(c.mods).map(([modifierId, qty]) => ({ modifierId, qty })));
-        return a + (v.ok ? unitPriceWithModifiers(c.item.priceSatang, v.modifiers) : c.item.priceSatang) * c.qty;
-      }, 0),
-    [cart],
-  );
+  const lineTotal = (c: CartLine) => {
+    const v = validateModifiers(c.item.modifierGroups, Object.entries(c.mods).map(([modifierId, qty]) => ({ modifierId, qty })));
+    return (v.ok ? unitPriceWithModifiers(c.item.priceSatang, v.modifiers) : c.item.priceSatang) * c.qty;
+  };
+  const cartTotal = cart.reduce((a, c) => a + lineTotal(c), 0);
 
   if (q.isLoading) return <div className="p-4"><LoadingBlock /></div>;
-  if (q.error || !q.data) return <div className="p-4"><ErrorState error={q.error} /></div>;
+  if (q.error || !q.data) {
+    const gone = q.error instanceof ApiError && q.error.status === 404;
+    return (
+      <div className="min-h-dvh">
+        <header className="bg-char px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3">
+          <img src="/brand/logo-white.png" alt="WORA Grill" className="mx-auto h-16 w-auto" />
+        </header>
+        <main className="mx-auto flex max-w-md flex-col items-center gap-3 p-6 text-center" role="alert">
+          <AlertTriangle className="size-10 text-chili" aria-hidden />
+          {gone ? (
+            <>
+              <p className="text-lg font-medium">{t('th').expired}</p>
+              <p className="text-ink-2">{t('en').expired}</p>
+            </>
+          ) : (
+            <>
+              <p className="text-lg font-medium">{errorMessage(q.error)}</p>
+              <Button variant="outline" onClick={() => q.refetch()}>
+                {L.retry}
+              </Button>
+            </>
+          )}
+        </main>
+      </div>
+    );
+  }
   const d = q.data;
   if (!d.orderOpen) return <p className="p-8 text-center text-lg">{L.closed}</p>;
   const items = d.menu.items.filter((i) => cat === 'all' || i.categoryId === cat);
@@ -340,7 +377,7 @@ export function GuestMenuPage() {
           ) : (
             <ul className="flex flex-col gap-2">
               {cart.map((c) => (
-                <li key={c.id} className="flex items-center gap-2">
+                <li key={c.id} className="flex items-start gap-2 border-b border-line pb-2 last:border-0">
                   <span className="flex items-center gap-1">
                     <button type="button" aria-label="ลด / less" className="flex size-11 items-center justify-center rounded-control border border-line-strong" onClick={() => setCart(c.qty <= 1 ? cart.filter((x) => x.id !== c.id) : cart.map((x) => (x.id === c.id ? { ...x, qty: x.qty - 1 } : x)))}>
                       <Minus className="size-4" />
@@ -352,8 +389,18 @@ export function GuestMenuPage() {
                   </span>
                   <span className="min-w-0 flex-1">
                     {localName(lang, c.item)}
-                    {c.note && <span className="block text-xs text-ink-3">{c.note}</span>}
+                    {Object.keys(c.mods).length > 0 && (
+                      <span className="block text-sm text-ink-3">
+                        {c.item.modifierGroups
+                          .flatMap((g) => g.modifiers)
+                          .filter((m) => c.mods[m.id])
+                          .map((m) => localName(lang, m))
+                          .join(', ')}
+                      </span>
+                    )}
+                    {c.note && <span className="block text-sm text-ink-3">“{c.note}”</span>}
                   </span>
+                  <span className="num shrink-0 font-medium">{formatBaht(lineTotal(c))}</span>
                   <button type="button" aria-label="ลบ / remove" className="flex size-11 items-center justify-center rounded-control hover:bg-sunken" onClick={() => setCart(cart.filter((x) => x.id !== c.id))}>
                     <X className="size-4" />
                   </button>

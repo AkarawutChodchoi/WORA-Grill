@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useApproval } from '../../components/ApprovalDialog';
 import { Badge, Button, Checkbox, DataTable, Dialog, EmptyState, Input, MoneyInput, PageHeader, Panel, QueryView, Select, Tabs, Textarea, useToast } from '../../components/ui';
 import { errorMessage, get, post, put, qs } from '../../lib/api';
+import { useTabParam } from '../../lib/useTabParam';
 import { useAuth } from '../../lib/auth';
 import { fmtDate, fmtDateTime, formatBaht, todayISO } from '../../lib/format';
 import { toSatang } from '@shared/money';
@@ -107,9 +108,9 @@ function IngredientDialog({ ing, onClose }: { ing: Ingredient | 'new'; onClose: 
         {units.map((u, idx) => (
           <div key={idx} className="flex flex-wrap items-end gap-2">
             <span className="pb-2.5">1</span>
-            <Input aria-label="หน่วย" placeholder="kg / ลัง / แผง" wrapClassName="w-28" value={u.unit} onChange={(e) => setUnits(units.map((x, j) => (j === idx ? { ...x, unit: e.target.value } : x)))} />
+            <Input label="หน่วย" placeholder="kg / ลัง / แผง" wrapClassName="w-28" value={u.unit} onChange={(e) => setUnits(units.map((x, j) => (j === idx ? { ...x, unit: e.target.value } : x)))} />
             <span className="pb-2.5">=</span>
-            <Input aria-label="ตัวคูณ" inputMode="decimal" wrapClassName="w-28" value={u.factor} onChange={(e) => setUnits(units.map((x, j) => (j === idx ? { ...x, factor: e.target.value } : x)))} />
+            <Input label="ตัวคูณ" inputMode="decimal" wrapClassName="w-28" value={u.factor} onChange={(e) => setUnits(units.map((x, j) => (j === idx ? { ...x, factor: e.target.value } : x)))} />
             <span className="pb-2.5">{f.baseUnit}</span>
             <Checkbox className="pb-2" label="หน่วยซื้อ" checked={u.isPurchase} onChange={(e) => setUnits(units.map((x, j) => (j === idx ? { ...x, isPurchase: e.target.checked } : x)))} />
             <Checkbox className="pb-2" label="หน่วยใช้" checked={u.isUsage} onChange={(e) => setUnits(units.map((x, j) => (j === idx ? { ...x, isUsage: e.target.checked } : x)))} />
@@ -201,7 +202,7 @@ export function LinesEditor({ lines, setLines, ingredients, withCost, baseUnitOn
         return (
           <div key={idx} className="flex flex-wrap items-end gap-2 rounded-control border border-line p-2">
             <Select
-              aria-label="วัตถุดิบ"
+              label="วัตถุดิบ"
               wrapClassName="min-w-48 flex-1"
               value={l.ingredientId}
               onChange={(e) => {
@@ -217,7 +218,7 @@ export function LinesEditor({ lines, setLines, ingredients, withCost, baseUnitOn
               ))}
             </Select>
             <Input
-              aria-label={baseUnitOnly ? 'ยอดคงเหลือจริง' : 'จำนวน'}
+              label={baseUnitOnly ? 'ยอดคงเหลือจริง' : 'จำนวน'}
               placeholder={baseUnitOnly ? 'ยอดจริง' : 'จำนวน'}
               inputMode="decimal"
               wrapClassName="w-24"
@@ -225,9 +226,9 @@ export function LinesEditor({ lines, setLines, ingredients, withCost, baseUnitOn
               onChange={(e) => set(idx, { qty: e.target.value })}
             />
             {baseUnitOnly ? (
-              <span className="flex h-10 items-center text-sm text-ink-2">{ing?.baseUnit ?? ''}</span>
+              <span className="flex h-10 items-center text-sm text-ink-2 pointer-coarse:h-11">{ing?.baseUnit ?? ''}</span>
             ) : (
-              <Select aria-label="หน่วย" wrapClassName="w-28" value={l.unit} onChange={(e) => set(idx, { unit: e.target.value })}>
+              <Select label="หน่วย" wrapClassName="w-28" value={l.unit} onChange={(e) => set(idx, { unit: e.target.value })}>
                 {unitOpts.map((u) => (
                   <option key={u} value={u}>
                     {u}
@@ -237,11 +238,11 @@ export function LinesEditor({ lines, setLines, ingredients, withCost, baseUnitOn
             )}
             {withCost && (
               <>
-                <MoneyInput aria-label="ราคาต่อหน่วย" placeholder="ราคา/หน่วย" wrapClassName="w-28" value={l.cost ?? ''} onChange={(e) => set(idx, { cost: e.target.value })} />
+                <MoneyInput label="ราคาต่อหน่วย" placeholder="ราคา/หน่วย" wrapClassName="w-28" value={l.cost ?? ''} onChange={(e) => set(idx, { cost: e.target.value })} />
                 {ing?.trackExpiry && (
                   <>
-                    <Input aria-label="เลขล็อต" placeholder="ล็อต" wrapClassName="w-24" value={l.lotNo ?? ''} onChange={(e) => set(idx, { lotNo: e.target.value })} />
-                    <Input aria-label="วันหมดอายุ" type="date" wrapClassName="w-40" value={l.expiryDate ?? ''} onChange={(e) => set(idx, { expiryDate: e.target.value })} />
+                    <Input label="เลขล็อต" placeholder="ล็อต" wrapClassName="w-24" value={l.lotNo ?? ''} onChange={(e) => set(idx, { lotNo: e.target.value })} />
+                    <Input label="วันหมดอายุ" type="date" wrapClassName="w-40" value={l.expiryDate ?? ''} onChange={(e) => set(idx, { expiryDate: e.target.value })} />
                   </>
                 )}
               </>
@@ -311,7 +312,7 @@ function StockOpsTab() {
             className="mt-3"
             loading={submit.isPending}
             disabled={kind !== 'receive' && reason.trim().length < 3}
-            onClick={() => (kind === 'adjust' ? adjustApproval.request((a) => submit.mutate(a)) : submit.mutate(null))}
+            onClick={() => (kind === 'adjust' ? adjustApproval.request((a) => submit.mutateAsync(a)) : submit.mutate(null))}
           >
             บันทึก{kinds.find((k) => k.value === kind)?.label}
           </Button>
@@ -367,8 +368,8 @@ function RecipesTab() {
   const produce = useInvMutation(() => post('/inventory/produce', { outputIngredientId: target.slice(2), batches: produceQty[0] }), 'บันทึกการผลิตแล้ว');
   const cost = target.startsWith('m:') ? costs.data?.items.find((c) => c.menuItemId === target.slice(2)) : undefined;
   return (
-    <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-      <Panel title="สูตรอาหาร (BOM)">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <Panel title="สูตรอาหาร (วัตถุดิบต่อ 1 จาน)">
         <Select label="เลือกเมนู / ตัวเลือก / วัตถุดิบกึ่งสำเร็จ" value={target} onChange={(e) => load(e.target.value)} wrapClassName="mb-4">
           <option value="">— เลือก —</option>
           {targets.map((t) => (
@@ -408,7 +409,7 @@ function RecipesTab() {
                   <dd className="num">{formatBaht(cost.costSatang)}</dd>
                 </div>
                 <div className="flex justify-between font-semibold">
-                  <dt>Food cost</dt>
+                  <dt>ต้นทุนวัตถุดิบ %</dt>
                   <dd className={cost.foodCostPct! > 40 ? 'text-chili' : 'text-basil-600'}>{cost.foodCostPct}%</dd>
                 </div>
               </dl>
@@ -453,7 +454,7 @@ function CountsTab() {
     'ปรับยอดตามการนับแล้ว',
   );
   return (
-    <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
+    <div className="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
       <Panel
         title="ใบนับสต็อก"
         actions={
@@ -522,7 +523,7 @@ function CountsTab() {
                   <Button variant="outline" loading={saveCounts.isPending} onClick={() => saveCounts.mutate(undefined)}>
                     บันทึกร่าง
                   </Button>
-                  <Button loading={postCount.isPending} onClick={() => approval.request((a) => postCount.mutate(a))}>
+                  <Button loading={postCount.isPending} onClick={() => approval.request((a) => postCount.mutateAsync(a))}>
                     ยืนยันและปรับยอด
                   </Button>
                 </div>
@@ -535,6 +536,18 @@ function CountsTab() {
     </div>
   );
 }
+
+const REF_LABEL: Record<string, string> = {
+  order_item: 'ขายในบิล',
+  receive: 'รับเข้า',
+  goods_receipt: 'รับของตามใบสั่งซื้อ',
+  adjust: 'ปรับยอด',
+  stock_count: 'นับสต็อก',
+  transfer: 'โอนระหว่างสาขา',
+  stock_transfer: 'โอนระหว่างสาขา',
+  supplier_return: 'คืนซัพพลายเออร์',
+  production: 'ผลิต/เตรียมของ',
+};
 
 const MOVE_LABEL: Record<string, string> = {
   PURCHASE: 'รับเข้า',
@@ -592,7 +605,7 @@ function MovementsTab() {
               { key: 'q', header: 'จำนวน', align: 'right', cell: (r) => fmtQty(r.qty, r.baseUnit) },
               { key: 'bal', header: 'คงเหลือ', align: 'right', cell: (r) => fmtQty(r.balanceAfter, r.baseUnit) },
               { key: 'v', header: 'มูลค่า', align: 'right', cell: (r) => (r.value == null ? '—' : formatBaht(Math.round(Number(r.value)))) },
-              { key: 'r', header: 'อ้างอิง/เหตุผล', cell: (r) => <span className="text-xs text-ink-2">{r.reason ?? r.refType}</span> },
+              { key: 'r', header: 'อ้างอิง/เหตุผล', cell: (r) => <span className="text-xs text-ink-2">{r.reason ?? REF_LABEL[r.refType] ?? r.refType}</span> },
               { key: 'by', header: 'โดย', cell: (r) => r.by ?? '—' },
             ]}
           />
@@ -652,7 +665,7 @@ type Tab = 'ingredients' | 'ops' | 'recipes' | 'counts' | 'movements' | 'alerts'
 
 export function InventoryPage() {
   const { can } = useAuth();
-  const [tab, setTab] = useState<Tab>('ingredients');
+  const [tab, setTab] = useTabParam<Tab>('ingredients');
   const items: { value: Tab; label: string }[] = [
     { value: 'ingredients', label: 'วัตถุดิบ' },
     { value: 'ops', label: 'รับ/เบิก/ของเสีย' },
@@ -664,7 +677,7 @@ export function InventoryPage() {
   ];
   return (
     <>
-      <PageHeader title="สต็อกวัตถุดิบ" crumbs={[{ label: 'หลังร้าน' }]} description="ยอดคงเหลือคำนวณจากบัญชีความเคลื่อนไหว (ledger) · ต้นทุนแบบถัวเฉลี่ยถ่วงน้ำหนัก · ตัดสต็อกเมื่อส่งรายการเข้าครัว" />
+      <PageHeader title="สต็อกวัตถุดิบ" crumbs={[{ label: 'หลังร้าน' }]} description="ยอดคงเหลือคำนวณจากประวัติรับเข้า-เบิกออกทุกรายการ ต้นทุนเป็นค่าเฉลี่ย และตัดสต็อกอัตโนมัติเมื่อส่งรายการเข้าครัว" />
       <Tabs value={tab} onChange={setTab} items={items} />
       {tab === 'ingredients' && <IngredientsTab />}
       {tab === 'ops' && <StockOpsTab />}

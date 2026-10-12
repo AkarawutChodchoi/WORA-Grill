@@ -6,6 +6,7 @@ import { ALLERGENS, MENU_TAGS } from '@shared/menu';
 import { toSatang } from '@shared/money';
 import { Badge, Button, Checkbox, DataTable, Dialog, EmptyState, Input, MoneyInput, PageHeader, Panel, QueryView, Tabs, useToast } from '../../components/ui';
 import { errorMessage, get, patch, post, put } from '../../lib/api';
+import { useTabParam } from '../../lib/useTabParam';
 import { useAuth } from '../../lib/auth';
 import { formatBaht } from '../../lib/format';
 import { ItemDialog } from './ItemDialog';
@@ -118,6 +119,7 @@ function ItemsTab({ menu, stations }: { menu: AdminMenu; stations: Station[] }) 
           <EmptyState title="ไม่พบเมนู" />
         ) : (
           <DataTable
+            stackBelow="xl"
             rows={rows}
             rowKey={(r) => r.id}
             columns={[
@@ -506,7 +508,7 @@ function StationsTab({ stations }: { stations: Station[] }) {
 
 export function MenuPage() {
   const { can } = useAuth();
-  const [tab, setTab] = useState<Tab>('items');
+  const [tab, setTab] = useTabParam<Tab>('items');
   const menu = useAdminMenu();
   const stations = useStations();
   const manage = can('menu.manage');

@@ -3,6 +3,7 @@ import { Download, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { Badge, StatusBadge, Button, Checkbox, ConfirmDialog, DataTable, Dialog, EmptyState, Input, PageHeader, Panel, QueryView, Textarea, useToast } from '../../components/ui';
 import { errorMessage, get, patch, post } from '../../lib/api';
+import { useTierName } from '../../lib/tiers';
 import { useAuth } from '../../lib/auth';
 import { fmtDate, fmtDateTime, formatBaht } from '../../lib/format';
 
@@ -73,6 +74,7 @@ export function CustomerForm({ initial, onSaved, onCancel }: { initial?: Partial
 const LOYALTY_LABEL: Record<string, string> = { EARN: 'ได้รับ', REDEEM: 'ใช้แต้ม', ADJUST: 'ปรับ', EXPIRE: 'หมดอายุ', REVERSE: 'คืน/ยกเลิก' };
 
 function CustomerDrawer({ id, onClose }: { id: string; onClose: () => void }) {
+  const tierName = useTierName();
   const { can } = useAuth();
   const qc = useQueryClient();
   const toast = useToast();
@@ -144,7 +146,7 @@ function CustomerDrawer({ id, onClose }: { id: string; onClose: () => void }) {
                   <dt className="text-ink-2">แพ้อาหาร</dt>
                   <dd className={d.customer.allergies ? 'font-medium text-chili' : ''}>{d.customer.allergies ?? '—'}</dd>
                   <dt className="text-ink-2">ระดับ</dt>
-                  <dd>{d.customer.tier ?? '—'}</dd>
+                  <dd>{tierName(d.customer.tier) ?? '—'}</dd>
                   <dt className="text-ink-2">แต้มคงเหลือ</dt>
                   <dd className="num font-semibold">{d.customer.pointsBalance.toLocaleString()}</dd>
                   <dt className="text-ink-2">ยอดซื้อสะสม</dt>
@@ -232,6 +234,7 @@ function CustomerDrawer({ id, onClose }: { id: string; onClose: () => void }) {
 }
 
 export function CustomersPage() {
+  const tierName = useTierName();
   const { can } = useAuth();
   const qc = useQueryClient();
   const [q, setQ] = useState('');
@@ -263,7 +266,7 @@ export function CustomersPage() {
             columns={[
               { key: 'n', header: 'ชื่อ', cell: (r) => <span className="font-medium">{r.name}</span> },
               { key: 'p', header: 'โทร', cell: (r) => r.phone ?? '—' },
-              { key: 't', header: 'ระดับ', cell: (r) => (r.tier ? <Badge tone="info">{r.tier}</Badge> : '—') },
+              { key: 't', header: 'ระดับ', cell: (r) => (r.tier ? <Badge tone="info">{tierName(r.tier)}</Badge> : '—') },
               { key: 'pt', header: 'แต้ม', align: 'right', cell: (r) => r.pointsBalance.toLocaleString() },
               { key: 'v', header: 'มาแล้ว', align: 'right', cell: (r) => `${r.visitCount} ครั้ง` },
               { key: 'l', header: 'มาล่าสุด', cell: (r) => fmtDate(r.lastVisitAt) },

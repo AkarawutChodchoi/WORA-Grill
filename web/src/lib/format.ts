@@ -16,6 +16,11 @@ export function fmtElapsed(from: string | Date, now = Date.now()): string {
   const m = elapsedMinutes(from, now);
   return m < 60 ? `${m} นาที` : `${Math.floor(m / 60)} ชม. ${m % 60} น.`;
 }
+/** Compact elapsed time for small tiles: "25น." or "7:25ชม.". */
+export function fmtElapsedShort(from: string | Date, now = Date.now()): string {
+  const m = elapsedMinutes(from, now);
+  return m < 60 ? `${m}น.` : `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}ชม.`;
+}
 /** Today's date (YYYY-MM-DD) in Bangkok. */
 export function todayISO(): string {
   return new Date().toLocaleDateString('en-CA', { timeZone: tz });

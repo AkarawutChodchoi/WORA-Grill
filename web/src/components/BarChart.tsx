@@ -17,16 +17,18 @@ export function BarChart({ data, format, height = 200, title, emptyText = 'ไ�
   const max = Math.max(0, ...data.map((d) => d.value));
   if (data.length === 0 || max === 0) return <p className="py-6 text-center text-sm text-ink-3">{emptyText}</p>;
   const W = 640;
-  const pad = { l: 8, r: 8, t: 12, b: 24 };
+  const pad = { l: 8, r: 8, t: 12, b: 4 };
   const innerH = height - pad.t - pad.b;
   const step = (W - pad.l - pad.r) / data.length;
   const bw = Math.max(4, Math.min(28, step * 0.6));
   const y = (v: number) => pad.t + innerH - (v / max) * innerH;
+  // Axis labels are HTML (not SVG text) so they stay ≥12px on phones; fewer labels fit on narrow screens.
   const labelEvery = Math.ceil(data.length / 12);
+  const labelEveryNarrow = Math.ceil(data.length / 6);
   return (
     <figure className="relative">
       <div className="mb-1 flex justify-end">
-        <button type="button" className="text-xs text-sky hover:underline" onClick={() => setTable(!table)} aria-pressed={table}>
+        <button type="button" className="min-h-9 px-1 text-sm text-sky hover:underline pointer-coarse:min-h-11" onClick={() => setTable(!table)} aria-pressed={table}>
           {table ? 'ดูกราฟ' : 'ดูเป็นตาราง'}
         </button>
       </div>
@@ -78,15 +80,25 @@ export function BarChart({ data, format, height = 200, title, emptyText = 'ไ�
                     pointerEvents="none"
                   />
                 )}
-                {i % labelEvery === 0 && (
-                  <text x={cx} y={height - 6} textAnchor="middle" fontSize="11" fill="var(--color-ink-3)">
-                    {d.label}
-                  </text>
-                )}
               </g>
             );
           })}
         </svg>
+      )}
+      {!table && (
+        <div className="relative h-5 text-xs text-ink-3" aria-hidden>
+          {data.map((d, i) =>
+            i % labelEvery === 0 ? (
+              <span
+                key={d.key}
+                className={i % labelEveryNarrow === 0 ? 'absolute -translate-x-1/2 whitespace-nowrap' : 'absolute hidden -translate-x-1/2 whitespace-nowrap sm:inline'}
+                style={{ left: `${((pad.l + step * i + step / 2) / W) * 100}%` }}
+              >
+                {d.label}
+              </span>
+            ) : null,
+          )}
+        </div>
       )}
       {!table && hover !== null && (
         <div

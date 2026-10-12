@@ -123,7 +123,7 @@ function ServerLineDialog({ order, item, onClose }: { order: Order; item: OrderI
                   variant="danger"
                   disabled={reason.trim().length < 3}
                   loading={act.isPending}
-                  onClick={() => cancelApproval.request((approval) => act.mutate(() => post<Order>(`/order-items/${item.id}/cancel`, { reason, approval })))}
+                  onClick={() => cancelApproval.request((approval) => act.mutateAsync(() => post<Order>(`/order-items/${item.id}/cancel`, { reason, approval })))}
                 >
                   ยกเลิกรายการ
                 </Button>
@@ -260,7 +260,7 @@ function MoreDialog({ order, onClose }: { order: Order; onClose: () => void }) {
         onClose={() => setVoidOpen(false)}
         onConfirm={(reason) =>
           voidApproval.request((approval) =>
-            act.mutate(async () => {
+            act.mutateAsync(async () => {
               const o = await post<Order>(`/orders/${order.id}/void`, { reason, approval });
               setVoidOpen(false);
               onClose();
@@ -496,7 +496,7 @@ export function OrderScreen() {
             className="h-10 w-full rounded-control border border-line-strong bg-surface pr-3 pl-9"
           />
         </div>
-        <LiveIndicator />
+        <LiveIndicator compact />
         <OfflineIndicator />
         <span className="hidden text-sm text-ink-2 md:inline">{me?.user.name}</span>
         {o.items.some((i) => ['SENT', 'PREPARING'].includes(i.status)) && (
@@ -567,9 +567,9 @@ export function OrderScreen() {
       </div>
       {showTicket && (
         <div className="fixed inset-0 z-40 flex flex-col bg-surface lg:hidden" role="dialog" aria-modal="true" aria-label="บิล">
-          <div className="flex justify-end border-b border-line p-2">
-            <Button variant="ghost" onClick={() => setShowTicket(false)}>
-              ปิด
+          <div className="flex border-b border-line p-2 pt-[max(0.5rem,env(safe-area-inset-top))]">
+            <Button variant="ghost" icon={<ArrowLeft className="size-5" />} onClick={() => setShowTicket(false)}>
+              กลับไปเลือกเมนู
             </Button>
           </div>
           <div className="min-h-0 flex-1">{ticket}</div>

@@ -1,8 +1,9 @@
 import { clsx } from 'clsx';
 import { forwardRef, useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
 
+/** 16px text so iOS doesn't zoom on focus; solid ink focus outline (≥3:1) per WCAG 2.2 focus visibility. */
 const control =
-  'w-full rounded-control border border-line-strong bg-surface px-3 text-ink placeholder:text-ink-3 focus:border-sky focus:outline-none focus:ring-2 focus:ring-sky/25 disabled:bg-sunken disabled:text-ink-3 aria-[invalid=true]:border-chili';
+  'w-full rounded-control border border-line-strong bg-surface px-3 text-base text-ink placeholder:text-ink-3 focus:border-ink focus:outline-2 focus:outline-offset-1 focus:outline-ink disabled:bg-sunken disabled:text-ink-3 aria-[invalid=true]:border-chili aria-[invalid=true]:border-2';
 
 interface A11yProps {
   id: string;
@@ -52,7 +53,7 @@ export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputE
 ) {
   return (
     <Field label={label} hint={hint} error={error} className={wrapClassName} required={required}>
-      {(a) => <input ref={ref} {...a} {...rest} required={required} className={clsx(control, 'h-10', className)} />}
+      {(a) => <input ref={ref} {...a} {...rest} required={required} className={clsx(control, 'h-10 pointer-coarse:h-11', className)} />}
     </Field>
   );
 });
@@ -61,7 +62,7 @@ export function Select({ label, hint, error, wrapClassName, className, children,
   return (
     <Field label={label} hint={hint} error={error} className={wrapClassName} required={required}>
       {(a) => (
-        <select {...a} {...rest} required={required} className={clsx(control, 'h-10 pr-8', className)}>
+        <select {...a} {...rest} required={required} className={clsx(control, 'h-10 pr-8 pointer-coarse:h-11', className)}>
           {children}
         </select>
       )}

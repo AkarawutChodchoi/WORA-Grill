@@ -4,7 +4,7 @@ import { AlertTriangle, ArrowLeft, Ban, History, Lock, Printer, Sigma, Undo2 } f
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { ALLERGENS } from '@shared/menu';
-import { Dialog, useToast } from '../../components/ui';
+import { Dialog, LoadingBlock, useToast } from '../../components/ui';
 import { errorMessage, get, post } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
 import { LiveIndicator, useLivePolling, useRealtimeEvent } from '../../lib/realtime';
@@ -44,9 +44,12 @@ function useClock(ms = 1000) {
   return now;
 }
 
-function mmss(ms: number) {
+/** Ticket age as m:ss, or h:mm:ss once it passes an hour (so "402:09" reads as 6:42:09). */
+export function mmss(ms: number) {
   const s = Math.max(0, Math.floor(ms / 1000));
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  const two = (n: number) => String(n).padStart(2, '0');
+  if (s >= 3600) return `${Math.floor(s / 3600)}:${two(Math.floor((s % 3600) / 60))}:${two(s % 60)}`;
+  return `${Math.floor(s / 60)}:${two(s % 60)}`;
 }
 
 /** Short beep for new tickets (WebAudio; browsers allow it after the first tap on the page). */
@@ -82,7 +85,7 @@ function SoldOutDialog({ onClose }: { onClose: () => void }) {
   const items = (menu.data?.items ?? []).filter((i) => !q || i.name.includes(q));
   return (
     <Dialog open onClose={onClose} title="แจ้งเมนูหมด" size="lg">
-      <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="ค้นหาเมนู" aria-label="ค้นหาเมนู" className="mb-3 h-11 w-full rounded-control border border-line-strong px-3" />
+      <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="ค้นหาเมนู" aria-label="ค้นหาเมนู" className="mb-3 h-11 w-full rounded-control border border-line-strong px-3 text-base" />
       <ul className="grid gap-2 sm:grid-cols-2">
         {items.map((i) => (
           <li key={i.id}>
@@ -97,6 +100,8 @@ function SoldOutDialog({ onClose }: { onClose: () => void }) {
           </li>
         ))}
       </ul>
+      {menu.isLoading && <LoadingBlock rows={3} />}
+      {menu.data && items.length === 0 && <p className="py-6 text-center text-ink-3">{q ? `ไม่พบเมนู "${q}"` : 'ยังไม่มีเมนู'}</p>}
     </Dialog>
   );
 }
@@ -108,10 +113,10 @@ function TicketCard({ t, now, thresholds, onBump, busy, expo }: { t: Ticket; now
   const ready = t.items.filter((i) => i.status === 'READY');
   return (
     <article
-      className={clsx('flex break-inside-avoid flex-col overflow-hidden rounded-panel border-2 bg-[#1F1F1F] text-[#F2F2F2]', tone === 'late' ? 'border-chili' : tone === 'warn' ? 'border-turmeric' : 'border-[#333333]')}
+      className={clsx('flex break-inside-avoid flex-col overflow-hidden rounded-panel border-2 bg-kds-card text-white', tone === 'late' ? 'border-chili' : tone === 'warn' ? 'border-turmeric' : 'border-kds-line')}
       aria-label={`บิล ${t.orderNo}`}
     >
-      <header className={clsx('flex items-center justify-between gap-2 px-3 py-2', tone === 'late' ? 'bg-chili text-white' : tone === 'warn' ? 'bg-turmeric text-black' : 'bg-[#2B2B2B]')}>
+      <header className={clsx('flex items-center justify-between gap-2 px-3 py-2', tone === 'late' ? 'bg-chili text-white' : tone === 'warn' ? 'bg-turmeric text-black' : 'bg-kds-raised')}>
         <div className="min-w-0">
           <div className="text-xl leading-tight font-bold">{t.tableName ? `โต๊ะ ${t.tableName}` : (CHANNEL_LABEL[t.channel] ?? t.channel)}</div>
           <div className="text-sm opacity-90">
@@ -122,8 +127,8 @@ function TicketCard({ t, now, thresholds, onBump, busy, expo }: { t: Ticket; now
           {mmss(now - new Date(t.firstSentAt).getTime())}
         </div>
       </header>
-      {t.orderNote && <p className="bg-[#3A3420] px-3 py-1 text-sm text-[#FFE08A]">{t.orderNote}</p>}
-      <ul className="flex flex-col divide-y divide-[#333333]">
+      {t.orderNote && <p className="bg-kds-note-bg px-3 py-1 text-sm text-kds-note">{t.orderNote}</p>}
+      <ul className="flex flex-col divide-y divide-kds-line">
         {t.items.map((i) => {
           const next = expo ? (i.status === 'READY' ? 'SERVED' : NEXT[i.status]) : i.status === 'READY' ? null : NEXT[i.status];
           return (
@@ -138,17 +143,17 @@ function TicketCard({ t, now, thresholds, onBump, busy, expo }: { t: Ticket; now
                 <span className="num w-9 shrink-0 text-2xl font-bold">{i.qty}</span>
                 <span className="min-w-0 flex-1">
                   <span className="text-lg leading-snug font-semibold">{i.nameSnapshot}</span>
-                  {i.course > 1 && <span className="ml-2 rounded bg-[#333333] px-1.5 text-xs">รอบ {i.course}</span>}
+                  {i.course > 1 && <span className="ml-2 rounded bg-kds-line px-1.5 text-xs">รอบ {i.course}</span>}
                   {i.modifiers.map((m, k) => (
-                    <span key={k} className="block text-base text-[#C2C2C2]">
+                    <span key={k} className="block text-base text-kds-muted">
                       + {m.name}
                       {m.qty > 1 && ` ×${m.qty}`}
                     </span>
                   ))}
-                  {i.comboComponents.length > 0 && <span className="block text-sm text-[#C2C2C2]">ชุด: {i.comboComponents.map((c) => `${c.name}${c.qty > 1 ? ` ×${c.qty}` : ''}`).join(', ')}</span>}
-                  {i.note && <span className="mt-0.5 block rounded bg-[#FFE08A] px-1.5 text-base font-semibold text-black">⚑ {i.note}</span>}
+                  {i.comboComponents.length > 0 && <span className="block text-sm text-kds-muted">ชุด: {i.comboComponents.map((c) => `${c.name}${c.qty > 1 ? ` ×${c.qty}` : ''}`).join(', ')}</span>}
+                  {i.note && <span className="mt-0.5 block rounded bg-kds-note px-1.5 text-base font-semibold text-black">⚑ {i.note}</span>}
                   {i.allergens.length > 0 && (
-                    <span className="mt-0.5 flex items-center gap-1 text-sm font-bold text-[#FF8A80]">
+                    <span className="mt-0.5 flex items-center gap-1 text-sm font-bold text-kds-alert">
                       <AlertTriangle className="size-4" /> แพ้: {i.allergens.map((a) => ALLERGENS[a] ?? a).join(', ')}
                     </span>
                   )}
@@ -156,7 +161,7 @@ function TicketCard({ t, now, thresholds, onBump, busy, expo }: { t: Ticket; now
                 <span className="shrink-0 self-center text-sm font-semibold uppercase">{i.status === 'SENT' ? 'ใหม่' : i.status === 'PREPARING' ? 'กำลังทำ' : 'เสร็จ'}</span>
               </button>
               {PREV[i.status] && (
-                <button type="button" aria-label="ย้อนสถานะ" disabled={busy} onClick={() => onBump([i.id], PREV[i.status]!)} className="px-2 text-[#A3A3A3] hover:text-white">
+                <button type="button" aria-label="ย้อนสถานะ" disabled={busy} onClick={() => onBump([i.id], PREV[i.status]!)} className="px-2 text-kds-dim hover:text-white">
                   <Undo2 className="size-5" />
                 </button>
               )}
@@ -175,7 +180,7 @@ function TicketCard({ t, now, thresholds, onBump, busy, expo }: { t: Ticket; now
             เสิร์ฟแล้ว ({ready.length})
           </button>
         )}
-        <Link to={`/kitchen-ticket/${t.orderId}?itemIds=${t.items.map((i) => i.id).join(',')}`} className="flex min-h-12 items-center rounded-control bg-[#333333] px-3" aria-label="พิมพ์ใบสั่งครัว">
+        <Link to={`/kitchen-ticket/${t.orderId}?itemIds=${t.items.map((i) => i.id).join(',')}`} className="flex min-h-12 items-center rounded-control bg-kds-line px-3" aria-label="พิมพ์ใบสั่งครัว">
           <Printer className="size-5" />
         </Link>
       </footer>
@@ -240,14 +245,14 @@ export function KdsPage() {
 
   return (
     <div className="kds flex min-h-dvh flex-col">
-      <header className="flex flex-wrap items-center gap-2 border-b border-[#333333] px-3 py-2">
-        <button type="button" onClick={() => nav('/')} className="flex size-11 items-center justify-center rounded hover:bg-[#2B2B2B]" aria-label="ออกจากจอครัว">
+      <header className="flex flex-wrap items-center gap-2 border-b border-kds-line px-3 py-2">
+        <button type="button" onClick={() => nav('/')} className="flex size-11 items-center justify-center rounded hover:bg-kds-raised" aria-label="ออกจากจอครัว">
           <ArrowLeft className="size-5" />
         </button>
         <h1 className="text-lg font-semibold">จอครัว</h1>
         <div className="flex flex-wrap gap-1" role="tablist" aria-label="สเตชัน">
           {kds.data?.lockedStation ? (
-            <span className="flex items-center gap-1 rounded bg-[#2B2B2B] px-3 py-1.5">
+            <span className="flex items-center gap-1 rounded bg-kds-raised px-3 py-1.5">
               <Lock className="size-4" /> {kds.data.lockedStation}
             </span>
           ) : (
@@ -258,7 +263,7 @@ export function KdsPage() {
                 role="tab"
                 aria-selected={station === s.code}
                 onClick={() => setStation(s.code)}
-                className={clsx('min-h-10 rounded px-3', station === s.code ? 'bg-brand text-white' : 'bg-[#2B2B2B] hover:bg-[#3D3D3D]')}
+                className={clsx('min-h-10 rounded px-3', station === s.code ? 'bg-brand text-white' : 'bg-kds-raised hover:bg-kds-hover')}
               >
                 {s.name}
               </button>
@@ -268,10 +273,10 @@ export function KdsPage() {
         <div className="ml-auto flex flex-wrap items-center gap-2">
           <LiveIndicator />
           <span className="num hidden text-lg sm:inline">{new Date(now).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}</span>
-          <button type="button" onClick={() => setAllDay(!allDay)} aria-pressed={allDay} className={clsx('flex min-h-10 items-center gap-1 rounded px-3', allDay ? 'bg-sky' : 'bg-[#2B2B2B]')}>
+          <button type="button" onClick={() => setAllDay(!allDay)} aria-pressed={allDay} className={clsx('flex min-h-10 items-center gap-1 rounded px-3', allDay ? 'bg-sky' : 'bg-kds-raised')}>
             <Sigma className="size-4" /> รวมยอด
           </button>
-          <button type="button" onClick={() => setRecall(true)} className="flex min-h-10 items-center gap-1 rounded bg-[#2B2B2B] px-3">
+          <button type="button" onClick={() => setRecall(true)} className="flex min-h-10 items-center gap-1 rounded bg-kds-raised px-3">
             <History className="size-4" /> ย้อนดู
           </button>
           {can('menu.sold_out') && (
@@ -286,8 +291,8 @@ export function KdsPage() {
         <main className="min-w-0 flex-1 overflow-y-auto p-3">
           {kds.error ? (
             <div className="flex flex-col items-start gap-2">
-              <p className="text-[#FF8A80]">{errorMessage(kds.error)}</p>
-              <button type="button" onClick={() => kds.refetch()} className="min-h-11 rounded bg-[#2B2B2B] px-4">
+              <p className="text-kds-alert">{errorMessage(kds.error)}</p>
+              <button type="button" onClick={() => kds.refetch()} className="min-h-11 rounded bg-kds-raised px-4">
                 ลองใหม่
               </button>
             </div>
@@ -302,11 +307,11 @@ export function KdsPage() {
           )}
         </main>
         {allDay && (
-          <aside className="fixed inset-x-0 bottom-0 z-20 max-h-[45dvh] overflow-y-auto border-t border-[#333333] bg-[#121212] p-3 sm:static sm:max-h-none sm:w-64 sm:shrink-0 sm:border-t-0 sm:border-l" aria-label="ยอดรวมที่ต้องทำ">
+          <aside className="fixed inset-x-0 bottom-0 z-20 max-h-[45dvh] overflow-y-auto border-t border-kds-line bg-char p-3 sm:static sm:max-h-none sm:w-64 sm:shrink-0 sm:border-t-0 sm:border-l" aria-label="ยอดรวมที่ต้องทำ">
             <h2 className="mb-2 font-semibold">ต้องทำทั้งหมด</h2>
             <ul className="flex flex-col gap-1">
               {(counts.data?.counts ?? []).map((c) => (
-                <li key={c.name} className="flex justify-between gap-2 rounded bg-[#1F1F1F] px-2 py-1.5 text-lg">
+                <li key={c.name} className="flex justify-between gap-2 rounded bg-kds-card px-2 py-1.5 text-lg">
                   <span>{c.name}</span>
                   <span className="num font-bold">×{c.qty}</span>
                 </li>

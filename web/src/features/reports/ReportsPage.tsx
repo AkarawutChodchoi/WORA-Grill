@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { BarChart, BarList } from '../../components/BarChart';
 import { Badge, Button, DataTable, Dialog, EmptyState, Input, PageHeader, Panel, QueryView, Select, Stat, StatusBadge, Tabs, useToast } from '../../components/ui';
 import { ApiError, errorMessage, get, qs } from '../../lib/api';
+import { useTabParam } from '../../lib/useTabParam';
 import { useAuth } from '../../lib/auth';
 import { fmtDate, fmtTime, formatBaht, todayISO } from '../../lib/format';
 import { METHOD_LABEL } from '../../lib/settings';
@@ -90,7 +91,7 @@ function SalesTab({ params }: { params: string }) {
                     </li>
                   ))}
                 </ul>
-                <Definition>แตะวันที่เพื่อดูบิลที่ประกอบเป็นยอดนั้น · ยอดขาย = บิลที่ชำระแล้ว (PAID/CLOSED) ตามวันทำการของสาขา</Definition>
+                <Definition>แตะวันที่เพื่อดูบิลที่ประกอบเป็นยอดนั้น · ยอดขาย = บิลที่ชำระแล้ว ตามวันทำการของสาขา</Definition>
               </Panel>
               <Panel title="ยอดขายตามชั่วโมง">
                 <BarChart
@@ -298,7 +299,7 @@ export function ReportsPage() {
   const [from, setFrom] = useState(addDaysISO(todayISO(), -6));
   const [to, setTo] = useState(todayISO());
   const [branches, setBranches] = useState('current');
-  const [tab, setTab] = useState<Tab>('sales');
+  const [tab, setTab] = useTabParam<Tab>('sales');
   const params = qs({ from, to, branches }).slice(1);
   const exportName: Partial<Record<Tab, string>> = { sales: 'daily', items: 'items', costs: 'costs', staff: 'staff', tax: 'tax' };
   const download = async () => {

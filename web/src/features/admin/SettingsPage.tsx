@@ -59,7 +59,7 @@ function SettingsForm({ data }: { data: BranchInfo }) {
             onChange={(e) => setB({ ...b, taxId: e.target.value.replace(/\D/g, '').slice(0, 13) })}
             hint="ใส่เมื่อจดทะเบียน VAT แล้ว — ใบเสร็จจะเป็นใบกำกับภาษีอย่างย่อ"
           />
-          <Input label="Timezone" value={b.timezone} onChange={(e) => setB({ ...b, timezone: e.target.value })} />
+          <Input label="เขตเวลา" hint="เช่น Asia/Bangkok" value={b.timezone} onChange={(e) => setB({ ...b, timezone: e.target.value })} />
           <Input label="เวลาเปิด" type="time" value={s.openTime} onChange={(e) => setS({ ...s, openTime: e.target.value })} />
           <Input label="เวลาปิด" type="time" value={s.closeTime} onChange={(e) => setS({ ...s, closeTime: e.target.value })} />
         </div>

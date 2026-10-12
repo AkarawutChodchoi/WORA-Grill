@@ -5,6 +5,7 @@ import { toSatang } from '@shared/money';
 import type { OrgSettings } from '@shared/settings';
 import { Badge, Button, Checkbox, DataTable, Dialog, EmptyState, Input, MoneyInput, PageHeader, Panel, QueryView, Select, Tabs, Textarea, useToast } from '../../components/ui';
 import { errorMessage, get, post, put } from '../../lib/api';
+import { useTabParam } from '../../lib/useTabParam';
 import { useAuth } from '../../lib/auth';
 import { fmtDate, fmtDateTime, formatBaht } from '../../lib/format';
 import { CHANNEL_LABEL } from '../menu/ItemDialog';
@@ -254,10 +255,10 @@ function LoyaltySettings() {
       <div className="flex flex-col gap-2">
         {l.tiers.map((t, i) => (
           <div key={i} className="flex flex-wrap items-end gap-2">
-            <Input aria-label="รหัส" placeholder="GOLD" wrapClassName="w-28" value={t.code} onChange={(e) => set({ tiers: l.tiers.map((x, j) => (j === i ? { ...x, code: e.target.value.toUpperCase() } : x)) })} />
-            <Input aria-label="ชื่อ" placeholder="Gold" wrapClassName="w-36" value={t.name} onChange={(e) => set({ tiers: l.tiers.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)) })} />
-            <MoneyInput aria-label="ยอดสะสมขั้นต่ำ" wrapClassName="w-36" value={(t.minSpendSatang / 100).toFixed(2)} onChange={(e) => set({ tiers: l.tiers.map((x, j) => (j === i ? { ...x, minSpendSatang: (() => { try { return toSatang(e.target.value || '0'); } catch { return x.minSpendSatang; } })() } : x)) })} />
-            <Input aria-label="ตัวคูณแต้ม" inputMode="decimal" wrapClassName="w-24" value={String(t.earnMultiplierBps / 10000)} onChange={(e) => set({ tiers: l.tiers.map((x, j) => (j === i ? { ...x, earnMultiplierBps: Math.round(Number(e.target.value || 1) * 10000) } : x)) })} />
+            <Input label="รหัส" placeholder="GOLD" wrapClassName="w-28" value={t.code} onChange={(e) => set({ tiers: l.tiers.map((x, j) => (j === i ? { ...x, code: e.target.value.toUpperCase() } : x)) })} />
+            <Input label="ชื่อ" placeholder="Gold" wrapClassName="w-36" value={t.name} onChange={(e) => set({ tiers: l.tiers.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)) })} />
+            <MoneyInput label="ยอดสะสมขั้นต่ำ" wrapClassName="w-36" value={(t.minSpendSatang / 100).toFixed(2)} onChange={(e) => set({ tiers: l.tiers.map((x, j) => (j === i ? { ...x, minSpendSatang: (() => { try { return toSatang(e.target.value || '0'); } catch { return x.minSpendSatang; } })() } : x)) })} />
+            <Input label="ตัวคูณแต้ม" inputMode="decimal" wrapClassName="w-24" value={String(t.earnMultiplierBps / 10000)} onChange={(e) => set({ tiers: l.tiers.map((x, j) => (j === i ? { ...x, earnMultiplierBps: Math.round(Number(e.target.value || 1) * 10000) } : x)) })} />
             <Button variant="ghost" aria-label="ลบระดับ" icon={<Trash2 className="size-4" />} onClick={() => set({ tiers: l.tiers.filter((_, j) => j !== i) })} />
           </div>
         ))}
@@ -285,7 +286,7 @@ function LoyaltySettings() {
 
 export function PromotionsPage() {
   const { can } = useAuth();
-  const [tab, setTab] = useState<'promos' | 'loyalty'>('promos');
+  const [tab, setTab] = useTabParam<'promos' | 'loyalty'>('promos', ['promos', 'loyalty']);
   const list = useQuery({ queryKey: ['promotions'], queryFn: () => get<{ promotions: Promotion[] }>('/promotions') });
   const menu = useQuery({ queryKey: ['menu-admin'], queryFn: () => get<AdminMenu>('/menu/admin'), enabled: can('menu.view') });
   const [editing, setEditing] = useState<Promotion | 'new' | null>(null);

@@ -3,8 +3,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Clock, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toSatang } from '@shared/money';
-import { Badge, Button, DataTable, Dialog, EmptyState, Input, MoneyInput, PageHeader, Panel, QueryView, Select, Tabs, Textarea, useToast } from '../../components/ui';
+import { Badge, Button, DataTable, Dialog, EmptyState, ErrorState, Input, LoadingBlock, MoneyInput, PageHeader, Panel, QueryView, Select, Tabs, Textarea, useToast } from '../../components/ui';
 import { del, errorMessage, get, patch, post, put } from '../../lib/api';
+import { useTabParam } from '../../lib/useTabParam';
 import { useAuth } from '../../lib/auth';
 import { fmtDate, fmtDateTime, fmtTime, formatBaht, todayISO } from '../../lib/format';
 
@@ -280,7 +281,7 @@ function AttendanceTab() {
 
 export function StaffPage() {
   const { can } = useAuth();
-  const [tab, setTab] = useState<'staff' | 'schedule' | 'attendance'>(can('staff.manage') ? 'staff' : 'attendance');
+  const [tab, setTab] = useTabParam<'staff' | 'schedule' | 'attendance'>(can('staff.manage') ? 'staff' : 'attendance');
   const staff = useQuery({ queryKey: ['staff'], queryFn: () => get<{ staff: StaffRow[] }>('/staff'), enabled: can('staff.manage') });
   const [editing, setEditing] = useState<StaffRow | null>(null);
   return (
@@ -313,7 +314,7 @@ export function StaffPage() {
           )}
         </QueryView>
       )}
-      {tab === 'schedule' && staff.data && <ScheduleTab staff={staff.data.staff.filter((s) => s.isActive)} />}
+      {tab === 'schedule' && (staff.data ? <ScheduleTab staff={staff.data.staff.filter((s) => s.isActive)} /> : staff.error ? <ErrorState error={staff.error} onRetry={() => staff.refetch()} /> : <LoadingBlock />)}
       {tab === 'attendance' && <AttendanceTab />}
       {editing && <ProfileDialog s={editing} onClose={() => setEditing(null)} />}
     </>

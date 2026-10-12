@@ -11,19 +11,30 @@ export interface Column<T> {
   mobile?: 'title' | 'media' | 'hide';
 }
 
+// Literal class names so Tailwind generates them.
+const STACK = { sm: ['sm:hidden', 'sm:block'], md: ['md:hidden', 'md:block'], lg: ['lg:hidden', 'lg:block'], xl: ['xl:hidden', 'xl:block'] } as const;
+
 export function DataTable<T>({
   columns,
   rows,
   rowKey,
   onRowClick,
   caption,
+  emptyText = 'ยังไม่มีรายการ',
+  stackBelow = 'sm',
 }: {
   columns: Column<T>[];
   rows: T[];
   rowKey: (r: T) => string;
   onRowClick?: (r: T) => void;
   caption?: string;
+  /** Shown instead of an empty table. */
+  emptyText?: string;
+  /** Width below which rows show as cards (wide tables with many actions should stack on tablets too). */
+  stackBelow?: 'sm' | 'md' | 'lg' | 'xl';
 }) {
+  const [cardsClass, tableClass] = STACK[stackBelow];
+  if (rows.length === 0) return <p className="rounded-panel border border-dashed border-line-strong bg-surface px-4 py-8 text-center text-ink-3">{emptyText}</p>;
   // Phones get one card per row instead of a table that only scrolls sideways.
   const mediaCol = columns.find((c) => c.mobile === 'media');
   const titleCol = columns.find((c) => c.mobile === 'title') ?? columns.find((c) => c !== mediaCol)!;
@@ -33,7 +44,7 @@ export function DataTable<T>({
   const actions = rest.filter(isAction);
   return (
     <>
-      <ul className="divide-y divide-line rounded-panel border border-line bg-surface sm:hidden" aria-label={caption}>
+      <ul className={clsx('divide-y divide-line rounded-panel border border-line bg-surface', cardsClass)} aria-label={caption}>
         {rows.map((r) => (
           <li
             key={rowKey(r)}
@@ -62,7 +73,7 @@ export function DataTable<T>({
           </li>
         ))}
       </ul>
-      <div className="hidden overflow-x-auto rounded-panel border border-line bg-surface sm:block">
+      <div className={clsx('hidden overflow-x-auto rounded-panel border border-line bg-surface', tableClass)}>
         <table className="w-full border-collapse text-sm">
           {caption && <caption className="sr-only">{caption}</caption>}
           <thead>

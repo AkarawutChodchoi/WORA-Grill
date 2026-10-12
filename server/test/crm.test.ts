@@ -171,3 +171,13 @@ describe('promotions', () => {
     expect(tx.length).toBeGreaterThan(0);
   });
 });
+
+describe('loyalty tier names', () => {
+  it('lets any signed-in staff read tier codes and names (no other settings)', async () => {
+    const c = await env.as('CASHIER');
+    const r = await c.get('/loyalty/tiers');
+    expect(r.status).toBe(200);
+    expect(Array.isArray(r.body.tiers)).toBe(true);
+    for (const t of r.body.tiers) expect(Object.keys(t).sort()).toEqual(['code', 'name']);
+  });
+});

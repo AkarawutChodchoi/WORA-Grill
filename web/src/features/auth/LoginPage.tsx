@@ -37,13 +37,18 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [touched, setTouched] = useState(false);
   const setup = useQuery({ queryKey: ['setup-status'], queryFn: () => get<{ needsSetup: boolean }>('/setup/status') });
 
   if (me) return <Navigate to={safeNext(params.get('next'))} replace />;
   if (setup.data?.needsSetup) return <Navigate to="/setup" replace />;
 
+  const emailErr = touched && !email.trim() ? 'กรอกอีเมล' : null;
+  const passwordErr = touched && !password ? 'กรอกรหัสผ่าน' : null;
   async function submit(e: FormEvent) {
     e.preventDefault();
+    setTouched(true);
+    if (!email.trim() || !password) return;
     setBusy(true);
     setError(null);
     try {
@@ -61,14 +66,14 @@ export function LoginPage() {
   return (
     <AuthCard title="เข้าสู่ระบบหลังร้าน" footer={<Link to="/pin" className="text-sky hover:underline">เครื่องหน้าร้าน: เข้าด้วย PIN</Link>}>
       <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
-        <Input label="อีเมล" type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus />
-        <Input label="รหัสผ่าน" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <Input label="อีเมล" type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus error={emailErr} />
+        <Input label="รหัสผ่าน" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required error={passwordErr} />
         {error && (
           <p className="rounded-control bg-chili-50 px-3 py-2 text-sm text-chili" role="alert">
             {error}
           </p>
         )}
-        <Button type="submit" size="lg" loading={busy} disabled={!email || !password}>
+        <Button type="submit" size="lg" loading={busy}>
           เข้าสู่ระบบ
         </Button>
       </form>

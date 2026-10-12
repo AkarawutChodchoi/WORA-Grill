@@ -104,7 +104,7 @@ export function PosHome() {
             onRowClick={(r) => nav(`/pos/orders/${r.id}`)}
             columns={[
               { key: 'no', header: 'บิล', cell: (r) => <span className="num font-medium">#{r.orderNo}</span> },
-              { key: 'where', header: 'โต๊ะ/ช่องทาง', cell: (r) => (r.tableName ? `โต๊ะ ${r.tableName}` : `${CHANNEL_LABEL[r.channel] ?? r.channel}${r.customerName ? ` · ${r.customerName}` : ''}`) },
+              { key: 'where', header: 'โต๊ะ/ช่องทาง', mobile: 'title', cell: (r) => (r.tableName ? `โต๊ะ ${r.tableName}` : `${CHANNEL_LABEL[r.channel] ?? r.channel}${r.customerName ? ` · ${r.customerName}` : ''}`) },
               { key: 'status', header: 'สถานะ', cell: (r) => <StatusBadge status={r.status} /> },
               { key: 'items', header: 'รายการ', align: 'right', cell: (r) => `${r.itemCount}${r.pendingCount ? ` (ยังไม่ส่ง ${r.pendingCount})` : ''}` },
               { key: 'time', header: 'เปิดมาแล้ว', cell: (r) => fmtElapsed(r.openedAt) },

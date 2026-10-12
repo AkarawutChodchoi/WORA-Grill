@@ -48,7 +48,7 @@ function DiscountDialog({ order, onClose }: { order: Order; onClose: () => void 
     },
     onError: (e) => {
       // Above the cashier ceiling the server asks for an override approval.
-      if (errorMessage(e).includes('ผู้จัดการ')) override.request((a) => apply.mutate(a));
+      if (errorMessage(e).includes('ผู้จัดการ')) override.request((a) => apply.mutateAsync(a));
       else toast.error(errorMessage(e));
     },
   });
@@ -63,7 +63,7 @@ function DiscountDialog({ order, onClose }: { order: Order; onClose: () => void 
           <Button variant="ghost" onClick={onClose}>
             ยกเลิก
           </Button>
-          <Button loading={apply.isPending} disabled={reason.trim().length < 3} onClick={() => approval.request((a) => apply.mutate(a))}>
+          <Button loading={apply.isPending} disabled={reason.trim().length < 3} onClick={() => approval.request((a) => apply.mutateAsync(a))}>
             ให้ส่วนลด
           </Button>
         </>
@@ -128,7 +128,7 @@ function RefundDialog({ order, payment, onClose }: { order: Order; payment: Paym
           <Button variant="ghost" onClick={onClose}>
             ยกเลิก
           </Button>
-          <Button variant="danger" loading={refund.isPending} disabled={!amt || amt > max || reason.trim().length < 3} onClick={() => approval.request((a) => refund.mutate(a))}>
+          <Button variant="danger" loading={refund.isPending} disabled={!amt || amt > max || reason.trim().length < 3} onClick={() => approval.request((a) => refund.mutateAsync(a))}>
             คืนเงิน
           </Button>
         </>
@@ -265,7 +265,7 @@ export function PaymentScreen() {
         </h1>
         <StatusBadge status={o.status} />
       </header>
-      <div className="grid gap-4 lg:grid-cols-[1fr_420px]">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_420px]">
         <div className="flex flex-col gap-4">
           {!online && (
             <p className="rounded-control bg-chili-50 px-3 py-2 text-sm text-chili">ออฟไลน์ — รับได้เฉพาะเงินสด ระบบจะบันทึกในเครื่องและยืนยันกับเซิร์ฟเวอร์เมื่อกลับมาออนไลน์</p>
@@ -295,25 +295,26 @@ export function PaymentScreen() {
                   </button>
                 ))}
               </div>
-              <div className="mb-3 flex flex-wrap items-center gap-2 text-sm">
-                <span className="text-ink-2">แบ่งจ่าย</span>
+              <fieldset className="mb-3 text-sm">
+                <legend className="mb-1 text-ink-2">แบ่งจ่ายกี่คน {split > 1 && <span className="font-medium text-ink">· คนละ {formatBaht(share)}</span>}</legend>
+                <div className="grid grid-cols-6 gap-2">
                 {[1, 2, 3, 4, 5, 6].map((n) => (
-                  <button key={n} type="button" onClick={() => (setSplit(n), setAmount(''))} className={clsx('size-11 rounded-control border', split === n ? 'border-brand bg-brand-50 font-semibold text-brand' : 'border-line')}>
+                  <button key={n} type="button" onClick={() => (setSplit(n), setAmount(''))} aria-pressed={split === n} className={clsx('h-11 rounded-control border', split === n ? 'border-brand bg-brand-50 font-semibold text-brand' : 'border-line')}>
                     {n}
                   </button>
                 ))}
-                <span className="text-ink-3">คน {split > 1 && `· คนละ ${formatBaht(share)}`}</span>
-              </div>
+                </div>
+              </fieldset>
               <div className="grid gap-3 sm:grid-cols-2">
                 <MoneyInput label="ยอดที่ชำระครั้งนี้" value={amount} placeholder={(share / 100).toFixed(2)} onChange={(e) => setAmount(e.target.value)} />
                 {method === 'CASH' ? (
                   <MoneyInput label="รับเงินมา" value={tendered} placeholder={((amt ?? 0) / 100).toFixed(2)} onChange={(e) => setTendered(e.target.value)} />
                 ) : (
-                  <Input label={method === 'CARD' ? 'Approval code (EDC)' : 'เลขอ้างอิง'} value={reference} onChange={(e) => setReference(e.target.value)} hint={method === 'PROMPTPAY' ? 'ยืนยันหลังตรวจยอดเข้าบัญชี' : undefined} />
+                  <Input label={method === 'CARD' ? 'รหัสอนุมัติจากเครื่องรูดบัตร' : 'เลขอ้างอิง'} value={reference} onChange={(e) => setReference(e.target.value)} hint={method === 'PROMPTPAY' ? 'ยืนยันหลังตรวจยอดเข้าบัญชี' : undefined} />
                 )}
               </div>
               {method === 'CASH' && (
-                <div className="mt-3 flex flex-wrap gap-2">
+                <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
                   {[amt ?? 0, 10000, 50000, 100000].map((v, i) => (
                     <Button key={i} variant="outline" onClick={() => setTendered((v / 100).toFixed(2))}>
                       {i === 0 ? 'พอดี' : formatBaht(v)}
@@ -342,7 +343,7 @@ export function PaymentScreen() {
                     }
                   }}
                 >
-                  QR ยืนยันอัตโนมัติ
+                  สร้าง QR (ระบบยืนยันยอดเอง)
                 </Button>
               )}
               {method === 'PROMPTPAY' && (
@@ -359,7 +360,7 @@ export function PaymentScreen() {
                     }
                   }}
                 >
-                  แสดง QR PromptPay
+                  {settings.data?.gatewayEnabled ? 'QR PromptPay (พนักงานตรวจยอดเอง)' : 'แสดง QR PromptPay'}
                 </Button>
               )}
               <Button size="lg" className="mt-4 w-full" loading={pay.isPending} disabled={noShift || due <= 0} onClick={submit}>
@@ -380,7 +381,7 @@ export function PaymentScreen() {
                   <p className="text-ink-2">ใบเสร็จเลขที่ {o.receiptNo ?? '—'}</p>
                   <div className="flex flex-wrap justify-center gap-2">
                     <Button icon={<Printer className="size-4" />} onClick={() => nav(`/pos/orders/${o.id}/receipt`)}>
-                      พิมพ์ใบเสร็จ
+                      ดูและพิมพ์ใบเสร็จ
                     </Button>
                     <Button
                       variant="outline"
@@ -392,7 +393,7 @@ export function PaymentScreen() {
                         })
                       }
                     >
-                      พิมพ์ที่เครื่องพิมพ์ใบเสร็จ
+                      ส่งไปเครื่องพิมพ์สลิป
                     </Button>
                     <Button variant="outline" onClick={() => setTaxOpen(true)}>
                       ขอใบกำกับภาษีเต็มรูป

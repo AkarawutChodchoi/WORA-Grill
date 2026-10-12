@@ -4,10 +4,10 @@ import { BellRing, LayoutGrid, List, Minus, Move, Pencil, Plus, Users } from 'lu
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import type { TableStatus } from '@shared/states';
-import { Badge, Button, Checkbox, Dialog, EmptyState, Input, PageHeader, QueryView, Select, StatusBadge, useToast } from '../../components/ui';
+import { Badge, Button, Checkbox, Dialog, EmptyState, Input, PageHeader, QueryView, Select, StatusBadge, statusLabel, useToast } from '../../components/ui';
 import { errorMessage, get, patch, post, put } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
-import { fmtElapsed, formatBaht } from '../../lib/format';
+import { fmtElapsed, fmtElapsedShort, formatBaht } from '../../lib/format';
 import { LiveIndicator, useLivePolling } from '../../lib/realtime';
 import { ServiceRequestsPanel } from './ServiceRequests';
 
@@ -50,6 +50,9 @@ export const STATUS_STYLE: Record<TableStatus, string> = {
 
 const CELL = 44;
 
+/** Short status words that fit on a floor-plan tile (full wording is in the list view and aria-label). */
+const TILE_STATUS: Record<TableStatus, string> = { AVAILABLE: 'ว่าง', OCCUPIED: 'มีลูกค้า', WAITING_FOOD: 'รออาหาร', DINING: 'กำลังทาน', BILL_REQUESTED: 'เช็กบิล', CLEANING: 'รอเก็บโต๊ะ' };
+
 export function useFloor() {
   const poll = useLivePolling();
   return useQuery({ queryKey: ['tables'], queryFn: () => get<FloorData>('/tables'), refetchInterval: poll });
@@ -71,23 +74,25 @@ function TableTile({ t, joinedTo, now, selected, onClick, style }: { t: TableRow
       type="button"
       onClick={onClick}
       style={style}
-      aria-label={`โต๊ะ ${t.name}`}
+      aria-label={`โต๊ะ ${t.name} ${statusLabel(t.status)}`}
       className={clsx(
-        'flex flex-col items-center justify-center gap-0.5 border-2 p-1 text-center leading-tight transition-shadow',
+        'flex flex-col items-center justify-center gap-0.5 overflow-hidden border-2 p-1 text-center leading-tight transition-shadow',
         t.shape === 'round' ? 'rounded-full' : 'rounded-panel',
         STATUS_STYLE[t.status],
         selected && 'ring-4 ring-sky/40',
       )}
     >
       <span className="text-base font-semibold">{t.name}</span>
+      {/* Status in words too, never colour alone. */}
+      {t.status !== 'AVAILABLE' && <span className="text-xs font-medium whitespace-nowrap">{TILE_STATUS[t.status]}</span>}
       {t.order ? (
         <>
-          <span className="flex items-center gap-1 text-xs">
-            <Users className="size-3" />
-            {t.order.guestCount} · {fmtElapsed(t.order.openedAt, now)}
+          <span className="flex items-center gap-0.5 text-xs whitespace-nowrap" title={fmtElapsed(t.order.openedAt, now)}>
+            <Users className="size-3" aria-hidden />
+            {t.order.guestCount} · {fmtElapsedShort(t.order.openedAt, now)}
           </span>
           {t.order.readyCount > 0 && (
-            <span className="flex items-center gap-0.5 rounded bg-white/90 px-1 text-[11px] font-medium text-basil-600">
+            <span className="flex items-center gap-0.5 rounded bg-white/90 px-1 text-xs font-medium text-basil-600">
               <BellRing className="size-3" />
               พร้อมเสิร์ฟ {t.order.readyCount}
             </span>
